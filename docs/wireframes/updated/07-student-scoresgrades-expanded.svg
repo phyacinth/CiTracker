@@ -1,0 +1,150 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1224" height="1364" viewBox="0 0 1224 1364">
+<g id="student-scoresgrades-expanded" transform="translate(0,0)">
+<rect width="1224" height="1364" rx="8" fill="#868686"/>
+<text x="16" y="26" font-family="Inter, Roboto, Arial, sans-serif" font-size="16" font-weight="600" fill="#FFFFFF">/student-scoresgrades-expanded</text>
+<text x="16" y="52" font-family="Inter, Roboto, Arial, sans-serif" font-size="12" fill="#EDEDED">Tablet · 800 +</text>
+<text x="848" y="52" font-family="Inter, Roboto, Arial, sans-serif" font-size="12" fill="#EDEDED">Mobile · Primary · 1 - 799</text>
+<g id="student-scoresgrades-expanded-tablet" transform="translate(16,64)">
+<clipPath id="clip-student-scoresgrades-expanded-1"><rect width="800" height="1280"/></clipPath>
+<g clip-path="url(#clip-student-scoresgrades-expanded-1)"><rect x="0.0" y="0.0" width="800.0" height="1280.0" fill="#FFFFFF"/>
+<text x="35.0" y="50.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="24.6" font-weight="700" fill="#1A1A1A" text-anchor="start">Title</text>
+<rect x="35.0" y="62.3" width="241.9" height="8.3" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="35.0" y="92.1" width="43.1" height="7.6" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="35.0" y="108.0" width="730.0" height="46.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="49.0" y="135.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.4" font-weight="400" fill="#9E9E9E" text-anchor="start">Dropdown</text>
+<text x="747.0" y="135.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="10.0" font-weight="400" fill="#1A1A1A" text-anchor="middle">v</text>
+<rect x="35.0" y="163.1" width="283.4" height="7.6" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="35.0" y="184.0" width="730.0" height="52.0" fill="#555555" rx="12"/>
+<rect x="35.0" y="224.0" width="730.0" height="12.0" fill="#555555"/>
+<text x="51.0" y="215.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="16.8" font-weight="700" fill="#FFFFFF" text-anchor="start">Expandable section</text>
+<rect x="670.6" y="202.9" width="50.4" height="10.4" fill="#FFFFFF" rx="2" fill-opacity="0.28"/>
+<path d="M735 213.0L741 207.0L747 213.0" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="35.0" y="236.0" width="730.0" height="430.0" fill="#E0E0E0"/>
+<rect x="47.0" y="249.5" width="282.2" height="7.3" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<clipPath id="exp1"><rect x="35" y="270" width="730" height="396"/></clipPath>
+<g clip-path="url(#exp1)">
+<rect x="35.0" y="270.0" width="730.0" height="36.0" fill="#BDBDBD"/>
+<rect x="45.0" y="283.9" width="44.8" height="6.9" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="261.3" y="283.9" width="95.2" height="6.9" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="405.5" y="283.9" width="56.0" height="6.9" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="531.7" y="283.9" width="33.6" height="6.9" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="630.8" y="283.9" width="84.0" height="6.9" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<path d="M35 306H765.0" fill="none" stroke="#FFFFFF" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="45.0" y="318.7" width="109.5" height="8.0" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="45.0" y="339.5" width="111.7" height="7.3" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="261.3" y="324.7" width="51.5" height="8.0" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="405.5" y="324.7" width="38.6" height="8.0" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="531.7" y="324.7" width="19.3" height="8.0" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="630.8" y="324.7" width="19.3" height="8.0" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="35.0" y="364.0" width="730.0" height="30.0" fill="#EDEDED"/>
+<rect x="61.0" y="374.5" width="129.4" height="7.3" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="261.3" y="374.5" width="41.2" height="7.3" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="35.0" y="394.0" width="730.0" height="30.0" fill="#EDEDED"/>
+<rect x="61.0" y="404.5" width="123.5" height="7.3" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="261.3" y="404.5" width="41.2" height="7.3" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<path d="M35 424H765.0" fill="none" stroke="#FFFFFF" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="45.0" y="436.7" width="167.4" height="8.0" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="45.0" y="457.5" width="111.7" height="7.3" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="261.3" y="442.7" width="32.2" height="8.0" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="405.5" y="442.7" width="19.3" height="8.0" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="531.7" y="442.7" width="19.3" height="8.0" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="630.8" y="442.7" width="19.3" height="8.0" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<path d="M35 482H765.0" fill="none" stroke="#FFFFFF" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="45.0" y="494.7" width="45.1" height="8.0" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="45.0" y="515.5" width="111.7" height="7.3" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="261.3" y="500.7" width="45.1" height="8.0" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="405.5" y="500.7" width="38.6" height="8.0" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="531.7" y="500.7" width="19.3" height="8.0" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="630.8" y="500.7" width="19.3" height="8.0" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<path d="M35 540H765.0" fill="none" stroke="#FFFFFF" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="45.0" y="552.7" width="135.2" height="8.0" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="45.0" y="573.5" width="111.7" height="7.3" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="261.3" y="558.7" width="51.5" height="8.0" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="405.5" y="558.7" width="38.6" height="8.0" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="531.7" y="558.7" width="19.3" height="8.0" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="630.8" y="558.7" width="19.3" height="8.0" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<path d="M35 598H765.0" fill="none" stroke="#FFFFFF" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="45.0" y="610.7" width="64.4" height="8.0" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="45.0" y="631.5" width="111.7" height="7.3" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="261.3" y="616.7" width="32.2" height="8.0" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="405.5" y="616.7" width="19.3" height="8.0" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="531.7" y="616.7" width="19.3" height="8.0" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="630.8" y="616.7" width="19.3" height="8.0" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+</g>
+<rect x="35.0" y="682.0" width="730.0" height="52.0" fill="#555555" rx="12"/>
+<text x="51.0" y="713.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="16.8" font-weight="700" fill="#FFFFFF" text-anchor="start">Expandable section</text>
+<rect x="695.8" y="700.9" width="25.2" height="10.4" fill="#FFFFFF" rx="2" fill-opacity="0.28"/>
+<path d="M735 705.0L741 711.0L747 705.0" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g></g>
+<g id="student-scoresgrades-expanded-mobile" transform="translate(848,64)">
+<clipPath id="clip-student-scoresgrades-expanded-0"><rect width="360" height="800"/></clipPath>
+<g clip-path="url(#clip-student-scoresgrades-expanded-0)"><rect x="0.0" y="0.0" width="360.0" height="800.0" fill="#FFFFFF"/>
+<text x="16.0" y="46.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="22.0" font-weight="700" fill="#1A1A1A" text-anchor="start">Title</text>
+<rect x="16.0" y="59.4" width="216.0" height="7.4" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="16.0" y="85.1" width="38.5" height="6.8" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="16.0" y="100.0" width="328.0" height="34.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="30.0" y="121.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="12.0" font-weight="400" fill="#9E9E9E" text-anchor="start">Dropdown</text>
+<text x="326.0" y="121.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="10.0" font-weight="400" fill="#1A1A1A" text-anchor="middle">v</text>
+<rect x="16.0" y="144.1" width="253.0" height="6.8" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="16.0" y="164.0" width="328.0" height="46.0" fill="#555555" rx="12"/>
+<rect x="16.0" y="198.0" width="328.0" height="12.0" fill="#555555"/>
+<text x="32.0" y="192.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="15.0" font-weight="700" fill="#FFFFFF" text-anchor="start">Expandable section</text>
+<rect x="255.0" y="181.2" width="45.0" height="9.3" fill="#FFFFFF" rx="2" fill-opacity="0.28"/>
+<path d="M314 190.0L320 184.0L326 190.0" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="16.0" y="210.0" width="328.0" height="396.0" fill="#E0E0E0"/>
+<rect x="28.0" y="224.4" width="252.0" height="6.5" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<clipPath id="exp2"><rect x="16" y="244" width="328" height="362"/></clipPath>
+<g clip-path="url(#exp2)">
+<rect x="16.0" y="244.0" width="810.0" height="32.0" fill="#BDBDBD"/>
+<rect x="26.0" y="256.8" width="40.0" height="6.2" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="266.0" y="256.8" width="85.0" height="6.2" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="426.0" y="256.8" width="50.0" height="6.2" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="566.0" y="256.8" width="30.0" height="6.2" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="676.0" y="256.8" width="75.0" height="6.2" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<path d="M16 276H826.0" fill="none" stroke="#FFFFFF" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="26.0" y="289.7" width="97.8" height="7.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="26.0" y="310.4" width="99.8" height="6.5" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="266.0" y="295.7" width="46.0" height="7.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="426.0" y="295.7" width="34.5" height="7.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="566.0" y="295.7" width="17.2" height="7.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="676.0" y="295.7" width="17.2" height="7.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="16.0" y="328.0" width="810.0" height="30.0" fill="#EDEDED"/>
+<rect x="42.0" y="339.4" width="115.5" height="6.5" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="266.0" y="339.4" width="36.8" height="6.5" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="16.0" y="358.0" width="810.0" height="30.0" fill="#EDEDED"/>
+<rect x="42.0" y="369.4" width="110.2" height="6.5" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="266.0" y="369.4" width="36.8" height="6.5" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<path d="M16 388H826.0" fill="none" stroke="#FFFFFF" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="26.0" y="401.7" width="149.5" height="7.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="26.0" y="422.4" width="99.8" height="6.5" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="266.0" y="407.7" width="28.8" height="7.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="426.0" y="407.7" width="17.2" height="7.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="566.0" y="407.7" width="17.2" height="7.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="676.0" y="407.7" width="17.2" height="7.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<path d="M16 440H826.0" fill="none" stroke="#FFFFFF" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="26.0" y="453.7" width="40.2" height="7.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="26.0" y="474.4" width="99.8" height="6.5" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="266.0" y="459.7" width="40.2" height="7.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="426.0" y="459.7" width="34.5" height="7.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="566.0" y="459.7" width="17.2" height="7.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="676.0" y="459.7" width="17.2" height="7.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<path d="M16 492H826.0" fill="none" stroke="#FFFFFF" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="26.0" y="505.7" width="120.8" height="7.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="26.0" y="526.4" width="99.8" height="6.5" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="266.0" y="511.7" width="46.0" height="7.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="426.0" y="511.7" width="34.5" height="7.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="566.0" y="511.7" width="17.2" height="7.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="676.0" y="511.7" width="17.2" height="7.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<path d="M16 544H826.0" fill="none" stroke="#FFFFFF" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="26.0" y="557.7" width="57.5" height="7.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="26.0" y="578.4" width="99.8" height="6.5" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="266.0" y="563.7" width="28.8" height="7.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="426.0" y="563.7" width="17.2" height="7.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="566.0" y="563.7" width="17.2" height="7.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="676.0" y="563.7" width="17.2" height="7.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+</g>
+<rect x="16.0" y="618.0" width="328.0" height="46.0" fill="#555555" rx="12"/>
+<text x="32.0" y="646.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="15.0" font-weight="700" fill="#FFFFFF" text-anchor="start">Expandable section</text>
+<rect x="277.5" y="635.2" width="22.5" height="9.3" fill="#FFFFFF" rx="2" fill-opacity="0.28"/>
+<path d="M314 638.0L320 644.0L326 638.0" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g></g>
+</g>
+</svg>

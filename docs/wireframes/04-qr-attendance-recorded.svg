@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1224" height="1364" viewBox="0 0 1224 1364">
+<g id="qr-attendance-recorded" transform="translate(0,0)">
+<rect width="1224" height="1364" rx="8" fill="#868686"/>
+<text x="16" y="26" font-family="Inter, Roboto, Arial, sans-serif" font-size="16" font-weight="600" fill="#FFFFFF">/qr-attendance-recorded</text>
+<text x="16" y="52" font-family="Inter, Roboto, Arial, sans-serif" font-size="12" fill="#EDEDED">Tablet · 800 +</text>
+<text x="848" y="52" font-family="Inter, Roboto, Arial, sans-serif" font-size="12" fill="#EDEDED">Mobile · Primary · 1 - 799</text>
+<g id="qr-attendance-recorded-tablet" transform="translate(16,64)">
+<clipPath id="clip-qr-attendance-recorded-1"><rect width="800" height="1280"/></clipPath>
+<g clip-path="url(#clip-qr-attendance-recorded-1)"><rect x="0.0" y="0.0" width="800.0" height="1280.0" fill="#FFFFFF"/>
+<path d="M41 48.0H27 M33 42.0L27 48.0L33 54.0" fill="none" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="69.0" y="54.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="19.0" font-weight="500" fill="#1A1A1A" text-anchor="start">Title</text>
+<rect x="35.0" y="100.0" width="730.0" height="560.0" fill="#E0E0E0" rx="12"/>
+<rect x="55.0" y="120.0" width="690.0" height="420.0" fill="#D3D3D3" rx="10"/>
+<path d="M89 200V154H135" fill="none" stroke="#1A1A1A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M711 200V154H665" fill="none" stroke="#1A1A1A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M89 460V506H135" fill="none" stroke="#1A1A1A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M711 460V506H665" fill="none" stroke="#1A1A1A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="382.4" y="312.4" width="35.2" height="35.2" fill="none" rx="3" stroke="#9E9E9E" stroke-width="1.2"/>
+<rect x="316.0" y="556.3" width="168.0" height="8.3" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="55.0" y="584.0" width="690.0" height="46.0" fill="#555555"/>
+<text x="400.0" y="612.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="14.6" font-weight="600" fill="#FFFFFF" text-anchor="middle">Button</text>
+<rect x="35.0" y="672.4" width="730.0" height="250.0" fill="#E0E0E0" rx="12"/>
+<rect x="394.0" y="704.4" width="12.0" height="12.0" fill="none" rx="3" stroke="#9E9E9E" stroke-width="1.2"/>
+<rect x="314.9" y="743.5" width="170.2" height="11.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="329.4" y="774.7" width="141.1" height="8.3" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="374.5" y="799.9" width="51.0" height="9.0" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="57.0" y="830.4" width="686.0" height="46.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="400.0" y="858.4" font-family="Inter, Roboto, Arial, sans-serif" font-size="14.6" font-weight="600" fill="#1A1A1A" text-anchor="middle">Button</text></g></g>
+<g id="qr-attendance-recorded-mobile" transform="translate(848,64)">
+<clipPath id="clip-qr-attendance-recorded-0"><rect width="360" height="800"/></clipPath>
+<g clip-path="url(#clip-qr-attendance-recorded-0)"><rect x="0.0" y="0.0" width="360.0" height="800.0" fill="#FFFFFF"/>
+<path d="M26 38.0H12 M18 32.0L12 38.0L18 44.0" fill="none" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="44.0" y="44.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="17.0" font-weight="500" fill="#1A1A1A" text-anchor="start">Title</text>
+<rect x="16.0" y="76.0" width="328.0" height="348.0" fill="#E0E0E0" rx="12"/>
+<rect x="30.0" y="90.0" width="300.0" height="230.0" fill="#D3D3D3" rx="10"/>
+<path d="M52 142V112H82" fill="none" stroke="#1A1A1A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M308 142V112H278" fill="none" stroke="#1A1A1A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M52 268V298H82" fill="none" stroke="#1A1A1A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M308 268V298H278" fill="none" stroke="#1A1A1A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="166.4" y="191.4" width="27.2" height="27.2" fill="none" rx="3" stroke="#9E9E9E" stroke-width="1.2"/>
+<rect x="105.0" y="337.4" width="150.0" height="7.4" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="30.0" y="364.0" width="300.0" height="36.0" fill="#555555"/>
+<text x="180.0" y="387.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.0" font-weight="600" fill="#FFFFFF" text-anchor="middle">Button</text>
+<rect x="16.0" y="430.8" width="328.0" height="216.0" fill="#E0E0E0" rx="12"/>
+<rect x="174.0" y="456.8" width="12.0" height="12.0" fill="none" rx="3" stroke="#9E9E9E" stroke-width="1.2"/>
+<rect x="104.0" y="497.3" width="152.0" height="9.9" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="117.0" y="528.2" width="126.0" height="7.4" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="157.2" y="553.4" width="45.5" height="8.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="32.0" y="582.8" width="296.0" height="36.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="180.0" y="605.8" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.0" font-weight="600" fill="#1A1A1A" text-anchor="middle">Button</text></g></g>
+</g>
+</svg>

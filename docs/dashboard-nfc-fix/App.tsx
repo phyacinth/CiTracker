@@ -1,0 +1,10341 @@
+import { useEffect, useMemo, useRef, useState } from "react"
+import { createPortal } from "react-dom"
+import { saveStudentScore } from "./lib/studentScores"
+import { QRCodeCanvas } from "qrcode.react"
+import { jsPDF } from "jspdf"
+import QRCode from "qrcode"
+import { supabase } from './lib/supabase'
+import { useAttendanceQr } from "./useAttendanceQr"
+import {loginFaculty, registerFaculty,} from "./lib/auth"
+import OmrScanner from "./OmrScanner"
+import "./notifications.css"
+import "./assessment-actions.css"
+import "./assessment-column-delete.css"
+
+const citLogo = `${import.meta.env.BASE_URL}cit.png`
+const citBuilding = "https://i.postimg.cc/526JYy0B/cit-login-background.png"
+
+type IconName = "home" | "calendar" | "book" | "chart" | "user" | "bell" | "search" | "play" | "arrow" | "clock" | "users" | "check" | "clipboard" | "scan" | "more" | "chevron" | "plus" | "minus" | "wifi" | "wifiOff" | "edit" | "logout" | "eye" | "eyeOff"
+const formatDatabaseTime = (value: string) => {
+  const [hoursValue, minutesValue] = value.split(":")
+  const hours = Number(hoursValue)
+  const minutes = Number(minutesValue ?? 0)
+  const meridiem = hours >= 12 ? "PM" : "AM"
+
+  return `${hours % 12 || 12}:${String(minutes).padStart(2, "0")} ${meridiem}`
+}
+
+function TimePicker12({ value, onChange, required, label }: { value: string; onChange: (value: string) => void; required?: boolean; label: string }) {
+  const [hours24 = "", minutes = ""] = value.split(":")
+  const valid = /^\d{2}:\d{2}$/.test(value)
+  const hourNumber = Number(hours24)
+  const hour12 = valid ? String(hourNumber % 12 || 12) : ""
+  const minute = valid ? minutes : ""
+  const period = valid && hourNumber >= 12 ? "PM" : "AM"
+  const update = (nextHour: string, nextMinute: string, nextPeriod: string) => {
+    if (!nextHour || !nextMinute) { onChange(""); return }
+    const next24 = Number(nextHour) % 12 + (nextPeriod === "PM" ? 12 : 0)
+    onChange(`${String(next24).padStart(2, "0")}:${nextMinute}`)
+  }
+  return (
+    <div className="time-picker-12" role="group" aria-label={label}>
+      <select value={hour12} aria-label={`${label} hour`} required={required} onChange={(e) => update(e.target.value, minute || "00", period)}>
+        <option value="">Hour</option>
+        {Array.from({ length: 12 }, (_, i) => String(i + 1)).map((hour) => <option key={hour} value={hour}>{hour}</option>)}
+      </select>
+      <span aria-hidden="true">:</span>
+      <select value={minute} aria-label={`${label} minute`} required={required} onChange={(e) => update(hour12 || "12", e.target.value, period)}>
+        <option value="">Min</option>
+        {Array.from({ length: 60 }, (_, i) => String(i).padStart(2, "0")).map((item) => <option key={item} value={item}>{item}</option>)}
+      </select>
+      <select value={period} aria-label={`${label} AM or PM`} onChange={(e) => update(hour12 || "12", minute || "00", e.target.value)}>
+        <option value="AM">AM</option><option value="PM">PM</option>
+      </select>
+    </div>
+  )
+}
+
+function Icon({ name, size = 20 }: { name: IconName; size?: number }) {
+  const paths: Record<IconName, React.ReactNode> = {
+    home: (
+      <>
+        <path d="m3 10 9-7 9 7" />
+        <path d="M5 9v11h14V9M9 20v-6h6v6" />
+      </>
+    ),
+    calendar: (
+      <>
+        <rect x="3" y="5" width="18" height="16" rx="3" />
+        <path d="M7 3v4m10-4v4M3 10h18" />
+      </>
+    ),
+    book: (
+      <>
+        <path d="M4 5.5A3.5 3.5 0 0 1 7.5 2H11v18H7.5A3.5 3.5 0 0 0 4 23.5zM20 5.5A3.5 3.5 0 0 0 16.5 2H13v18h3.5a3.5 3.5 0 0 1 3.5 3.5z" />
+      </>
+    ),
+    chart: (
+      <>
+        <path d="M4 20V10m6 10V4m6 16v-7m5 7H2" />
+      </>
+    ),
+    user: (
+      <>
+        <circle cx="12" cy="8" r="4" />
+        <path d="M4 21a8 8 0 0 1 16 0" />
+      </>
+    ),
+    bell: (
+      <>
+        <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4" />
+      </>
+    ),
+    search: (
+      <>
+        <circle cx="11" cy="11" r="7" />
+        <path d="m20 20-4-4" />
+      </>
+    ),
+    play: <path d="m9 7 9 5-9 5z" />,
+    arrow: (
+      <>
+        <path d="m5 12 14 0m-5-5 5 5-5 5" />
+      </>
+    ),
+    clock: (
+      <>
+        <circle cx="12" cy="12" r="9" />
+        <path d="M12 7v6l4 2" />
+      </>
+    ),
+    users: (
+      <>
+        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+        <circle cx="9" cy="7" r="4" />
+        <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+      </>
+    ),
+    check: <path d="m5 12 4 4L19 6" />,
+    clipboard: (
+      <>
+        <rect x="5" y="4" width="14" height="17" rx="2" />
+        <path d="M9 4V2h6v2m-7 6h8m-8 4h6" />
+      </>
+    ),
+    scan: (
+      <>
+        <path d="M4 8V4h4m8 0h4v4M4 16v4h4m8 0h4v-4" />
+        <path d="M8 12h8" />
+      </>
+    ),
+    more: (
+      <>
+        <circle cx="5" cy="12" r="1" fill="currentColor" />
+        <circle cx="12" cy="12" r="1" fill="currentColor" />
+        <circle cx="19" cy="12" r="1" fill="currentColor" />
+      </>
+    ),
+    chevron: <path d="m9 18 6-6-6-6" />,
+    plus: <path d="M12 5v14M5 12h14" />,
+    minus: <path d="M5 12h14" />,
+    wifi: (
+      <>
+        <path d="M4.5 9.5a11 11 0 0 1 15 0M7.5 12.5a7 7 0 0 1 9 0M10.5 15.5a3 3 0 0 1 3 0" />
+        <circle cx="12" cy="19" r="1" fill="currentColor" />
+      </>
+    ),
+    wifiOff: (
+      <>
+        <path d="m3 3 18 18M4.5 9.5a11 11 0 0 1 4-2.3M19.5 9.5a11 11 0 0 0-8.9-2.1M7.5 12.5a7 7 0 0 1 2.9-1.5M16.5 12.5a7 7 0 0 0-2.5-1.4M10.5 15.5a3 3 0 0 1 .9-.4" />
+        <circle cx="12" cy="19" r="1" fill="currentColor" />
+      </>
+    ),
+    edit: (
+      <>
+        <path d="M12 20h9" />
+        <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4Z" />
+      </>
+    ),
+    logout: (
+      <>
+        <path d="M10 4H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h5" />
+        <path d="m15 16 4-4-4-4M19 12H9" />
+      </>
+    ),
+    eye: (
+      <>
+        <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z" />
+        <circle cx="12" cy="12" r="2.8" />
+      </>
+    ),
+    eyeOff: (
+      <>
+        <path d="m3 3 18 18" />
+        <path d="M10.6 5.2A10.6 10.6 0 0 1 12 5c6 0 9.5 7 9.5 7a17.7 17.7 0 0 1-3.1 3.8M6.2 6.2A17.7 17.7 0 0 0 2.5 12S6 19 12 19c1.3 0 2.5-.3 3.6-.8" />
+        <path d="M9.9 9.9a3 3 0 0 0 4.2 4.2" />
+      </>
+    ),
+  }
+  return (
+    <svg
+      aria-hidden="true"
+      className="icon"
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      {paths[name]}
+    </svg>
+  )
+}
+
+type ClassSchedule = {
+  id: string
+  meetingDays: string[]
+  startTime: string
+  endTime: string
+  room: string
+  isDefault?: boolean
+}
+type ClassReschedule = {
+  id: string
+  originalDate: string
+  replacementDate: string
+  startTime: string
+  endTime: string
+  room: string
+  reason: string
+  mode: "moved" | "additional"
+}
+type ClassItem = {
+  id: string
+  subject: string
+  code: string
+  time: string
+  room: string
+  color: string
+  status: string
+  attendance: number
+  semesterStart: string
+  semesterEnd: string
+  meetingDays: string[]
+  accessCode?: string
+  schedules?: ClassSchedule[]
+  reschedules?: ClassReschedule[]
+}
+
+const meetingDayOptions = [
+  { value: "MON", label: "Mon" },
+  { value: "TUE", label: "Tue" },
+  { value: "WED", label: "Wed" },
+  { value: "THU", label: "Thu" },
+  { value: "FRI", label: "Fri" },
+  { value: "SAT", label: "Sat" },
+  { value: "SUN", label: "Sun" },
+]
+
+const formatSemesterDate = (value: string) => {
+  if (!value) return "Date to be set"
+  const date = new Date(`${value}T12:00:00`)
+  if (Number.isNaN(date.getTime())) return "Date to be set"
+  return new Intl.DateTimeFormat("en", { month: "short", day: "numeric" }).format(date)
+}
+
+const hasSemesterEnded = (item: ClassItem) => {
+  const semesterEnd = new Date(`${item.semesterEnd}T23:59:59`)
+  return !Number.isNaN(semesterEnd.getTime()) && semesterEnd < new Date()
+}
+
+const formatMeetingDays = (days: string[]) =>
+  days
+    .map(
+      (day) => meetingDayOptions.find((option) => option.value === day)?.label,
+    )
+    .filter(Boolean)
+    .join(" & ")
+const normalizeMeetingDay = (value: unknown) => {
+  const day = String(value ?? "").trim().slice(0, 3).toUpperCase()
+  const aliases: Record<string, string> = {
+    MON: "MON", TUE: "TUE", WED: "WED", THU: "THU",
+    FRI: "FRI", SAT: "SAT", SUN: "SUN",
+  }
+  return aliases[day] ?? day
+}
+
+const normalizedMeetingDays = (value: unknown): string[] => {
+  const values = Array.isArray(value)
+    ? value
+    : typeof value === "string"
+      ? value
+          .replace(/^\s*[\[{]/, "")
+          .replace(/[\]}]\s*$/, "")
+          .replace(/["']/g, "")
+          .split(/[,&/]+/)
+      : []
+
+  return [...new Set(values.map(normalizeMeetingDay).filter(Boolean))]
+}
+
+const mapDatabaseClass = (item: any): ClassItem => {
+  const schedules: ClassSchedule[] = (item.class_schedules ?? []).map(
+    (schedule: any) => ({
+      id: schedule.id,
+      meetingDays: normalizedMeetingDays(schedule.meeting_days),
+      startTime: schedule.start_time ?? "",
+      endTime: schedule.end_time ?? "",
+      room: schedule.room ?? "",
+    }),
+  )
+  const firstSchedule = schedules[0]
+  return {
+    id: item.id,
+    subject: item.subject ?? "",
+    code: item.code ?? "",
+    time:
+      firstSchedule?.startTime && firstSchedule?.endTime
+        ? `${formatDatabaseTime(firstSchedule.startTime)} - ${formatDatabaseTime(firstSchedule.endTime)}`
+        : item.start_time && item.end_time
+          ? `${formatDatabaseTime(item.start_time)} - ${formatDatabaseTime(item.end_time)}`
+          : "",
+    room: firstSchedule?.room || item.room || "To be confirmed",
+    color: item.color ?? "#7a62d3",
+    status: item.status ?? "Scheduled",
+    attendance: item.capacity ?? 0,
+    semesterStart: item.semester_start ?? "",
+    semesterEnd: item.semester_end ?? "",
+    meetingDays: firstSchedule?.meetingDays?.length
+      ? firstSchedule.meetingDays
+      : normalizedMeetingDays(item.meeting_days),
+    accessCode: item.access_code ?? "",
+    schedules,
+  }
+}
+
+type ActivityGroup = {
+  id: string
+  name: string
+  studentIds: string[]
+}
+
+type ActivityItem = {
+  id?: string
+  classId: string
+  date: string
+  title: string
+  assessmentIndex: number
+  description: string
+  type: string
+  startTime: string
+  endTime: string
+  participation: string
+  groups: ActivityGroup[]
+  itemCount: number
+  pointsPerItem: number
+  omrAssessmentId?: string
+  answerKey: string[]
+}
+
+const dashboardDate = "2026-10-23"
+
+const initialActivities: ActivityItem[] = []
+
+const createActivityDraft = (): ActivityItem => ({
+  classId: "",
+  title: "Quiz 1",
+  assessmentIndex: 1,
+  description: "",
+  type: "Quiz",
+  date: "2026-10-30",
+  startTime: "09:00",
+  endTime: "10:00",
+  participation: "Individual",
+  groups: [],
+  itemCount: 50,
+  pointsPerItem: 1,
+  omrAssessmentId: undefined,
+  answerKey: Array.from({ length: 50 }, () => ""),
+})
+
+const formatActivityTime = (value: string) => {
+  const [hours, minutes] = value.split(":").map(Number)
+  const meridiem = hours >= 12 ? "PM" : "AM"
+  return `${hours % 12 || 12}:${String(minutes).padStart(2, "0")} ${meridiem}`
+}
+
+type RecordStudent = {
+  name: string
+  id: string
+  userId?: string
+  score: number
+  attendance: string
+}
+
+const students: RecordStudent[] = []
+
+type StudentConcern = {
+  id: string
+  studentId: string
+  studentName: string
+  category: string
+  message: string
+  section: string
+  submittedAt: string
+  createdAt: string
+  status: "Open" | "Accepted" | "Denied"
+  facultyReply?: string
+  reviewDraft?: string
+  draftDecision?: "Accepted" | "Denied"
+  draftSavedAt?: string
+}
+
+const initialStudentConcerns: StudentConcern[] = []
+
+type RecordSectionOption = {
+  id: string
+  subject: string
+  code: string
+  schedule: string
+  students: number
+  assessmentCount: number
+  academicYear: string
+}
+
+const recordSections: RecordSectionOption[] = []
+
+type RecordAssessmentColumn = {
+  id: string
+  assessmentId?: string
+  label: string
+  type: "Quiz" | "Hands On" | "Activities" | "Exam" | "Attendance" | "Recitation"
+  term?: "Midterm" | "Final"
+  maxScore?: number
+  itemCount?: number
+  pointsPerItem?: number
+}
+
+const maxScoreForColumn = (column: RecordAssessmentColumn) => {
+  const value = Number(column.maxScore)
+  if (Number.isFinite(value) && value > 0) return value
+  return column.type === "Attendance" || column.type === "Recitation" ? 10 : 100
+}
+const itemCountForColumn = (column: RecordAssessmentColumn) => {
+  const explicitItems = Number(column.itemCount)
+  if (Number.isFinite(explicitItems) && explicitItems > 0) return Math.round(explicitItems)
+
+  const pointsPerItem = Number(column.pointsPerItem)
+  const maximum = maxScoreForColumn(column)
+  if (Number.isFinite(pointsPerItem) && pointsPerItem > 0) {
+    return Math.max(1, Math.round(maximum / pointsPerItem))
+  }
+
+  // Manual class-record columns default to one point per item.
+  return Math.max(1, Math.round(maximum))
+}
+const assessmentColumnIndex = (column: Pick<RecordAssessmentColumn, "label">) => {
+  const match = String(column.label ?? "").match(/\d+/)
+  return match ? Number(match[0]) : Number.NaN
+}
+const sameAssessmentSlot = (
+  left: Pick<RecordAssessmentColumn, "label" | "type" | "term">,
+  right: Pick<RecordAssessmentColumn, "label" | "type" | "term">,
+) => left.type === right.type && left.term === right.term &&
+  Number.isFinite(assessmentColumnIndex(left)) &&
+  assessmentColumnIndex(left) === assessmentColumnIndex(right)
+const assessmentItemOverrideKey = (classId: string, column: RecordAssessmentColumn) =>
+  `cit-portal:item-count:${classId}:${column.term ?? "Midterm"}:${column.type}:${assessmentColumnIndex(column)}`
+const readAssessmentItemOverride = (classId: string, column: RecordAssessmentColumn) => {
+  if (!classId) return null
+  const value = Number(localStorage.getItem(assessmentItemOverrideKey(classId, column)))
+  return Number.isFinite(value) && value > 0 ? value : null
+}
+
+const initialRecordAssessmentColumns: RecordAssessmentColumn[] = [
+  { id: "quiz-1", label: "Midterm Quiz 1", type: "Quiz", term: "Midterm" },
+  { id: "quiz-2", label: "Midterm Quiz 2", type: "Quiz", term: "Midterm" },
+  {
+    id: "midterm-project-1",
+    label: "Midterm Project 1",
+    type: "Hands On",
+    term: "Midterm",
+  },
+  {
+    id: "final-project-1",
+    label: "Final Project 1",
+    type: "Hands On",
+    term: "Final",
+  },
+  {
+    id: "midterm-recitation-1",
+    label: "Midterm Recitation 1",
+    type: "Recitation",
+    term: "Midterm",
+  },
+  {
+    id: "final-recitation-1",
+    label: "Final Recitation 1",
+    type: "Recitation",
+    term: "Final",
+  },
+  {
+    id: "midterm-attendance-1",
+    label: "Midterm Attendance 1",
+    type: "Attendance",
+    term: "Midterm",
+  },
+  {
+    id: "final-attendance-1",
+    label: "Final Attendance 1",
+    type: "Attendance",
+    term: "Final",
+  },
+]
+
+const navItems: { id: string; label: string; icon: IconName }[] = [
+  { id: "home", label: "Home", icon: "home" },
+  { id: "scanner", label: "OMR Scanner", icon: "scan" },
+  { id: "classes", label: "Classes", icon: "book" },
+  { id: "records", label: "Records", icon: "chart" },
+  { id: "activities", label: "Activities", icon: "calendar" },
+  { id: "profile", label: "Profile", icon: "user" },
+]
+
+const professorPhoto =
+  "https://images.unsplash.com/photo-1573497161161-c3e73707e25c?auto=format&fit=crop&w=240&q=85"
+
+type MessageDialogDetail = {
+  title?: string
+  message: string
+  tone?: "error" | "info" | "success"
+}
+
+const showMessage = (
+  message: string,
+  tone: MessageDialogDetail["tone"] = "error",
+  title?: string,
+) => {
+  window.dispatchEvent(
+    new CustomEvent<MessageDialogDetail>("classtrack:message", {
+      detail: { message, tone, title },
+    }),
+  )
+}
+
+function MessageDialogHost() {
+  const [dialog, setDialog] = useState<MessageDialogDetail | null>(null)
+
+  useEffect(() => {
+    const handleMessage = (event: Event) => {
+      const detail = (event as CustomEvent<MessageDialogDetail>).detail
+      if (detail?.message) setDialog(detail)
+    }
+    window.addEventListener("classtrack:message", handleMessage)
+    return () => window.removeEventListener("classtrack:message", handleMessage)
+  }, [])
+
+  if (!dialog) return null
+  const title = dialog.title ?? (dialog.tone === "success" ? "Success" : dialog.tone === "info" ? "Notice" : "Something went wrong")
+  return (
+    <div className="modal-backdrop formal-message-backdrop" onMouseDown={(event) => event.target === event.currentTarget && setDialog(null)}>
+      <section className={`formal-message-dialog ${dialog.tone ?? "error"}`} role="alertdialog" aria-modal="true" aria-labelledby="formal-message-title" aria-describedby="formal-message-description">
+        <button type="button" className="formal-message-close" onClick={() => setDialog(null)} aria-label="Close message" title="Close">×</button>
+        <div className="formal-message-heading">
+          <span className="formal-message-icon" aria-hidden="true"><Icon name={dialog.tone === "success" ? "check" : dialog.tone === "info" ? "bell" : "minus"} size={18} /></span>
+          <div className="formal-message-copy">
+            <h2 id="formal-message-title">{title}</h2>
+            <p id="formal-message-description">{dialog.message}</p>
+          </div>
+        </div>
+        <div className="formal-message-actions">
+          <button type="button" className="primary-button" onClick={() => setDialog(null)} autoFocus>Okay</button>
+        </div>
+      </section>
+    </div>
+  )
+}
+
+type ToastTone = "success" | "error" | "info"
+type ToastDetail = { message: string; tone?: ToastTone }
+
+const showToast = (message: string, tone: ToastTone = "success") => {
+  window.dispatchEvent(new CustomEvent<ToastDetail>("classtrack:toast", { detail: { message, tone } }))
+}
+
+function ToastHost() {
+  const [toast, setToast] = useState<(ToastDetail & { id: number }) | null>(null)
+
+  useEffect(() => {
+    let timer: number | undefined
+    const handleToast = (event: Event) => {
+      const detail = (event as CustomEvent<ToastDetail>).detail
+      if (!detail?.message) return
+      if (timer !== undefined) window.clearTimeout(timer)
+      setToast({ id: Date.now(), message: detail.message, tone: detail.tone ?? "success" })
+      timer = window.setTimeout(() => setToast(null), 3500)
+    }
+    window.addEventListener("classtrack:toast", handleToast)
+    return () => {
+      window.removeEventListener("classtrack:toast", handleToast)
+      if (timer !== undefined) window.clearTimeout(timer)
+    }
+  }, [])
+
+  if (!toast) return null
+  return (
+    <aside className={`app-toast ${toast.tone ?? "success"}`} role="status" aria-live="polite">
+      <span className="app-toast-icon"><Icon name={toast.tone === "error" ? "minus" : "check"} size={16} /></span>
+      <span>{toast.message}</span>
+      <button type="button" onClick={() => setToast(null)} aria-label="Dismiss notification">×</button>
+    </aside>
+  )
+}
+
+type FacultyProfile = {
+  name: string
+  department: string
+  facultyNumber: string
+  email: string
+  photoUrl: string
+}
+
+type FacultyNotification = {
+  id: string
+  kind: "concern" | "omr" | "assessment" | "quiz" | "gradebook" | "system"
+  title: string
+  message: string
+  createdAt: string
+  readAt?: string
+  targetPage?: "activities" | "records" | "classes" | "home"
+  classId?: string
+  entityId?: string
+}
+
+const emptyFacultyProfile: FacultyProfile = {
+  name: "",
+  department: "",
+  facultyNumber: "",
+  email: "",
+  photoUrl: professorPhoto,
+}
+
+const profileFromUser = (user: any): FacultyProfile => {
+  const metadata = user?.user_metadata ?? {}
+  return {
+    name: String(metadata.full_name ?? metadata.name ?? user?.email?.split("@")[0] ?? emptyFacultyProfile.name),
+    department: String(metadata.department ?? emptyFacultyProfile.department),
+    facultyNumber: String(metadata.faculty_number ?? metadata.facultyNumber ?? emptyFacultyProfile.facultyNumber),
+    email: String(user?.email ?? metadata.email ?? ""),
+    photoUrl: String(metadata.avatar_url ?? metadata.photo_url ?? professorPhoto),
+  }
+}
+
+const normalizeStudentRequestCategory = (value: unknown): "concern" | "petition" | "request" => {
+  const category = String(value ?? "request").trim().toLowerCase()
+  if (category.includes("petition")) return "petition"
+  if (category.includes("concern")) return "concern"
+  return "request"
+}
+
+const studentRequestCategoryLabel = (value: unknown) => {
+  const category = normalizeStudentRequestCategory(value)
+  return category === "petition" ? "Petition" : category === "concern" ? "Concern" : "Request"
+}
+
+const loadFacultyNotifications = async (): Promise<FacultyNotification[]> => {
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return []
+
+  const { data, error } = await supabase
+    .from("faculty_notifications")
+    .select("id, kind, title, message, target_page, class_id, entity_id, read_at, created_at")
+    .eq("recipient_id", user.id)
+    .order("created_at", { ascending: false })
+    .limit(100)
+
+  if (error) {
+    console.error("Unable to load faculty notifications:", error)
+    return []
+  }
+
+  return (data ?? []).map((row: any) => ({
+    id: String(row.id),
+    kind: String(row.kind ?? "system") as FacultyNotification["kind"],
+    title: String(row.title ?? "Notification"),
+    message: String(row.message ?? ""),
+    targetPage: ["activities", "records", "classes", "home"].includes(String(row.target_page))
+      ? String(row.target_page) as FacultyNotification["targetPage"]
+      : "home",
+    classId: row.class_id ? String(row.class_id) : undefined,
+    entityId: row.entity_id ? String(row.entity_id) : undefined,
+    readAt: row.read_at ? String(row.read_at) : undefined,
+    createdAt: String(row.created_at ?? new Date().toISOString()),
+  }))
+}
+
+function Header({
+  title = "Dashboard",
+  onNotify,
+  onProfile,
+}: {
+  title?: string
+  onNotify: () => void
+  onProfile?: () => void
+}) {
+  const [headerDate, setHeaderDate] = useState(() => new Date())
+  const [profile, setProfile] = useState<FacultyProfile>(emptyFacultyProfile)
+  const [notificationCount, setNotificationCount] = useState(0)
+
+  useEffect(() => {
+    let active = true
+    const loadHeader = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (active && user) setProfile(profileFromUser(user))
+      const notices = await loadFacultyNotifications()
+      if (active) setNotificationCount(notices.filter((notice) => !notice.readAt).length)
+    }
+    void loadHeader()
+    const timer = window.setInterval(loadHeader, 60_000)
+    const profileChannel = supabase
+      .channel("faculty-header-sync")
+      .on("postgres_changes", { event: "*", schema: "public", table: "faculty_notifications" }, loadHeader)
+      .subscribe()
+    return () => {
+      active = false
+      window.clearInterval(timer)
+      void supabase.removeChannel(profileChannel)
+    }
+  }, [])
+
+  useEffect(() => {
+    let midnightTimer: number | undefined
+    const refresh = () => {
+      const current = new Date()
+      const next = new Date(current)
+      next.setHours(24, 0, 0, 0)
+      midnightTimer = window.setTimeout(() => {
+        setHeaderDate(new Date())
+        refresh()
+      }, next.getTime() - current.getTime() + 250)
+    }
+    refresh()
+    return () => { if (midnightTimer !== undefined) window.clearTimeout(midnightTimer) }
+  }, [])
+
+  const formattedHeaderDate = new Intl.DateTimeFormat("en-US", {
+    weekday: "long", month: "long", day: "numeric",
+  }).format(headerDate)
+
+  return (
+    <header className="topbar">
+      <div><p className="eyebrow">{formattedHeaderDate}</p><h1>{title}</h1></div>
+      <div className="top-actions">
+        <button className="icon-button notification-button" aria-label={`Open notifications${notificationCount ? `, ${notificationCount} unread` : ""}`} onClick={onNotify}>
+          <Icon name="bell" />
+          {notificationCount > 0 && <span />}
+        </button>
+        <button className="avatar-menu" onClick={onProfile} aria-label={profile.name ? `Open ${profile.name} profile` : "Open faculty profile"}>
+          <img className="mini-avatar" src={profile.photoUrl} alt="" />
+          <span className="avatar-tooltip">
+            {profile.name ? (
+              <>
+                <strong>{profile.name}</strong>
+                {profile.department && <small>{profile.department}</small>}
+                {profile.facultyNumber && <small>Faculty No. {profile.facultyNumber}</small>}
+              </>
+            ) : (
+              <span className="profile-tooltip-skeleton" aria-label="Loading faculty profile" />
+            )}
+          </span>
+        </button>
+      </div>
+    </header>
+  )
+}
+function Sidebar({
+  page,
+  setPage,
+  onLogout,
+}: {
+  page: string
+  setPage: (page: string) => void
+  onLogout: () => void
+}) {
+  return (
+    <aside className="sidebar">
+      <div className="brand brand-text-only" aria-label="CiTracker">
+        <span>CiTracker</span>
+      </div>
+      <nav className="side-nav" aria-label="Main navigation">
+        {navItems.map((item) => (
+          <button
+            key={item.id}
+            className={page === item.id ? "active" : ""}
+            onClick={() => setPage(item.id)}
+          >
+            <Icon name={item.icon} />
+            <span>{item.label}</span>
+          </button>
+        ))}
+      </nav>
+      <button
+        className="sidebar-logout"
+        aria-label="Log out"
+        title="Log out"
+        onClick={onLogout}
+      >
+        <Icon name="logout" size={19} />
+        <span>Log out</span>
+      </button>
+    </aside>
+  )
+}
+
+function BottomNav({
+  page,
+  setPage,
+}: {
+  page: string
+  setPage: (page: string) => void
+}) {
+  return (
+    <nav className="bottom-nav" aria-label="Mobile navigation">
+      {navItems.map((item) => (
+        <button
+          key={item.id}
+          className={page === item.id ? "active" : ""}
+          onClick={() => setPage(item.id)}
+        >
+          <Icon name={item.icon} size={19} />
+          <span>{item.label}</span>
+        </button>
+      ))}
+    </nav>
+  )
+}
+
+function ConnectionNotice({
+  online,
+  onToggle,
+}: {
+  online: boolean
+  onToggle: () => void
+}) {
+  return (
+    <button
+      className={`connection-notice ${online ? "online" : "offline"}`}
+      onClick={onToggle}
+      aria-label={`Switch to ${online ? "offline" : "online"} mode`}
+    >
+      <Icon name={online ? "wifi" : "wifiOff"} size={16} />
+      <span>
+        {online
+          ? "Online · changes are synced"
+          : "Offline · changes will update when you’re back online"}
+      </span>
+    </button>
+  )
+}
+const dayCodeFromDate = (date: Date) =>
+  ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"][date.getDay()]
+
+const minutesFromTime = (value: string) => {
+  const [hoursValue, minutesValue] = value.split(":")
+  const hours = Number(hoursValue)
+  const minutes = Number(minutesValue ?? 0)
+  return Number.isFinite(hours) && Number.isFinite(minutes)
+    ? hours * 60 + minutes
+    : -1
+}
+
+const isClassScheduledNow = (item: ClassItem, now: Date) => {
+  const localDate = [
+    now.getFullYear(),
+    String(now.getMonth() + 1).padStart(2, "0"),
+    String(now.getDate()).padStart(2, "0"),
+  ].join("-")
+
+  if (item.semesterStart && localDate < item.semesterStart) return false
+  if (item.semesterEnd && localDate > item.semesterEnd) return false
+
+  const today = dayCodeFromDate(now)
+  const currentMinutes = now.getHours() * 60 + now.getMinutes()
+  const schedules = classOccurrencesForDay(item, now)
+
+  return schedules.some((schedule) => {
+    const startMinutes = minutesFromTime(schedule.startTime)
+    const endMinutes = minutesFromTime(schedule.endTime)
+    return (
+      schedule.meetingDays.includes(today) &&
+      startMinutes >= 0 &&
+      endMinutes >= 0 &&
+      currentMinutes >= startMinutes &&
+      currentMinutes <= endMinutes
+    )
+  })
+}
+
+const localDateKeyFor = (date: Date) => [date.getFullYear(), String(date.getMonth() + 1).padStart(2, "0"), String(date.getDate()).padStart(2, "0")].join("-")
+const classOccurrencesForDay = (item: ClassItem, date: Date) => {
+  const dateKey = localDateKeyFor(date)
+  const day = normalizeMeetingDay(dayCodeFromDate(date))
+  const temporary = (item.reschedules ?? []).filter((row) => row.replacementDate === dateKey)
+  const movedAway = (item.reschedules ?? []).some((row) => row.mode === "moved" && row.originalDate === dateKey)
+  // Every saved class schedule is a recurring occurrence. isDefault only
+  // identifies the primary schedule shown in summaries; it must not disable
+  // additional schedules that happen on the same or another day.
+  const recurring = movedAway ? [] : (item.schedules ?? []).filter((schedule) =>
+    normalizedMeetingDays(schedule.meetingDays).includes(day),
+  )
+  return [
+    ...temporary.map((row) => ({
+      id: `temporary-${row.id}`,
+      meetingDays: [day],
+      startTime: row.startTime,
+      endTime: row.endTime,
+      room: row.room,
+      isDefault: false,
+    })),
+    ...recurring,
+  ]
+}
+const occurrenceKeyForSchedule = (schedule: ClassSchedule, date: Date) => {
+  const dateKey = localDateKeyFor(date)
+  return String(schedule.id).startsWith("temporary-")
+    ? `${dateKey}:temporary:${String(schedule.id).replace("temporary-", "")}`
+    : `${dateKey}:default:${schedule.id}`
+}
+const currentOccurrenceForClass = (item: ClassItem, now = new Date()) => {
+  const minutes = now.getHours() * 60 + now.getMinutes()
+  return classOccurrencesForDay(item, now).find((schedule) => {
+    const start = minutesFromTime(schedule.startTime)
+    const end = minutesFromTime(schedule.endTime)
+    return start >= 0 && end >= 0 && minutes >= start && minutes <= end
+  }) ?? null
+}
+const isCurrentOccurrenceEnded = (item: ClassItem, endedKeys: string[], now = new Date()) => {
+  const occurrence = currentOccurrenceForClass(item, now)
+  return occurrence ? endedKeys.includes(`${item.id}:${occurrenceKeyForSchedule(occurrence, now)}`) : false
+}
+
+const isClassScheduledToday = (item: ClassItem, now = new Date()) => {
+  const localDate = localDateKeyFor(now)
+  if (item.semesterStart && localDate < item.semesterStart) return false
+  if (item.semesterEnd && localDate > item.semesterEnd) return false
+  return classOccurrencesForDay(item, now).length > 0
+}
+
+function ClassCard({
+  item,
+  onStart,
+  ended,
+  onEdit,
+  onArchive,
+  onMakeUpClass,
+  onCancelReschedule,
+  onView,
+  activity,
+}: {
+  item: ClassItem
+  onStart: (item: ClassItem) => void
+  ended: boolean
+  onEdit?: (item: ClassItem) => void
+  onArchive?: (item: ClassItem) => void
+  onMakeUpClass?: (item: ClassItem) => void
+  onCancelReschedule?: (item: ClassItem, row: ClassReschedule) => void
+  onView?: (item: ClassItem) => void
+  activity?: ActivityItem
+}) {
+  const [now, setNow] = useState(() => new Date())
+  const [accessCodeCopied, setAccessCodeCopied] = useState(false)
+
+  const copyAccessCode = async () => {
+    const value = item.accessCode?.trim()
+    if (!value) return
+
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(value)
+      } else {
+        const textarea = document.createElement("textarea")
+        textarea.value = value
+        textarea.setAttribute("readonly", "")
+        textarea.style.position = "fixed"
+        textarea.style.opacity = "0"
+        document.body.appendChild(textarea)
+        textarea.select()
+        const copied = document.execCommand("copy")
+        document.body.removeChild(textarea)
+        if (!copied) throw new Error("Copy command was blocked.")
+      }
+
+      setAccessCodeCopied(true)
+      window.setTimeout(() => setAccessCodeCopied(false), 1800)
+    } catch (error) {
+      console.error("Unable to copy class access code:", error)
+      window.prompt("Copy this class access code:", value)
+    }
+  }
+
+  useEffect(() => {
+    const timer = window.setInterval(() => setNow(new Date()), 30_000)
+    return () => window.clearInterval(timer)
+  }, [])
+
+  const semesterEnded = hasSemesterEnded(item)
+  const isEnded = ended || semesterEnded
+  const canStartNow = !isEnded && isClassScheduledNow(item, now)
+  return (
+    <article className="class-card">
+      <div className="class-accent" style={{ background: item.color }} />
+      <div className="class-card-top">
+        <span
+          className="status-pill"
+          style={{
+            color: isEnded ? "#667587" : item.color,
+            background: isEnded ? "#edf1f4" : `${item.color}12`,
+          }}
+        >
+          {isEnded
+            ? ended
+              ? "Class Ended"
+              : "Semester ended"
+            : canStartNow
+              ? "In session"
+              : item.status}
+        </span>
+{onEdit ? (
+  <div className="class-card-actions">
+    <button
+      type="button"
+      className="class-card-edit"
+      aria-label={`Edit ${item.subject}`}
+      onClick={() => onEdit(item)}
+    >
+      <Icon name="edit" size={15} />
+      <span>Edit</span>
+    </button>
+
+    {onMakeUpClass && (
+      <button type="button" className="class-card-edit" aria-label={`Add make-up class for ${item.subject}`} onClick={() => onMakeUpClass(item)}>
+        <Icon name="calendar" size={15} /><span>Make-up class</span>
+      </button>
+    )}
+
+    {onArchive && (
+      <button
+        type="button"
+        className="class-card-delete"
+        aria-label={`Archive ${item.subject}`}
+        onClick={() => onArchive(item)}
+      >
+        Archive
+      </button>
+    )}
+  </div>
+) : (
+          <button aria-label={`More options for ${item.subject}`}>
+            <Icon name="more" />
+          </button>
+        )}
+      </div>
+      <h3>{item.subject}</h3>
+      <p className="class-code">{item.code}</p>
+      {item.accessCode ? (
+        <div className="class-access-code" aria-label="Student class access code">
+          <div>
+            <span>Class code</span>
+            <strong>{item.accessCode}</strong>
+          </div>
+          <button
+            type="button"
+            className={accessCodeCopied ? "class-code-copy copied" : "class-code-copy"}
+            onClick={() => void copyAccessCode()}
+            aria-label={`Copy class code ${item.accessCode}`}
+          >
+            <Icon name="clipboard" size={15} />
+            {accessCodeCopied ? "Copied" : "Copy"}
+          </button>
+        </div>
+      ) : (
+        <p className="class-access-code-missing">Class code unavailable. Edit and save this class to generate one.</p>
+      )}
+      <div className="class-meta">
+        <span>
+          <Icon name="clock" size={16} />
+          {item.time}
+        </span>
+        <span>
+          <Icon name="home" size={16} />
+          {item.room}
+        </span>
+      </div>
+      <div
+        className="class-schedule-overview"
+        style={{
+          display: "flex",
+          alignItems: "flex-start",
+          justifyContent: "space-between",
+          gap: 16,
+          flexWrap: "wrap",
+          marginTop: 16,
+          padding: "14px 16px",
+          border: "1px solid #e4ebf3",
+          borderRadius: 12,
+          background: "#f8fbff",
+        }}
+      >
+        <div
+          className="class-schedule-list"
+          style={{
+            display: "grid",
+            gap: 10,
+            minWidth: 0,
+            flex: "1 1 360px",
+          }}
+        >
+          {(item.schedules?.length
+            ? item.schedules
+            : [
+                {
+                  id: `legacy-${item.id}`,
+                  meetingDays: item.meetingDays,
+                  startTime: "",
+                  endTime: "",
+                  room: item.room,
+                },
+              ]
+          ).map((schedule, index) => {
+            const scheduleTime =
+              schedule.startTime && schedule.endTime
+                ? `${formatDatabaseTime(schedule.startTime)} - ${formatDatabaseTime(schedule.endTime)}`
+                : index === 0
+                  ? item.time
+                  : "Time to be set"
+
+            return (
+              <div
+                key={schedule.id}
+                className="class-schedule-row"
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "minmax(120px, 0.9fr) minmax(160px, 1.2fr) minmax(110px, 1fr)",
+                  alignItems: "center",
+                  gap: 12,
+                  color: "#334155",
+                  fontSize: 13,
+                }}
+              >
+                <strong
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 7,
+                    color: "#0f4f8a",
+                    fontWeight: 700,
+                  }}
+                >
+                  <Icon name="calendar" size={15} />
+                  {formatMeetingDays(schedule.meetingDays) || "Days to be set"}
+                  {schedule.isDefault && <small style={{ marginLeft: 6, color: "#0b6b52", fontWeight: 800 }}>Default</small>}
+                </strong>
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 7 }}>
+                  <Icon name="clock" size={15} />
+                  {scheduleTime}
+                </span>
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 7 }}>
+                  <Icon name="home" size={15} />
+                  {schedule.room || "To be confirmed"}
+                </span>
+              </div>
+            )
+          })}
+        </div>
+
+        <div
+          className="class-semester-range"
+          style={{
+            marginLeft: "auto",
+            flex: "0 0 auto",
+            textAlign: "right",
+            paddingLeft: 14,
+            borderLeft: "1px solid #dbe5ef",
+          }}
+        >
+          <small
+            style={{
+              display: "block",
+              marginBottom: 4,
+              color: "#64748b",
+              fontSize: 10,
+              fontWeight: 700,
+              letterSpacing: ".08em",
+              textTransform: "uppercase",
+            }}
+          >
+            Semester
+          </small>
+          <strong style={{ color: "#334155", fontSize: 12, whiteSpace: "nowrap" }}>
+            {formatSemesterDate(item.semesterStart)} - {formatSemesterDate(item.semesterEnd)}
+          </strong>
+        </div>
+      </div>
+      {activity && (
+        <div className="class-activity">
+          <span>
+            <Icon name="clipboard" size={15} />
+            Today’s activity
+          </span>
+          <strong>{activity.title}</strong>
+          <small>
+            {formatActivityTime(activity.startTime)} –{" "}
+            {formatActivityTime(activity.endTime)}
+          </small>
+        </div>
+      )}
+      {(item.reschedules?.length ?? 0) > 0 && (
+        <section className="class-temporary-schedules" style={{ marginTop: 12, padding: "13px 15px", border: "1px solid #f1cf8a", borderRadius: 12, background: "#fffaf0" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 10, marginBottom: 9 }}>
+            <strong style={{ color: "#8a5700" }}><Icon name="calendar" size={15} /> Temporary schedules</strong>
+            <small>{item.reschedules?.length} active</small>
+          </div>
+          <div style={{ display: "grid", gap: 9 }}>
+            {item.reschedules?.map((row) => (
+              <article key={row.id} style={{ padding: "10px 11px", border: "1px solid #f3dfb8", borderRadius: 10, background: "#fff" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 10, flexWrap: "wrap" }}>
+                  <div>
+                    <div style={{ display: "flex", gap: 7, alignItems: "center", flexWrap: "wrap" }}>
+                      <strong>{new Intl.DateTimeFormat("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" }).format(new Date(`${row.replacementDate}T12:00:00`))}</strong>
+                      <span className="status-pill">{row.mode === "moved" ? "Moved" : "Additional"}</span>
+                    </div>
+                    <small style={{ display: "block", marginTop: 4 }}>{formatDatabaseTime(row.startTime)} - {formatDatabaseTime(row.endTime)} · {row.room || "Room to be confirmed"}</small>
+                    <small style={{ display: "block", marginTop: 3 }}>From {new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric" }).format(new Date(`${row.originalDate}T12:00:00`))}{row.reason ? ` · ${row.reason}` : ""}</small>
+                  </div>
+                  {onCancelReschedule && <button type="button" className="class-card-delete" onClick={() => onCancelReschedule(item, row)}>Cancel temporary schedule</button>}
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
+      <div className="class-footer">
+        <div
+          className="student-stack"
+          aria-label={`${item.attendance} enrolled students`}
+        >
+          <span>JD</span>
+          <span>AR</span>
+          <span>+{item.attendance - 2}</span>
+        </div>
+        <button
+          className={
+            canStartNow
+              ? "primary-button compact"
+              : "secondary-button compact class-view-button"
+          }
+          onClick={() => canStartNow ? onStart(item) : (onView ? onView(item) : onStart(item))}
+        >
+          {canStartNow ? <Icon name="play" size={16} /> : <Icon name="eye" size={16} />}
+          {canStartNow ? "Start class" : "View details"}
+        </button>
+      </div>
+    </article>
+  )
+}
+
+function Dashboard({
+  onStart,
+  setPage,
+  endedClassIds,
+  activities,
+}: {
+  onStart: (item: ClassItem) => void
+  setPage: (page: string) => void
+  endedClassIds: Array<string | number>
+  activities: ActivityItem[]
+}) {
+  const [dashboardClasses, setDashboardClasses] = useState<ClassItem[]>([])
+  const [dashboardClassesLoading, setDashboardClassesLoading] = useState(true)
+  const [dashboardClassesError, setDashboardClassesError] = useState("")
+  const [dashboardReminders, setDashboardReminders] = useState<ActivityItem[]>([])
+  const [dashboardOpenQuizIds, setDashboardOpenQuizIds] = useState<Set<string>>(new Set())
+  const [dashboardOpenConcerns, setDashboardOpenConcerns] = useState(0)
+  const [dashboardFacultyName, setDashboardFacultyName] = useState("")
+  const [dashboardNow, setDashboardNow] = useState(() => new Date())
+
+  const dashboardDisplayName = (() => {
+    if (!dashboardFacultyName.trim()) return ""
+    const cleanedName = dashboardFacultyName.replace(/^prof\.?\s+/i, "").trim()
+    const firstName = cleanedName.split(/\s+/)[0] || ""
+    return firstName ? `Prof. ${firstName}` : ""
+  })()
+
+  const dashboardGreeting = (() => {
+    const hour = dashboardNow.getHours()
+    if (hour < 12) return "Good morning"
+    if (hour < 18) return "Good afternoon"
+    return "Good evening"
+  })()
+
+  // Count scheduled assessments plus quizzes manually reopened after their
+  // scheduled end time. Reopened state is persisted in omr_assessments.status.
+  const dashboardActiveAssessments = activities.filter((activity) => {
+    const endAt = new Date(`${activity.date}T${activity.endTime}`).getTime()
+    const scheduledActive = !Number.isNaN(endAt) && dashboardNow.getTime() < endAt
+    const manuallyReopened = Boolean(
+      activity.type === "Quiz" &&
+      activity.omrAssessmentId &&
+      dashboardOpenQuizIds.has(activity.omrAssessmentId),
+    )
+    return scheduledActive || manuallyReopened
+  })
+
+  useEffect(() => {
+    const assessmentIds = Array.from(new Set(
+      activities
+        .filter((activity) => activity.type === "Quiz" && activity.omrAssessmentId)
+        .map((activity) => activity.omrAssessmentId as string),
+    ))
+
+    if (assessmentIds.length === 0) {
+      setDashboardOpenQuizIds(new Set())
+      return
+    }
+
+    let cancelled = false
+    const loadOpenQuizStates = async () => {
+      const { data, error } = await supabase
+        .from("omr_assessments")
+        .select("id, status")
+        .in("id", assessmentIds)
+
+      if (cancelled || error) return
+      setDashboardOpenQuizIds(new Set(
+        (data ?? [])
+          .filter((assessment) => String(assessment.status ?? "").toLowerCase() === "open")
+          .map((assessment) => String(assessment.id)),
+      ))
+    }
+
+    void loadOpenQuizStates()
+    const interval = window.setInterval(() => void loadOpenQuizStates(), 15000)
+    return () => {
+      cancelled = true
+      window.clearInterval(interval)
+    }
+  }, [activities])
+
+  useEffect(() => {
+    const timer = window.setInterval(() => setDashboardNow(new Date()), 30_000)
+    return () => window.clearInterval(timer)
+  }, [])
+
+  useEffect(() => {
+    async function loadDashboardFaculty() {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+      const profile = profileFromUser(user)
+      setDashboardFacultyName(profile.name)
+    }
+    void loadDashboardFaculty()
+  }, [])
+
+  useEffect(() => {
+    let active = true
+
+    const loadDashboardClasses = async () => {
+      setDashboardClassesLoading(true)
+      setDashboardClassesError("")
+
+      const { data: { user }, error: userError } = await supabase.auth.getUser()
+      if (userError || !user) {
+        if (active) {
+          setDashboardClasses([])
+          setDashboardClassesLoading(false)
+        }
+        return
+      }
+
+      const { data, error } = await supabase
+        .from("classes")
+        .select("*, class_schedules(id, meeting_days, start_time, end_time, room, is_default), class_reschedules(id, original_date, replacement_date, start_time, end_time, room, reason, mode)")
+        .eq("faculty_id", user.id)
+        .order("created_at", { ascending: true })
+
+      if (!active) return
+      if (error) {
+        console.error("Unable to load dashboard classes:", error)
+        setDashboardClasses([])
+        setDashboardClassesError(error.message)
+      } else {
+        setDashboardClasses(
+          (data ?? [])
+            .filter((row: any) => String(row.status ?? "").trim().toLowerCase() !== "archived")
+            .map(mapDatabaseClass),
+        )
+      }
+      setDashboardClassesLoading(false)
+    }
+
+    void loadDashboardClasses()
+
+    const classChannel = supabase
+      .channel("dashboard-class-schedule-sync")
+      .on("postgres_changes", { event: "*", schema: "public", table: "classes" }, () => void loadDashboardClasses())
+      .on("postgres_changes", { event: "*", schema: "public", table: "class_schedules" }, () => void loadDashboardClasses())
+      .subscribe()
+
+    const reloadVisibleDashboard = () => {
+      if (document.visibilityState === "visible") void loadDashboardClasses()
+    }
+    const reloadFocusedDashboard = () => void loadDashboardClasses()
+    document.addEventListener("visibilitychange", reloadVisibleDashboard)
+    window.addEventListener("focus", reloadFocusedDashboard)
+
+    return () => {
+      active = false
+      document.removeEventListener("visibilitychange", reloadVisibleDashboard)
+      window.removeEventListener("focus", reloadFocusedDashboard)
+      void supabase.removeChannel(classChannel)
+    }
+  }, [])
+
+  useEffect(() => {
+    let active = true
+    const loadDashboardItems = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+      const [remindersResult, concernsResult] = await Promise.all([
+        supabase
+          .from("faculty_reminders")
+          .select("id, class_id, reminder_date, title, assessment_index, description, activity_type, start_time, end_time, participation, groups, item_count, points_per_item, omr_assessment_id")
+          .eq("faculty_id", user.id)
+          .order("reminder_date", { ascending: true }),
+        supabase
+          .from("student_requests")
+          .select("id", { count: "exact", head: true })
+          .eq("faculty_id", user.id)
+          .eq("status", "Open"),
+      ])
+      if (!active) return
+      if (!remindersResult.error) {
+        setDashboardReminders((remindersResult.data ?? []).map((row: any) => ({
+          id: String(row.id),
+          classId: String(row.class_id ?? ""),
+          date: String(row.reminder_date ?? ""),
+          title: String(row.title ?? "Reminder"),
+          type: String(row.activity_type ?? "Activity"),
+          startTime: String(row.start_time ?? "").slice(0, 5),
+          endTime: String(row.end_time ?? "").slice(0, 5),
+          participation: String(row.participation ?? "Individual"),
+          groups: Array.isArray(row.groups) ? row.groups : [],
+        })))
+      }
+      setDashboardOpenConcerns(concernsResult.error ? 0 : concernsResult.count ?? 0)
+    }
+    void loadDashboardItems()
+    const channel = supabase
+      .channel("dashboard-reminders-concerns-sync")
+      .on("postgres_changes", { event: "*", schema: "public", table: "faculty_reminders" }, () => void loadDashboardItems())
+      .on("postgres_changes", { event: "*", schema: "public", table: "student_requests" }, () => void loadDashboardItems())
+      .subscribe()
+    return () => {
+      active = false
+      void supabase.removeChannel(channel)
+    }
+  }, [])
+
+  const toLocalDateKey = (date: Date) =>
+    [
+      date.getFullYear(),
+      String(date.getMonth() + 1).padStart(2, "0"),
+      String(date.getDate()).padStart(2, "0"),
+    ].join("-")
+
+  const [calendarNow, setCalendarNow] = useState(() => new Date())
+  const today = calendarNow
+  const todayKey = toLocalDateKey(today)
+  const [selectedDateKey, setSelectedDateKey] = useState(todayKey)
+
+  useEffect(() => {
+    let midnightTimer: number | undefined
+
+    const scheduleMidnightRefresh = () => {
+      const current = new Date()
+      const nextMidnight = new Date(current)
+      nextMidnight.setHours(24, 0, 0, 0)
+      const delay = nextMidnight.getTime() - current.getTime() + 250
+
+      midnightTimer = window.setTimeout(() => {
+        const refreshedDate = new Date()
+        setCalendarNow(refreshedDate)
+        setSelectedDateKey(toLocalDateKey(refreshedDate))
+        scheduleMidnightRefresh()
+      }, delay)
+    }
+
+    scheduleMidnightRefresh()
+
+    return () => {
+      if (midnightTimer !== undefined) {
+        window.clearTimeout(midnightTimer)
+      }
+    }
+  }, [])
+
+  const monday = new Date(today)
+  const mondayOffset = (today.getDay() + 6) % 7
+  monday.setHours(12, 0, 0, 0)
+  monday.setDate(today.getDate() - mondayOffset)
+  const weekDates = Array.from({ length: 7 }, (_, index) => {
+    const date = new Date(monday)
+    date.setDate(monday.getDate() + index)
+    return date
+  })
+
+  const selectedDate =
+    weekDates.find((date) => toLocalDateKey(date) === selectedDateKey) ?? today
+  const selectedDayCode = dayCodeFromDate(selectedDate)
+  const selectedActivities = dashboardReminders.filter(
+    (activity) => activity.date === selectedDateKey,
+  )
+  const selectedClasses = dashboardClasses.filter((item) => {
+    const insideSemester =
+      (!item.semesterStart || selectedDateKey >= item.semesterStart) &&
+      (!item.semesterEnd || selectedDateKey <= item.semesterEnd)
+    if (!insideSemester) return false
+
+    const selectedDay = normalizeMeetingDay(selectedDayCode)
+    return schedulesForDashboardClass(item).some((schedule) =>
+      normalizedMeetingDays(schedule.meetingDays).includes(selectedDay),
+    )
+  })
+  const selectedConcernCount = selectedDateKey === todayKey
+    ? dashboardOpenConcerns
+    : 0
+  const selectedRecordCount = 0
+  function schedulesForDashboardClass(item: ClassItem): ClassSchedule[] {
+    const classMeetingDays = normalizedMeetingDays(item.meetingDays)
+    const schedules = (item.schedules ?? []).map((schedule) => {
+      const scheduleMeetingDays = normalizedMeetingDays(schedule.meetingDays)
+      return {
+        ...schedule,
+        meetingDays: scheduleMeetingDays.length > 0 ? scheduleMeetingDays : classMeetingDays,
+      }
+    })
+    const validSchedules = schedules.filter((schedule) => schedule.meetingDays.length > 0)
+    if (validSchedules.length > 0) return validSchedules
+    if (classMeetingDays.length === 0) return []
+
+    const timeParts = item.time.split(/\s+-\s+/)
+    return [{
+      id: `${item.id}-fallback-schedule`,
+      meetingDays: classMeetingDays,
+      startTime: timeParts[0] ?? "",
+      endTime: timeParts[1] ?? "",
+      room: item.room || "To be confirmed",
+    }]
+  }
+
+  const focusActivity = selectedActivities[0]
+  const selectedDateLabel = new Intl.DateTimeFormat("en", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+  }).format(selectedDate)
+
+  const classOccurrencesForDate = (date: Date) => {
+    const dateKey = toLocalDateKey(date)
+    const dayCode = dayCodeFromDate(date)
+    return dashboardClasses.flatMap((item) => {
+      if (item.semesterStart && dateKey < item.semesterStart) return []
+      if (item.semesterEnd && dateKey > item.semesterEnd) return []
+      return schedulesForDashboardClass(item)
+        .filter((schedule) =>
+          schedule.meetingDays.map(normalizeMeetingDay).includes(normalizeMeetingDay(dayCode)),
+        )
+        .map((schedule) => ({ item, schedule }))
+    })
+  }
+
+  return (
+    <>
+      <Header
+        onNotify={() => setPage("notifications")}
+        onProfile={() => setPage("profile")}
+      />
+      <section className="welcome">
+        <div className="welcome-main">
+          <div className="welcome-copy">
+            <p className="eyebrow welcome-greeting">{dashboardGreeting}</p>
+            {dashboardDisplayName ? (
+              <h2>Ready for today, {dashboardDisplayName}?</h2>
+            ) : (
+              <div className="profile-name-skeleton dashboard-name-skeleton" aria-label="Loading faculty profile" />
+            )}
+            <p className="welcome-status-message">
+              <span className="fg-inline-bold" data-fge-id="fge-361">
+                You have {selectedClasses.length} {selectedClasses.length === 1 ? "class" : "classes"} and {selectedRecordCount} records waiting for review.
+              </span>
+            </p>
+          </div>
+          <button
+            className="day-activity"
+            onClick={() => setPage("activities")}
+            aria-label={
+              focusActivity
+                ? `Open selected activity, ${focusActivity.title} at ${formatActivityTime(focusActivity.startTime)}`
+                : "Open activities"
+            }
+          >
+            <span className="day-activity-label">Selected date</span>
+            <strong>{focusActivity?.title ?? "No activity yet"}</strong>
+            <small>
+              <Icon name="clock" size={13} />{" "}
+              {focusActivity
+                ? `${formatActivityTime(focusActivity.startTime)} · ${dashboardClasses.find((item) => String(item.id) === String(focusActivity.classId))?.code ?? "Class"}`
+                : selectedClasses.length
+                  ? `${selectedClasses.length} scheduled ${selectedClasses.length === 1 ? "class" : "classes"}`
+                  : "No scheduled items"}
+            </small>
+            <span className="day-activity-people" aria-hidden="true">
+              <i>JD</i>
+              <i>AR</i>
+              <i>MS</i>
+              <b>+29</b>
+            </span>
+            <span className="day-activity-shapes" aria-hidden="true">
+              <i />
+              <i />
+              <i />
+            </span>
+          </button>
+        </div>
+        <div className="date-tile" aria-label={selectedDateLabel}>
+          <strong>{selectedDate.getDate()}</strong>
+          <span>{selectedDate.toLocaleString("en", { month: "short" }).toUpperCase()}</span>
+        </div>
+        <div className="day-strip" aria-label="This week’s dates">
+          {weekDates.map((date) => {
+            const dateKey = toLocalDateKey(date)
+            const classOccurrences = classOccurrencesForDate(date)
+            const dayActivities = activities.filter((activity) => activity.date === dateKey)
+            const concernCount = dateKey === todayKey ? selectedConcernCount : 0
+            const recordCount = dateKey === todayKey ? selectedRecordCount : 0
+            const hasItems =
+              classOccurrences.length > 0 ||
+              dayActivities.length > 0 ||
+              concernCount > 0 ||
+              recordCount > 0
+
+            return (
+              <div className="day-strip-item" key={dateKey}>
+                <button
+                  type="button"
+                  className={dateKey === selectedDateKey ? "active" : ""}
+                  onClick={() => setSelectedDateKey(dateKey)}
+                  aria-label={`View schedule for ${new Intl.DateTimeFormat("en", {
+                    weekday: "long",
+                    month: "long",
+                    day: "numeric",
+                  }).format(date)}`}
+                >
+                  <span>{date.toLocaleString("en", { weekday: "short" }).toUpperCase()}</span>
+                  <strong>{date.getDate()}</strong>
+                  {hasItems && (
+                    <span className="day-event-dots" aria-hidden="true">
+                      {classOccurrences.length > 0 && <i className="class-dot" />}
+                      {dayActivities.length > 0 && <i className="activity-dot" />}
+                      {recordCount > 0 && <i className="record-dot" />}
+                      {concernCount > 0 && <i className="concern-dot" />}
+                    </span>
+                  )}
+                </button>
+
+                <div className="day-hover-card" role="tooltip">
+                  <strong>{new Intl.DateTimeFormat("en", {
+                    weekday: "long",
+                    month: "long",
+                    day: "numeric",
+                  }).format(date)}</strong>
+
+                  {classOccurrences.length > 0 && (
+                    <section>
+                      <span>Classes</span>
+                      {classOccurrences.map(({ item, schedule }: { item: ClassItem; schedule: ClassSchedule }) => (
+                        <button
+                          type="button"
+                          key={`${item.id}-${schedule.id}`}
+                          onClick={() => onStart(item)}
+                        >
+                          <b>{item.subject}</b>
+                          <small>
+                            {formatDatabaseTime(schedule.startTime)} - {formatDatabaseTime(schedule.endTime)}
+                            {schedule.room ? ` · ${schedule.room}` : ""}
+                          </small>
+                        </button>
+                      ))}
+                    </section>
+                  )}
+
+                  {dayActivities.length > 0 && (
+                    <section className="day-hover-reminders">
+                      <span>Reminders</span>
+                      {dayActivities.map((activity, index) => (
+                        <button
+                          type="button"
+                          key={`${activity.title}-${index}`}
+                          onClick={() => setPage("activities")}
+                        >
+                          <b>{activity.title}</b>
+                          <small>{formatActivityTime(activity.startTime)}</small>
+                        </button>
+                      ))}
+                    </section>
+                  )}
+
+                  {(recordCount > 0 || concernCount > 0) && (
+                    <section className="day-hover-counts">
+                      {recordCount > 0 && <span>{recordCount} records to review</span>}
+                      {concernCount > 0 && <span>{concernCount} open concerns</span>}
+                    </section>
+                  )}
+
+                  {!hasItems && <p>No scheduled items</p>}
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      </section>
+
+      <section
+        className="quick-summary section"
+        aria-labelledby="quick-summary-title"
+      >
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">At a glance</p>
+            <h2 id="quick-summary-title">Quick summary</h2>
+          </div>
+        </div>
+        <div className="summary-grid">
+          <button onClick={() => setPage("classes")}>
+            <span className="summary-icon green">
+              <Icon name="calendar" />
+            </span>
+            <span>
+              <strong>{dashboardClasses.length} {dashboardClasses.length === 1 ? "class" : "classes"}</strong>
+              <small>Total active classes</small>
+            </span>
+          </button>
+          <button onClick={() => setPage("activities")}>
+            <span className="summary-icon amber">
+              <Icon name="clipboard" />
+            </span>
+            <span>
+              <strong>
+                {dashboardActiveAssessments.length} {dashboardActiveAssessments.length === 1 ? "active assessment" : "active assessments"}
+              </strong>
+              <small>
+                {dashboardActiveAssessments.length > 0
+                  ? "Scheduled or currently in progress"
+                  : "No active assessments"}
+              </small>
+            </span>
+          </button>
+          <button onClick={() => setPage("activities")}>
+            <span className="summary-icon blue">
+              <Icon name="users" />
+            </span>
+            <span>
+              <strong>{dashboardOpenConcerns} {dashboardOpenConcerns === 1 ? "concern" : "concerns"}</strong>
+              <small>{dashboardOpenConcerns > 0 ? "Need your attention" : "No open concerns"}</small>
+            </span>
+          </button>
+        </div>
+      </section>
+
+      <section className="section">
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">Your schedule</p>
+            <h2>{selectedDateKey === todayKey ? "Today’s classes" : `${selectedDate.toLocaleString("en", { weekday: "long" })} classes`}</h2>
+          </div>
+          <button onClick={() => setPage("classes")}>
+            See all <Icon name="arrow" size={16} />
+          </button>
+        </div>
+<div className="class-grid">
+          {dashboardClassesLoading ? (
+            <div className="dashboard-class-empty" role="status">
+              <span className="dashboard-class-empty-icon"><Icon name="calendar" size={22} /></span>
+              <div><strong>Loading classes...</strong><p>Checking the selected date and class schedules.</p></div>
+            </div>
+          ) : dashboardClassesError ? (
+            <div className="dashboard-class-empty error" role="alert">
+              <span className="dashboard-class-empty-icon"><Icon name="minus" size={22} /></span>
+              <div><strong>Classes could not be loaded</strong><p>{dashboardClassesError}</p></div>
+              <button type="button" className="secondary-button" onClick={() => setPage("classes")}>Open classes</button>
+            </div>
+          ) : selectedClasses.length > 0 ? (
+            selectedClasses.map((item) => (
+              <ClassCard
+                key={item.id}
+                item={item}
+                onStart={onStart}
+                ended={isCurrentOccurrenceEnded(item, endedClassIds)}
+                activity={selectedActivities.find((activity) => String(activity.classId) === String(item.id))}
+              />
+            ))
+          ) : (
+            <div className="dashboard-class-empty">
+              <span className="dashboard-class-empty-icon"><Icon name="calendar" size={22} /></span>
+              <div>
+                <strong>No classes scheduled for {selectedDateKey === todayKey ? "today" : selectedDate.toLocaleDateString("en-US", { month: "long", day: "numeric" })}</strong>
+                <p>No active class has a meeting schedule matching {selectedDate.toLocaleDateString("en-US", { weekday: "long" })}. Select another calendar date or open Classes to view all active classes.</p>
+              </div>
+              <button type="button" className="secondary-button" onClick={() => setPage("classes")}>View all classes</button>
+            </div>
+          )}
+        </div>
+      </section>
+    </>
+  )
+}
+
+const createClientId = () => {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return crypto.randomUUID()
+  }
+
+  if (typeof crypto !== "undefined" && typeof crypto.getRandomValues === "function") {
+    const bytes = crypto.getRandomValues(new Uint8Array(16))
+    bytes[6] = (bytes[6] & 0x0f) | 0x40
+    bytes[8] = (bytes[8] & 0x3f) | 0x80
+    const hex = Array.from(bytes, (value) => value.toString(16).padStart(2, "0"))
+    return `${hex.slice(0, 4).join("")}-${hex.slice(4, 6).join("")}-${hex.slice(6, 8).join("")}-${hex.slice(8, 10).join("")}-${hex.slice(10).join("")}`
+  }
+
+  return `local-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`
+}
+
+const generateStudentAccessCode = () => {
+  const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
+  const values = crypto.getRandomValues(new Uint32Array(8))
+  return Array.from(values, (value) => alphabet[value % alphabet.length]).join("")
+}
+
+function AddClassModal({
+  onClose,
+  onSave,
+  initialClass,
+}: {
+  onClose: () => void
+  onSave: (newClass: ClassItem) => void
+  initialClass?: ClassItem | null
+}) {
+  const isEditing = Boolean(initialClass)
+  const makeSchedule = (schedule?: Partial<ClassSchedule>): ClassSchedule => ({
+    id: schedule?.id ?? createClientId(),
+    meetingDays: schedule?.meetingDays ?? [],
+    startTime: schedule?.startTime ?? "",
+    endTime: schedule?.endTime ?? "",
+    room: schedule?.room ?? "",
+    isDefault: schedule?.isDefault ?? true,
+  })
+  const legacySchedule = initialClass
+    ? makeSchedule({
+        meetingDays: initialClass.meetingDays,
+        startTime: "",
+        endTime: "",
+        room: initialClass.room === "To be confirmed" ? "" : initialClass.room,
+      })
+    : makeSchedule()
+  const [form, setForm] = useState({
+    subject: initialClass?.subject ?? "",
+    code: initialClass?.code ?? "",
+    semesterStart: initialClass?.semesterStart ?? "2026-06-06",
+    semesterEnd: initialClass?.semesterEnd ?? "2026-11-07",
+    attendance: initialClass ? String(initialClass.attendance) : "",
+    requirements: "",
+  })
+  const [schedules, setSchedules] = useState<ClassSchedule[]>(
+    initialClass?.schedules?.length ? initialClass.schedules : [legacySchedule],
+  )
+  const [saving, setSaving] = useState(false)
+  const [studentAccessCode, setStudentAccessCode] = useState(
+    () => initialClass?.accessCode || generateStudentAccessCode(),
+  )
+  const updateForm = (field: keyof typeof form, value: string) =>
+    setForm((current) => ({ ...current, [field]: value }))
+  const addSchedule = () =>
+    setSchedules((current) => [...current, makeSchedule({ isDefault: current.length === 0 })])
+  const removeSchedule = (scheduleId: string) =>
+    setSchedules((current) => {
+      if (current.length === 1) return current
+      const removedWasDefault = current.find((schedule) => schedule.id === scheduleId)?.isDefault
+      const remaining = current.filter((schedule) => schedule.id !== scheduleId)
+      return removedWasDefault
+        ? remaining.map((schedule, index) => ({ ...schedule, isDefault: index === 0 }))
+        : remaining
+    })
+  const updateSchedule = (
+    scheduleId: string,
+    changes: Partial<ClassSchedule>,
+  ) =>
+    setSchedules((current) =>
+      current.map((schedule) =>
+        schedule.id === scheduleId ? { ...schedule, ...changes } : schedule,
+      ),
+    )
+  const setDefaultSchedule = (scheduleId: string) =>
+    setSchedules((current) => current.map((schedule) => ({ ...schedule, isDefault: schedule.id === scheduleId })))
+  const selectScheduleDay = (scheduleId: string, day: string) =>
+    setSchedules((current) =>
+      current.map((schedule) =>
+        schedule.id === scheduleId
+          ? { ...schedule, meetingDays: [day] }
+          : schedule,
+      ),
+    )
+
+  const submitClass = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    const schedulesAreValid = schedules.filter((schedule) => schedule.isDefault).length === 1 && schedules.every(
+      (schedule) =>
+        schedule.meetingDays.length > 0 &&
+        schedule.startTime &&
+        schedule.endTime &&
+        schedule.endTime > schedule.startTime,
+    )
+    if (
+      !form.subject.trim() ||
+      !form.code.trim() ||
+      !form.attendance ||
+      Number(form.attendance) <= 0 ||
+      !form.semesterStart ||
+      !form.semesterEnd ||
+      form.semesterEnd < form.semesterStart ||
+      !schedulesAreValid
+    ) {
+      showMessage("Complete all required class and schedule information. Each schedule needs a day and valid times, and exactly one schedule must be set as the default.")
+      return
+    }
+    const { data: { user }, error: userError } = await supabase.auth.getUser()
+    if (userError || !user) {
+      showMessage("Please sign in before creating or editing a class.")
+      return
+    }
+    setSaving(true)
+    const classValues = {
+      faculty_id: user.id,
+      subject: form.subject.trim(),
+      code: form.code.trim(),
+      section: form.code.trim(),
+      capacity: Number(form.attendance),
+      semester_start: form.semesterStart,
+      semester_end: form.semesterEnd,
+      requirements: form.requirements.trim() || null,
+      access_code: studentAccessCode,
+      color: initialClass?.color ?? "#7a62d3",
+      status: initialClass?.status ?? "Scheduled",
+    }
+    let savedClass: any
+    if (initialClass) {
+      const { data, error } = await supabase
+        .from("classes")
+        .update(classValues)
+        .eq("id", initialClass.id)
+        .select()
+        .maybeSingle()
+      if (error || !data) {
+        setSaving(false)
+        showMessage(`Unable to update class: ${error?.message ?? "Class not found"}`)
+        return
+      }
+      savedClass = data
+      const { error: deleteError } = await supabase
+        .from("class_schedules")
+        .delete()
+        .eq("class_id", initialClass.id)
+      if (deleteError) {
+        setSaving(false)
+        showMessage(`Unable to replace schedules: ${deleteError.message}`)
+        return
+      }
+    } else {
+      const { data, error } = await supabase
+        .from("classes")
+        .insert(classValues)
+        .select()
+        .single()
+      if (error) {
+        setSaving(false)
+        showMessage(`Unable to create class: ${error.message}`)
+        return
+      }
+      savedClass = data
+    }
+    const scheduleRows = schedules.map((schedule) => ({
+      class_id: savedClass.id,
+      meeting_days: schedule.meetingDays,
+      start_time: schedule.startTime,
+      end_time: schedule.endTime,
+      room: schedule.room.trim() || null,
+      is_default: schedule.isDefault === true,
+    }))
+    const { data: savedScheduleRows, error: scheduleError } = await supabase
+      .from("class_schedules")
+      .insert(scheduleRows)
+      .select()
+    if (scheduleError) {
+      setSaving(false)
+      showMessage(`Unable to save schedules: ${scheduleError.message}`)
+      return
+    }
+    const savedSchedules: ClassSchedule[] = (savedScheduleRows ?? []).map(
+      (schedule: any) => ({
+        id: schedule.id,
+        meetingDays: schedule.meeting_days ?? [],
+        startTime: schedule.start_time ?? "",
+        endTime: schedule.end_time ?? "",
+        room: schedule.room ?? "",
+        isDefault: schedule.is_default !== false,
+      }),
+    )
+    const firstSchedule = savedSchedules.find((schedule) => schedule.isDefault) ?? savedSchedules[0] ?? schedules[0]
+    onSave({
+      id: savedClass.id,
+      subject: savedClass.subject,
+      code: savedClass.code,
+      time: `${formatDatabaseTime(firstSchedule.startTime)} - ${formatDatabaseTime(firstSchedule.endTime)}`,
+      room: firstSchedule.room || "To be confirmed",
+      color: savedClass.color ?? "#7a62d3",
+      status: savedClass.status ?? "Scheduled",
+      attendance: savedClass.capacity ?? Number(form.attendance),
+      semesterStart: savedClass.semester_start ?? form.semesterStart,
+      semesterEnd: savedClass.semester_end ?? form.semesterEnd,
+      meetingDays: firstSchedule.meetingDays,
+      accessCode: savedClass.access_code ?? studentAccessCode,
+      schedules: savedSchedules,
+      reschedules: initialClass?.reschedules ?? [],
+    })
+    setSaving(false)
+    if (!initialClass) {
+      showToast(`Class created successfully. Access code: ${savedClass.access_code ?? studentAccessCode}`)
+    }
+  }
+
+  return (
+    <div className="modal-backdrop" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
+      <section className="class-form-modal" role="dialog" aria-modal="true" aria-labelledby="add-class-title" style={{ fontFamily: "inherit" }}>
+        <button className="modal-close" onClick={onClose} aria-label="Close">×</button>
+        <p className="eyebrow">Class setup</p>
+        <h2 id="add-class-title">{isEditing ? "Edit class" : "Add a class"}</h2>
+        <p>{isEditing ? "Update the section details and schedules." : "Create a section and define how students can join."}</p>
+        <form className="class-form" onSubmit={submitClass}>
+          <div className="form-section-title">Class details</div>
+          <label>Subject name <em>Required</em>
+            <input autoFocus value={form.subject} onChange={(event) => updateForm("subject", event.target.value)} placeholder="e.g. Web Development Fundamentals" required />
+          </label>
+          <div className="class-form-grid">
+            <label>Course code / section <em>Required</em>
+              <input value={form.code} onChange={(event) => updateForm("code", event.target.value)} placeholder="e.g. BIT-CT 3B" required />
+            </label>
+            <label>Student capacity <em>Required</em>
+              <input type="number" min="1" max="200" value={form.attendance} onChange={(event) => updateForm("attendance", event.target.value)} required />
+            </label>
+          </div>
+          <div className="form-section-title">Semester schedule & access</div>
+          <div className="class-form-grid">
+            <label>Semester start <em>Required</em>
+              <input type="date" value={form.semesterStart} onChange={(event) => updateForm("semesterStart", event.target.value)} required />
+            </label>
+            <label>Semester end <em>Required</em>
+              <input type="date" min={form.semesterStart} value={form.semesterEnd} onChange={(event) => updateForm("semesterEnd", event.target.value)} required />
+            </label>
+          </div>
+          <div className="form-section-title">Class schedules</div>
+          <p>Select one class day per schedule. Add another schedule for each additional day, time, or room.</p>
+          <div className="schedule-list">
+            {schedules.map((schedule, index) => (
+              <section className="schedule-form-card" key={schedule.id} style={{ border: "1px solid #dbe6f0", borderRadius: 12, padding: 16, marginBottom: 14, fontFamily: "inherit" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap", marginBottom: 12 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+                    <strong>Schedule {index + 1}</strong>
+                    {schedule.isDefault ? (
+                      <span className="status-pill" style={{ color: "#0b6b52", background: "#e9f8f2" }}><Icon name="check" size={13} /> Default schedule</span>
+                    ) : (
+                      <button type="button" className="secondary-button compact" onClick={() => setDefaultSchedule(schedule.id)}><Icon name="check" size={14} /> Set as default</button>
+                    )}
+                  </div>
+                  {schedules.length > 1 && <button type="button" className="class-card-delete" style={{ fontFamily: "inherit" }} onClick={() => removeSchedule(schedule.id)}>Remove</button>}
+                </div>
+                <fieldset className="meeting-days">
+                  <legend>Class days <em>Required</em></legend>
+                  <div className="meeting-day-options">
+                    {meetingDayOptions.map((day) => {
+                      const selected = schedule.meetingDays.includes(day.value)
+                      return (
+                        <label key={day.value} className={selected ? "selected" : ""}>
+                          <input
+                            type="radio"
+                            name={`schedule-day-${schedule.id}`}
+                            checked={selected}
+                            onChange={() => selectScheduleDay(schedule.id, day.value)}
+                          />
+                          <span>{day.label}</span>
+                        </label>
+                      )
+                    })}
+                  </div>
+                </fieldset>
+                <div className="class-form-grid class-time-fields">
+                  <label>Start time <em>Required</em>
+                    <TimePicker12 label={`Schedule ${index + 1} start time`} value={schedule.startTime} onChange={(value) => updateSchedule(schedule.id, { startTime: value })} required />
+                  </label>
+                  <label>End time <em>Required</em>
+                    <TimePicker12 label={`Schedule ${index + 1} end time`} value={schedule.endTime} onChange={(value) => updateSchedule(schedule.id, { endTime: value })} required />
+                  </label>
+                  <label>Room / virtual space
+                    <input value={schedule.room} onChange={(event) => updateSchedule(schedule.id, { room: event.target.value })} placeholder="e.g. Lab 3" />
+                  </label>
+                </div>
+              </section>
+            ))}
+          </div>
+          <button type="button" className="secondary-button" style={{ fontFamily: "inherit" }} onClick={addSchedule}><Icon name="plus" size={16} /> Add another schedule</button>
+          <label>Student access code
+            <div className="class-access-code-field">
+              <input type="text" value={studentAccessCode} readOnly aria-label="Generated student access code" />
+              <button
+                type="button"
+                className="secondary-button class-code-generate"
+                onClick={() => setStudentAccessCode(generateStudentAccessCode())}
+                disabled={saving}
+              >
+                Generate code
+              </button>
+            </div>
+            <small>A code is generated automatically. Generate a new one before saving if needed. Students use this code to join the class.</small>
+          </label>
+          <label>Required materials or prerequisites
+            <textarea value={form.requirements} onChange={(event) => updateForm("requirements", event.target.value)} placeholder="e.g. Laptop, network cable, and completed safety orientation" />
+          </label>
+          <div className="class-form-actions">
+            <button type="button" className="secondary-button" onClick={onClose}>Cancel</button>
+            <button type="submit" className="primary-button" disabled={saving}>
+              <Icon name={isEditing ? "edit" : "plus"} size={16} />
+              {saving ? "Saving..." : isEditing ? "Save changes" : "Add class"}
+            </button>
+          </div>
+        </form>
+      </section>
+    </div>
+  )
+}
+
+function MakeUpClassModal({ item, onClose, onSaved }: { item: ClassItem; onClose: () => void; onSaved: (row: ClassReschedule) => void }) {
+  const [form, setForm] = useState({ originalDate: "", replacementDate: "", startTime: "", endTime: "", room: "", reason: "", mode: "additional" as "additional" })
+  const [saving, setSaving] = useState(false)
+  const save = async (event: React.FormEvent) => {
+    event.preventDefault()
+    if (!form.originalDate || !form.replacementDate || !form.startTime || !form.endTime || form.endTime <= form.startTime) {
+      showMessage("Choose the original date, temporary date, and a valid start and end time.")
+      return
+    }
+    if (form.replacementDate < item.semesterStart || form.replacementDate > item.semesterEnd) {
+      showMessage("The temporary schedule must be within the class semester dates.")
+      return
+    }
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+    setSaving(true)
+    const { data, error } = await supabase.from("class_reschedules").insert({ class_id: item.id, faculty_id: user.id, original_date: form.originalDate, replacement_date: form.replacementDate, start_time: form.startTime, end_time: form.endTime, room: form.room.trim() || null, reason: form.reason.trim() || null, mode: form.mode }).select().single()
+    setSaving(false)
+    if (error) { showMessage(`Unable to save temporary schedule: ${error.message}`); return }
+    onSaved({ id: String(data.id), originalDate: data.original_date, replacementDate: data.replacement_date, startTime: data.start_time, endTime: data.end_time, room: data.room ?? "", reason: data.reason ?? "", mode: data.mode })
+    showToast("Make-up class saved.")
+  }
+  return <div className="modal-backdrop" onMouseDown={(e) => e.target === e.currentTarget && onClose()}><section className="class-form-modal" role="dialog" aria-modal="true" aria-labelledby="reschedule-title"><button className="modal-close" onClick={onClose}>×</button><p className="eyebrow">Additional meeting</p><h2 id="reschedule-title">Make-up class for {item.subject}</h2><p>Add a one-time class meeting without changing or cancelling the regular weekly schedule.</p><form className="class-form" onSubmit={save}><div className="class-form-grid"><label>Original occurrence <em>Required</em><input type="date" min={item.semesterStart} max={item.semesterEnd} value={form.originalDate} onChange={(e) => setForm({...form, originalDate:e.target.value})}/></label><label>Temporary date <em>Required</em><input type="date" min={item.semesterStart} max={item.semesterEnd} value={form.replacementDate} onChange={(e) => setForm({...form, replacementDate:e.target.value})}/></label></div><input type="hidden" value="additional" /><div className="class-form-grid class-time-fields"><label>Start time <em>Required</em><TimePicker12 label="Temporary schedule start time" value={form.startTime} onChange={(value) => setForm({...form,startTime:value})} required/></label><label>End time <em>Required</em><TimePicker12 label="Temporary schedule end time" value={form.endTime} onChange={(value) => setForm({...form,endTime:value})} required/></label><label>Room / virtual space<input value={form.room} onChange={(e) => setForm({...form,room:e.target.value})}/></label></div><label>Reason<textarea value={form.reason} onChange={(e) => setForm({...form,reason:e.target.value})} placeholder="Example: Replacement lesson after a suspension"/></label><div className="class-form-actions"><button type="button" className="secondary-button" onClick={onClose}>Cancel</button><button className="primary-button" disabled={saving}>{saving ? "Saving..." : "Save make-up class"}</button></div></form></section></div>
+}
+
+function ClassesPage({
+  onStart,
+  setPage,
+  endedClassIds,
+}: {
+  onStart: (item: ClassItem) => void
+  setPage: (page: string) => void
+  endedClassIds: string[]
+}) {
+  const [classList, setClassList] = useState<ClassItem[]>([])
+  const [archivedClassList, setArchivedClassList] = useState<ClassItem[]>([])
+  const [classView, setClassView] = useState<"active" | "archived">("active")
+  const [restoringClassId, setRestoringClassId] = useState<string | null>(null)
+  const [classToArchive, setClassToArchive] = useState<ClassItem | null>(null)
+  const [classToMakeUp, setClassToMakeUp] = useState<ClassItem | null>(null)
+  const [classToView, setClassToView] = useState<ClassItem | null>(null)
+  const [classArchiving, setClassArchiving] = useState(false)
+  const [classesPageNow, setClassesPageNow] = useState(() => new Date())
+  const [isAddingClass, setIsAddingClass] = useState(false)
+  const [editingClass, setEditingClass] = useState<ClassItem | null>(null)
+  const cancelTemporarySchedule = async (classItem: ClassItem, row: ClassReschedule) => {
+    const { error } = await supabase.from("class_reschedules").delete().eq("id", row.id)
+    if (error) { showMessage(`Unable to cancel temporary schedule: ${error.message}`); return }
+    setClassList((current) => current.map((item) => item.id === classItem.id ? { ...item, reschedules: (item.reschedules ?? []).filter((entry) => entry.id !== row.id) } : item))
+    showToast("Temporary schedule cancelled.")
+  }
+
+  const archiveClass = async () => {
+    if (!classToArchive || classArchiving) return
+    setClassArchiving(true)
+    const { error } = await supabase
+      .from("classes")
+      .update({ status: "Archived" })
+      .eq("id", String(classToArchive.id))
+    setClassArchiving(false)
+    if (error) {
+      console.error("Unable to archive class:", error)
+      showMessage(`Unable to archive class: ${error.message}`, "error", "Class was not archived")
+      return
+    }
+    setClassList((current) => current.filter((item) => String(item.id) !== String(classToArchive.id)))
+    setArchivedClassList((current) => [
+      { ...classToArchive, status: "Archived" },
+      ...current.filter((item) => String(item.id) !== String(classToArchive.id)),
+    ])
+    setClassToArchive(null)
+    showToast("Class archived. Its schedules, students, records, and activities were preserved.")
+  }
+  const restoreArchivedClass = async (item: ClassItem) => {
+    const classId = String(item.id)
+    if (restoringClassId) return
+    setRestoringClassId(classId)
+    const { error } = await supabase
+      .from("classes")
+      .update({ status: "Scheduled" })
+      .eq("id", classId)
+    setRestoringClassId(null)
+    if (error) {
+      console.error("Unable to restore class:", error)
+      showMessage(`Unable to restore class: ${error.message}`, "error", "Class was not restored")
+      return
+    }
+    const restored = { ...item, status: "Scheduled" }
+    setArchivedClassList((current) => current.filter((row) => String(row.id) !== classId))
+    setClassList((current) => [restored, ...current.filter((row) => String(row.id) !== classId)])
+    showToast("Class restored to active classes.")
+  }
+
+  useEffect(() => {
+    let active = true
+
+    async function loadClasses() {
+      const { data: { user }, error: userError } = await supabase.auth.getUser()
+      if (!active) return
+      if (userError || !user) {
+        console.error("Unable to get signed-in faculty:", userError)
+        setClassList([])
+        return
+      }
+
+      const { data, error } = await supabase
+        .from("classes")
+        .select("*, class_schedules(id, meeting_days, start_time, end_time, room, is_default), class_reschedules(id, original_date, replacement_date, start_time, end_time, room, reason, mode)")
+        .eq("faculty_id", user.id)
+        .order("created_at", { ascending: true })
+
+      if (!active) return
+      if (error) {
+        console.error("Unable to load classes:", error)
+        showMessage(`Unable to load classes: ${error.message}`, "error", "Classes could not be loaded")
+        return
+      }
+
+      const mappedClasses = (data ?? []).map(mapDatabaseClass)
+      setClassList(
+        mappedClasses.filter((row) => String(row.status ?? "").trim().toLowerCase() !== "archived"),
+      )
+      setArchivedClassList(
+        mappedClasses.filter((row) => String(row.status ?? "").trim().toLowerCase() === "archived"),
+      )
+    }
+
+    void loadClasses()
+    return () => { active = false }
+  }, [])
+
+  useEffect(() => {
+    const timer = window.setInterval(() => setClassesPageNow(new Date()), 60_000)
+    return () => window.clearInterval(timer)
+  }, [])
+
+  const todayDayCode = dayCodeFromDate(classesPageNow)
+  const currentMinutes = classesPageNow.getHours() * 60 + classesPageNow.getMinutes()
+  const todaySchedule = classList
+    .flatMap((item) =>
+      classOccurrencesForDay(item, classesPageNow)
+        .map((schedule) => ({ item, schedule })),
+    )
+    .sort(
+      (a, b) =>
+        minutesFromTime(a.schedule.startTime) -
+        minutesFromTime(b.schedule.startTime),
+    )
+  const hasEndedOccurrence = (item: ClassItem, schedule: ClassSchedule) =>
+    endedClassIds.includes(`${item.id}:${occurrenceKeyForSchedule(schedule, classesPageNow)}`)
+
+  const activeScheduleToday = todaySchedule.find(({ item, schedule }: { item: ClassItem; schedule: ClassSchedule }) => {
+    if (hasEndedOccurrence(item, schedule)) return false
+    const start = minutesFromTime(schedule.startTime)
+    const end = minutesFromTime(schedule.endTime)
+    return currentMinutes >= start && currentMinutes < end
+  })
+  const nextClassToday = todaySchedule.find(({ item, schedule }: { item: ClassItem; schedule: ClassSchedule }) =>
+    !hasEndedOccurrence(item, schedule) && minutesFromTime(schedule.startTime) > currentMinutes,
+  )
+  const endedClassesToday = todaySchedule.filter(({ item, schedule }: { item: ClassItem; schedule: ClassSchedule }) =>
+    hasEndedOccurrence(item, schedule),
+  )
+  const lastClassToday = todaySchedule.at(-1)
+  const scheduleStatus = activeScheduleToday
+    ? {
+        title: `${activeScheduleToday.item.subject} is in progress`,
+        message: `${formatDatabaseTime(activeScheduleToday.schedule.startTime)} - ${formatDatabaseTime(activeScheduleToday.schedule.endTime)}${activeScheduleToday.schedule.room ? ` · ${activeScheduleToday.schedule.room}` : ""}`,
+      }
+    : nextClassToday
+      ? {
+          title: `Next class: ${nextClassToday.item.subject}`,
+          message: `${formatDatabaseTime(nextClassToday.schedule.startTime)} - ${formatDatabaseTime(nextClassToday.schedule.endTime)}${nextClassToday.schedule.room ? ` · ${nextClassToday.schedule.room}` : ""}`,
+        }
+      : endedClassesToday.length > 0
+        ? {
+            title: endedClassesToday.length === 1 ? "Class ended" : "Classes ended for today",
+            message: endedClassesToday.length === 1
+              ? `${endedClassesToday[0].item.subject} has ended. Class records remain available.`
+              : `${endedClassesToday.length} classes have ended. Class records remain available.`,
+          }
+        : todaySchedule.length === 0
+          ? {
+              title: "No classes scheduled today",
+              message: "Your teaching schedule is clear for today.",
+            }
+          : {
+              title: "Your schedule is clear",
+              message: lastClassToday
+                ? `Your final class ended at ${formatDatabaseTime(lastClassToday.schedule.endTime)}.`
+                : "There are no more scheduled classes today.",
+            }
+
+  return (
+    <>
+      <Header
+        title="My classes"
+        onNotify={() => setPage("notifications")}
+        onProfile={() => setPage("profile")}
+      />
+      <div className="page-intro">
+        <div>
+          <p className="eyebrow">Academic year 2026–27</p>
+          <h2>Class schedule</h2>
+          <p>Manage sessions, attendance, and learning activities.</p>
+        </div>
+        <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+          <button
+            type="button"
+            className={classView === "archived" ? "primary-button" : "secondary-button"}
+            onClick={() => setClassView((current) => current === "active" ? "archived" : "active")}
+          >
+            <Icon name="clipboard" size={17} />
+            {classView === "active" ? `Archived classes (${archivedClassList.length})` : "Back to active classes"}
+          </button>
+          {classView === "active" && (
+            <button
+              className="primary-button"
+              onClick={() => {
+                setEditingClass(null)
+                setIsAddingClass(true)
+              }}
+            >
+              <Icon name="plus" size={17} /> Add class
+            </button>
+          )}
+        </div>
+      </div>
+      {classView === "archived" && (
+        <div style={{ marginBottom: 18 }}>
+          <p className="eyebrow">Stored safely</p>
+          <h3>Archived classes</h3>
+          <p>Archived classes keep their students, attendance, activities, schedules, assessments, and grade records.</p>
+        </div>
+      )}
+      <div className="class-grid page-grid">
+        {(classView === "active" ? classList : archivedClassList).map((item) => (
+          <div key={item.id} style={{ display: "grid", gap: 10 }}>
+            <ClassCard
+              item={item}
+              onStart={onStart}
+              ended={classView === "archived" ? true : isCurrentOccurrenceEnded(item, endedClassIds)}
+              onEdit={classView === "active" ? (classToEdit) => {
+                setEditingClass(classToEdit)
+                setIsAddingClass(true)
+              } : undefined}
+              onArchive={classView === "active" ? (classItem) => setClassToArchive(classItem) : undefined}
+              onMakeUpClass={classView === "active" ? (classItem) => setClassToMakeUp(classItem) : undefined}
+              onView={(classItem) => setClassToView(classItem)}
+              onCancelReschedule={classView === "active" ? (classItem, row) => void cancelTemporarySchedule(classItem, row) : undefined}
+            />
+            {classView === "archived" && (
+              <button
+                type="button"
+                className="primary-button"
+                onClick={() => void restoreArchivedClass(item)}
+                disabled={restoringClassId === String(item.id)}
+              >
+                <Icon name="arrow" size={16} />
+                {restoringClassId === String(item.id) ? "Restoring..." : "Restore class"}
+              </button>
+            )}
+          </div>
+        ))}
+      </div>
+      {(classView === "active" ? classList : archivedClassList).length === 0 && (
+        <div className="empty-prompt" aria-live="polite">
+          <span><Icon name={classView === "archived" ? "clipboard" : "calendar"} /></span>
+          <h3>{classView === "archived" ? "No archived classes" : "No active classes"}</h3>
+          <p>{classView === "archived" ? "Classes you archive will appear here and can be restored later." : "Add a class to begin managing schedules and attendance."}</p>
+        </div>
+      )}
+      {classView === "active" && classList.length > 0 && (
+        <div className="empty-prompt" aria-live="polite">
+          <span>
+            <Icon name={activeScheduleToday ? "clock" : endedClassesToday.length > 0 ? "check" : "calendar"} />
+          </span>
+          <h3>{scheduleStatus.title}</h3>
+          <p>{scheduleStatus.message}</p>
+        </div>
+      )}
+      {classToArchive && (
+        <div className="modal-backdrop class-confirm-backdrop" onMouseDown={(event) => {
+          if (event.target === event.currentTarget && !classArchiving) setClassToArchive(null)
+        }}>
+          <section className="class-confirm-modal" role="alertdialog" aria-modal="true" aria-labelledby="archive-class-title" aria-describedby="archive-class-description">
+            <button type="button" className="class-confirm-close" onClick={() => setClassToArchive(null)} disabled={classArchiving} aria-label="Close archive class dialog">×</button>
+            <div className="class-confirm-header">
+              <span className="class-confirm-icon" aria-hidden="true"><Icon name="clipboard" size={18} /></span>
+              <div>
+                <h2 id="archive-class-title">Archive class?</h2>
+                <p id="archive-class-description"><strong>{classToArchive.subject}</strong> ({classToArchive.code}) will be removed from active classes, but schedules, students, attendance, activities, and grade records will remain stored.</p>
+              </div>
+            </div>
+            <div className="class-confirm-actions">
+              <button type="button" className="secondary-button" onClick={() => setClassToArchive(null)} disabled={classArchiving}>Cancel</button>
+              <button type="button" className="primary-button" onClick={() => void archiveClass()} disabled={classArchiving}>{classArchiving ? "Archiving..." : "Archive class"}</button>
+            </div>
+          </section>
+        </div>
+      )}
+      {classToMakeUp && (
+        <MakeUpClassModal
+          item={classToMakeUp}
+          onClose={() => setClassToMakeUp(null)}
+          onSaved={(row) => {
+            setClassList((current) => current.map((item) => item.id === classToMakeUp.id ? { ...item, reschedules: [...(item.reschedules ?? []), row] } : item))
+            setClassToMakeUp(null)
+          }}
+        />
+      )}
+      {classToView && (
+        <div className="modal-backdrop" onMouseDown={(event) => event.target === event.currentTarget && setClassToView(null)}>
+          <section className="class-form-modal" role="dialog" aria-modal="true" aria-labelledby="class-details-title">
+            <button className="modal-close" onClick={() => setClassToView(null)} aria-label="Close class details">×</button>
+            <p className="eyebrow">Class details</p>
+            <h2 id="class-details-title">{classToView.subject}</h2>
+            <p><strong>{classToView.code}</strong> · {classToView.status}</p>
+            <div className="class-schedule-overview" style={{ display: "grid", gap: 14, marginTop: 18, padding: 18, border: "1px solid #dbe5ef", borderRadius: 12, background: "#f8fbff" }}>
+              <p><strong>Class code:</strong> {classToView.accessCode || "Unavailable"}</p>
+              <p><strong>Semester:</strong> {formatSemesterDate(classToView.semesterStart)} - {formatSemesterDate(classToView.semesterEnd)}</p>
+              <p><strong>Student capacity:</strong> {classToView.attendance}</p>
+              {(classToView.schedules ?? []).map((schedule, index) => (
+                <article key={schedule.id} style={{ padding: 12, background: "white", border: "1px solid #e4ebf3", borderRadius: 10 }}>
+                  <strong>Schedule {index + 1}{schedule.isDefault ? " · Default" : ""}</strong>
+                  <p>{formatMeetingDays(schedule.meetingDays) || "Days not set"}</p>
+                  <p>{formatDatabaseTime(schedule.startTime)} - {formatDatabaseTime(schedule.endTime)} · {schedule.room || "Room to be confirmed"}</p>
+                </article>
+              ))}
+              {(classToView.reschedules?.length ?? 0) > 0 && <p><strong>Make-up classes:</strong> {classToView.reschedules?.length}</p>}
+            </div>
+            <div className="class-form-actions">
+              <button type="button" className="secondary-button" onClick={() => setClassToView(null)}>Close</button>
+              <button type="button" className="primary-button" onClick={() => { setEditingClass(classToView); setClassToView(null); setIsAddingClass(true) }}><Icon name="edit" size={15} /> Edit class</button>
+            </div>
+          </section>
+        </div>
+      )}
+      {isAddingClass && (
+        <AddClassModal
+          initialClass={editingClass}
+          onClose={() => {
+            setIsAddingClass(false)
+            setEditingClass(null)
+          }}
+          onSave={(savedClass) => {
+            setClassList((current) =>
+              editingClass
+                ? current.map((item) =>
+                    item.id === savedClass.id ? savedClass : item,
+                  )
+                : [...current, savedClass],
+            )
+            setIsAddingClass(false)
+            setEditingClass(null)
+          }}
+        />
+      )}
+    </>
+  )
+}
+
+function RecordsPage({
+  setPage,
+  omrDraftScores,
+}: {
+  setPage: (page: string) => void
+  omrDraftScores: Record<string, number>
+}) {
+  const [query, setQuery] = useState("")
+  const [recordStudents, setRecordStudents] = useState<typeof students>(students)
+  const csvInputRef = useRef<HTMLInputElement | null>(null)
+  const [recordDate, setRecordDate] = useState(() => {
+    const now = new Date()
+    const localDate = new Date(now.getTime() - now.getTimezoneOffset() * 60_000)
+    return localDate.toISOString().slice(0, 10)
+  })
+  const [datePickerOpen, setDatePickerOpen] = useState(false)
+  const [calendarMonth, setCalendarMonth] = useState(
+    () => new Date("2026-10-01T12:00:00"),
+  )
+  const [assessmentColumns, setAssessmentColumns] = useState(
+    () => initialRecordAssessmentColumns.filter(
+      (column) => column.type !== "Quiz" && column.type !== "Exam",
+    ),
+  )
+  const defaultExamMaximums = {
+    "midterm-written": 100,
+    "midterm-actual": 100,
+    "final-written": 100,
+    "final-actual": 100,
+  }
+  const [examMaximums, setExamMaximums] = useState(defaultExamMaximums)
+  const [dailySummaryItems, setDailySummaryItems] = useState({
+    "midterm-recitation": 10,
+    "final-recitation": 5,
+    "midterm-attendance": 10,
+    "final-attendance": 5,
+  })
+  const [assessmentToDelete, setAssessmentToDelete] = useState<RecordAssessmentColumn | null>(null)
+  const [assessmentDeleting, setAssessmentDeleting] = useState(false)
+  const [gradebookView, setGradebookView] = useState<"summary" | "daily">(() => {
+    const requestedView = sessionStorage.getItem("records-target-view")
+    if (requestedView === "summary") {
+      sessionStorage.removeItem("records-target-view")
+      return "summary"
+    }
+    return localStorage.getItem("cit-portal:records-view") === "summary" ? "summary" : "daily"
+  })
+  const [dailyRemarks, setDailyRemarks] = useState<Record<string, string>>({})
+  const [dailySessions, setDailySessions] = useState<Record<string, {
+    attendanceId: string
+    recitationId: string
+  }>>({})
+  const [recordValues, setRecordValues] =
+    useState<Record<string, Record<string, number | "">>>({})
+  const [studentStatuses, setStudentStatuses] =
+    useState<Record<string, string>>({})
+  const [manualAttendanceOverrides, setManualAttendanceOverrides] =
+    useState<Record<string, boolean>>({})
+  const [selectedSectionId, setSelectedSectionId] = useState(
+    () => sessionStorage.getItem("records-target-class") || localStorage.getItem("cit-portal:records-section") || "",
+  )
+  const [recordSectionOptions, setRecordSectionOptions] = useState<RecordSectionOption[]>([])
+  const [sectionsLoading, setSectionsLoading] = useState(true)
+  const [sectionMenuOpen, setSectionMenuOpen] = useState(false)
+  const [enrolledStudentsLoading, setEnrolledStudentsLoading] = useState(false)
+  const [enrolledStudentsError, setEnrolledStudentsError] = useState("")
+  const [recordPublicationStatus, setRecordPublicationStatus] = useState<"Draft" | "Published">("Draft")
+  const [lastPublishedAt, setLastPublishedAt] = useState<string | null>(null)
+  const [publishConfirmationOpen, setPublishConfirmationOpen] = useState(false)
+  const [draftSavedAt, setDraftSavedAt] = useState<string | null>(null)
+  const [gradebookSaveState, setGradebookSaveState] = useState<"saving" | "saved">("saved")
+  const localDraftValuesRef = useRef<Record<string, Record<string, number | "">>>({})
+  const scoreSaveTimersRef = useRef<Record<string, number>>({})
+  const assessmentIdByColumnRef = useRef<Record<string, string>>({})
+  const [publishingRecords, setPublishingRecords] = useState(false)
+  useEffect(() => {
+    let active = true
+
+    const loadRecordSections = async () => {
+      setSectionsLoading(true)
+      const { data: { user }, error: userError } = await supabase.auth.getUser()
+      if (userError || !user) {
+        if (active) {
+          setRecordSectionOptions([])
+          setSectionsLoading(false)
+        }
+        return
+      }
+
+      const { data: classRows, error: classError } = await supabase
+        .from("classes")
+        .select("id, subject, code, status, semester_start, semester_end, class_schedules(meeting_days, start_time, end_time, room)")
+        .eq("faculty_id", user.id)
+        .order("created_at", { ascending: true })
+
+      if (!active) return
+      if (classError) {
+        console.error("Unable to load gradebook sections:", classError)
+        setRecordSectionOptions([])
+        setSectionsLoading(false)
+        return
+      }
+
+      const activeClassRows = (classRows ?? []).filter(
+        (item: any) => String(item.status ?? "").trim().toLowerCase() !== "archived",
+      )
+      const classIds = activeClassRows.map((item: any) => String(item.id))
+      let enrollmentCounts: Record<string, number> = {}
+      if (classIds.length > 0) {
+        const { data: enrollmentRows, error: enrollmentError } = await supabase
+          .from("class_students")
+          .select("class_id")
+          .in("class_id", classIds)
+        if (!enrollmentError) {
+          enrollmentCounts = (enrollmentRows ?? []).reduce((counts: Record<string, number>, row: any) => {
+            const classId = String(row.class_id ?? "")
+            if (classId) counts[classId] = (counts[classId] ?? 0) + 1
+            return counts
+          }, {})
+        }
+      }
+
+      const sections = activeClassRows.map((item: any) => {
+        const schedule = Array.isArray(item.class_schedules) ? item.class_schedules[0] : null
+        const days = normalizedMeetingDays(schedule?.meeting_days)
+          .map((day) => meetingDayOptions.find((option) => option.value === day)?.label ?? day)
+          .join(" & ")
+        const start = schedule?.start_time ? formatDatabaseTime(schedule.start_time) : ""
+        const end = schedule?.end_time ? formatDatabaseTime(schedule.end_time) : ""
+        return {
+          id: String(item.id),
+          subject: String(item.subject ?? "Untitled class"),
+          code: String(item.code ?? "No code"),
+          schedule: [days, start && end ? `${start} – ${end}` : ""].filter(Boolean).join(" · ") || "Schedule not set",
+          students: enrollmentCounts[String(item.id)] ?? 0,
+          assessmentCount: assessmentColumns.length,
+          academicYear: (() => {
+            const startYear = String(item.semester_start ?? "").slice(0, 4)
+            const endYear = String(item.semester_end ?? "").slice(0, 4)
+            if (startYear && endYear) return `AY ${startYear}–${endYear}`
+            if (startYear) return `AY ${startYear}`
+            return "Academic year"
+          })(),
+        }
+      })
+
+      setRecordSectionOptions(sections)
+      setSelectedSectionId((current) => {
+        const requested = sessionStorage.getItem("records-target-class")
+        const candidate = requested || current || localStorage.getItem("cit-portal:records-section") || ""
+        sessionStorage.removeItem("records-target-class")
+        return sections.some((section) => section.id === candidate) ? candidate : sections[0]?.id ?? ""
+      })
+      setSectionsLoading(false)
+    }
+
+    void loadRecordSections()
+    const channel = supabase
+      .channel("records-sections-sync")
+      .on("postgres_changes", { event: "*", schema: "public", table: "classes" }, () => void loadRecordSections())
+      .on("postgres_changes", { event: "*", schema: "public", table: "class_schedules" }, () => void loadRecordSections())
+      .on("postgres_changes", { event: "*", schema: "public", table: "class_students" }, () => void loadRecordSections())
+      .subscribe()
+
+    const reloadOnFocus = () => void loadRecordSections()
+    window.addEventListener("focus", reloadOnFocus)
+    return () => {
+      active = false
+      window.removeEventListener("focus", reloadOnFocus)
+      void supabase.removeChannel(channel)
+    }
+  }, [assessmentColumns.length])
+
+  useEffect(() => {
+    if (!selectedSectionId) return
+    localStorage.setItem("cit-portal:records-section", selectedSectionId)
+    let active = true
+    void supabase
+      .from("student_grades")
+      .select("status, published_at, updated_at")
+      .eq("class_id", selectedSectionId)
+      .order("updated_at", { ascending: false })
+      .limit(1)
+      .maybeSingle()
+      .then(({ data, error }) => {
+        if (!active) return
+        if (error) {
+          console.error("Unable to load grade publication status:", error)
+          setRecordPublicationStatus("Draft")
+          setLastPublishedAt(null)
+          return
+        }
+        setRecordPublicationStatus(String(data?.status ?? "draft").toLowerCase() === "published" ? "Published" : "Draft")
+        setLastPublishedAt(data?.published_at ?? null)
+      })
+    return () => { active = false }
+  }, [selectedSectionId])
+
+  useEffect(() => {
+    if (!selectedSectionId) {
+      setExamMaximums(defaultExamMaximums)
+      return
+    }
+
+    const storageKey = `cit-portal:exam-maximums:${selectedSectionId}`
+    try {
+      const saved = JSON.parse(localStorage.getItem(storageKey) || "{}") as Partial<typeof defaultExamMaximums>
+      setExamMaximums({
+        "midterm-written": Math.min(1000, Math.max(1, Math.round(Number(saved["midterm-written"]) || 100))),
+        "midterm-actual": Math.min(1000, Math.max(1, Math.round(Number(saved["midterm-actual"]) || 100))),
+        "final-written": Math.min(1000, Math.max(1, Math.round(Number(saved["final-written"]) || 100))),
+        "final-actual": Math.min(1000, Math.max(1, Math.round(Number(saved["final-actual"]) || 100))),
+      })
+    } catch {
+      setExamMaximums(defaultExamMaximums)
+    }
+  }, [selectedSectionId])
+
+  useEffect(() => {
+    localStorage.setItem("cit-portal:records-view", gradebookView)
+  }, [gradebookView])
+
+  useEffect(() => {
+    const requestedView = sessionStorage.getItem("records-target-view")
+    if (requestedView === "summary") {
+      setGradebookView("summary")
+      sessionStorage.removeItem("records-target-view")
+    }
+  }, [])
+
+  useEffect(() => {
+    let active = true
+
+    const readFirst = (source: any, keys: string[]) => {
+      for (const key of keys) {
+        const value = source?.[key]
+        if (value !== null && value !== undefined && String(value).trim()) return String(value).trim()
+      }
+      return ""
+    }
+
+    const loadEnrolledStudents = async () => {
+      if (!selectedSectionId) {
+        if (active) {
+          setRecordStudents([])
+          setEnrolledStudentsLoading(false)
+          setEnrolledStudentsError("")
+        }
+        return
+      }
+
+      setEnrolledStudentsLoading(true)
+      setEnrolledStudentsError("")
+      const { data: enrollmentRows, error: enrollmentError } = await supabase
+        .from("class_students")
+        .select("*")
+        .eq("class_id", selectedSectionId)
+
+      if (!active) return
+      if (enrollmentError) {
+        console.error("Unable to load enrolled students:", enrollmentError)
+        setRecordStudents([])
+        setEnrolledStudentsError(enrollmentError.message)
+        setEnrolledStudentsLoading(false)
+        return
+      }
+
+      const enrollments = enrollmentRows ?? []
+      const studentIds = [...new Set(enrollments
+        .map((row: any) => readFirst(row, ["student_id", "profile_id", "user_id", "id"]))
+        .filter(Boolean))]
+
+      let profileRows: any[] = []
+      if (studentIds.length > 0) {
+        const studentProfilesResult = await supabase.from("student_profiles").select("*").in("id", studentIds)
+        if (!studentProfilesResult.error) profileRows = studentProfilesResult.data ?? []
+        else {
+          const profilesResult = await supabase.from("profiles").select("*").in("id", studentIds)
+          if (!profilesResult.error) profileRows = profilesResult.data ?? []
+        }
+      }
+      if (!active) return
+
+      const profileById = new Map<string, any>()
+      profileRows.forEach((profile: any) => {
+        const profileId = readFirst(profile, ["id", "student_id", "user_id", "profile_id"])
+        if (profileId) profileById.set(profileId, profile)
+      })
+
+      const loadedStudents: RecordStudent[] = enrollments.map((enrollment: any, index: number) => {
+        const authStudentId = readFirst(enrollment, ["student_id", "profile_id", "user_id", "id"])
+        const profile = enrollment.student_profiles ?? enrollment.profiles ?? enrollment.student ?? profileById.get(authStudentId) ?? {}
+        const studentNumber = readFirst(enrollment, ["student_number", "student_no", "school_id", "student_code"]) ||
+          readFirst(profile, ["student_number", "student_no", "school_id", "student_code"]) || authStudentId || `student-${index + 1}`
+        const fullName = readFirst(enrollment, ["student_name", "full_name", "name"]) ||
+          readFirst(profile, ["full_name", "student_name", "name", "display_name"]) || `Student ${studentNumber}`
+        const enrollmentStatus = readFirst(enrollment, ["status", "enrollment_status"])
+        return {
+          id: studentNumber,
+          userId: authStudentId || undefined,
+          name: fullName,
+          score: 0,
+          attendance: enrollmentStatus.toLowerCase() === "inactive" ? "Absent" : "Present",
+        }
+      })
+
+      loadedStudents.sort((a, b) => a.name.localeCompare(b.name))
+      setRecordStudents(loadedStudents)
+      setStudentStatuses((current) => {
+        const next = { ...current }
+        loadedStudents.forEach((student) => { if (!next[student.id]) next[student.id] = student.attendance })
+        return next
+      })
+      setRecordSectionOptions((current) => current.map((section) =>
+        section.id === selectedSectionId ? { ...section, students: loadedStudents.length } : section,
+      ))
+      setEnrolledStudentsLoading(false)
+    }
+
+    void loadEnrolledStudents()
+    const channel = supabase
+      .channel(`records-enrolled-students-${selectedSectionId || "none"}`)
+      .on("postgres_changes", {
+        event: "*", schema: "public", table: "class_students",
+        filter: selectedSectionId ? `class_id=eq.${selectedSectionId}` : undefined,
+      }, () => void loadEnrolledStudents())
+      .subscribe()
+    const reloadOnFocus = () => void loadEnrolledStudents()
+    window.addEventListener("focus", reloadOnFocus)
+    return () => {
+      active = false
+      window.removeEventListener("focus", reloadOnFocus)
+      void supabase.removeChannel(channel)
+    }
+  }, [selectedSectionId])
+
+  useEffect(() => {
+    // Assessment columns belong to one class only. Clear the previous class's
+    // dynamic columns before loading the newly selected class so Quiz 7 cannot
+    // leak into another section and become Quiz 8.
+    setAssessmentColumns(
+      initialRecordAssessmentColumns.filter(
+        (column) => column.type !== "Quiz" && column.type !== "Exam",
+      ),
+    )
+    setRecordValues({})
+    localDraftValuesRef.current = {}
+    assessmentIdByColumnRef.current = {}
+
+    let active = true
+
+    const normalizeAssessmentLabel = (value: string) =>
+      String(value ?? "").trim().toLowerCase().replace(/^(midterm|final)\s+/, "").replace(/\s+/g, " ")
+
+    const assessmentNumber = (row: any) => {
+      const explicit = Number(row?.assessment_index)
+      if (Number.isFinite(explicit) && explicit > 0) return explicit
+      const match = String(row?.title ?? "").match(/\d+/)
+      return match ? Number(match[0]) : Number.MAX_SAFE_INTEGER
+    }
+
+    const loadDatabaseGradebook = async () => {
+      if (!selectedSectionId) return
+
+      const [{ data: assessmentRows, error: assessmentError }, { data: reminderRows, error: reminderError }] = await Promise.all([
+        supabase
+          .from("omr_assessments")
+          .select("id, class_id, title, assessment_type, academic_term, assessment_index, item_count, points_per_item, status, gradebook_assessment_id")
+          .eq("class_id", selectedSectionId)
+          .neq("status", "archived")
+          .order("assessment_index", { ascending: true }),
+        supabase
+          .from("faculty_reminders")
+          .select("id, class_id, omr_assessment_id")
+          .eq("class_id", selectedSectionId)
+          .not("omr_assessment_id", "is", null),
+      ])
+
+      if (!active) return
+      if (assessmentError || reminderError) {
+        console.error(
+          "Unable to synchronize Gradebook assessments:",
+          assessmentError ?? reminderError,
+        )
+        return
+      }
+
+      // Activities/reminders are the source of truth for whether an assessment
+      // still exists. Old OMR rows left behind by earlier deletion logic must
+      // not remain visible as Gradebook columns.
+      const linkedAssessmentIds = new Set(
+        (reminderRows ?? []).map((row: any) => String(row.omr_assessment_id)),
+      )
+
+      const databaseAssessments = (assessmentRows ?? [])
+        .filter((row: any) => linkedAssessmentIds.has(String(row.id)))
+        .filter((row: any) => row.assessment_type === "quiz" || row.assessment_type === "exam")
+        .sort((a: any, b: any) => {
+          const aTerm = a.academic_term === "final" ? 1 : 0
+          const bTerm = b.academic_term === "final" ? 1 : 0
+          if (aTerm !== bTerm) return aTerm - bTerm
+          if (a.assessment_type !== b.assessment_type) return String(a.assessment_type).localeCompare(String(b.assessment_type))
+          return assessmentNumber(a) - assessmentNumber(b)
+        })
+
+      const resolvedColumnByAssessment = new Map<string, string>()
+
+      setAssessmentColumns((current) => {
+        // Supabase is authoritative for Quiz and Exam columns. Keeping previous
+        // Quiz/Exam columns here caused deleted reminders to remain in Records.
+        const databaseAssessmentIds = new Set(
+          databaseAssessments.map((row: any) =>
+            String(row.gradebook_assessment_id || row.id),
+          ),
+        )
+        const next = current
+          .filter((column) =>
+            column.type !== "Quiz" && column.type !== "Exam"
+              ? true
+              : !databaseAssessmentIds.has(String(column.assessmentId ?? column.id)),
+          )
+          .map((column) => ({ ...column }))
+
+        databaseAssessments.forEach((row: any) => {
+          const type: RecordAssessmentColumn["type"] = row.assessment_type === "exam" ? "Exam" : "Quiz"
+          const term: RecordAssessmentColumn["term"] = row.academic_term === "final" ? "Final" : "Midterm"
+          const title = String(row.title ?? `${type} ${assessmentNumber(row)}`)
+          const linkedGradebookId = String(row.gradebook_assessment_id ?? "")
+
+          // Quiz/Exam identity is term + type + assessment index. An OMR
+          // assessment enriches the existing Gradebook column at the same index
+          // instead of adding a second column such as “Quiz 4: Fundamentals”.
+          const index = assessmentNumber(row)
+          const targetSlot: RecordAssessmentColumn = {
+            id: linkedGradebookId || String(row.id),
+            assessmentId: linkedGradebookId || undefined,
+            label: `${type} ${index}`,
+            type,
+            term,
+            maxScore: Number(row.item_count) * Number(row.points_per_item) || 100,
+            itemCount: Number(row.item_count) || undefined,
+            pointsPerItem: Number(row.points_per_item) || undefined,
+          }
+          const existingIndex = next.findIndex((column) => sameAssessmentSlot(column, targetSlot))
+          const existingColumn = existingIndex >= 0 ? next[existingIndex] : null
+          const columnId = linkedGradebookId || existingColumn?.assessmentId || existingColumn?.id || String(row.id)
+          const savedItemOverride = readAssessmentItemOverride(selectedSectionId, targetSlot)
+          const resolvedPointsPerItem = Number(existingColumn?.pointsPerItem) > 0
+            ? Number(existingColumn?.pointsPerItem)
+            : Number(row.points_per_item) > 0 ? Number(row.points_per_item) : 1
+          const resolvedItemCount = savedItemOverride
+            ?? (Number(existingColumn?.itemCount) > 0 ? Number(existingColumn?.itemCount) : null)
+            ?? (Number(row.item_count) > 0 ? Number(row.item_count) : 100)
+          const mergedColumn: RecordAssessmentColumn = {
+            ...(existingColumn ?? {} as RecordAssessmentColumn),
+            id: columnId,
+            assessmentId: linkedGradebookId || existingColumn?.assessmentId,
+            label: existingColumn?.label || `${type} ${index}`,
+            type,
+            term,
+            maxScore: resolvedItemCount * resolvedPointsPerItem,
+            itemCount: resolvedItemCount,
+            pointsPerItem: resolvedPointsPerItem,
+          }
+          if (existingIndex >= 0) next[existingIndex] = mergedColumn
+          else next.push(mergedColumn)
+          resolvedColumnByAssessment.set(String(row.id), columnId)
+          if (linkedGradebookId) {
+            resolvedColumnByAssessment.set(linkedGradebookId, columnId)
+            assessmentIdByColumnRef.current[String(columnId)] = linkedGradebookId
+            assessmentIdByColumnRef.current[String(row.id)] = linkedGradebookId
+            assessmentIdByColumnRef.current[linkedGradebookId] = linkedGradebookId
+          }
+        })
+
+        const order = (column: RecordAssessmentColumn) => {
+          const termOrder = column.term === "Final" ? 10000 : 0
+          const typeOrder = column.type === "Quiz" ? 0 : column.type === "Exam" ? 1000 : 2000
+          const match = column.label.match(/\d+/)
+          return termOrder + typeOrder + (match ? Number(match[0]) : 999)
+        }
+        return next.sort((a, b) => order(a) - order(b))
+      })
+
+      const assessmentIds = databaseAssessments.map((row: any) => String(row.id))
+      if (assessmentIds.length > 0) {
+        const { data: submissionRows, error: submissionError } = await supabase
+          .from("omr_submissions")
+          .select("assessment_id, detected_student_number, final_score, proposed_score, status, created_at")
+          .in("assessment_id", assessmentIds)
+          .in("status", ["draft", "approved", "pending", "published"])
+          .order("created_at", { ascending: true })
+
+        if (!active) return
+        if (submissionError) console.error("Unable to synchronize OMR scores:", submissionError)
+        else {
+          setRecordValues((current) => {
+            const next = { ...current }
+            ;(submissionRows ?? []).forEach((submission: any) => {
+              const studentNumber = String(submission.detected_student_number ?? "").trim()
+              const columnId = resolvedColumnByAssessment.get(String(submission.assessment_id))
+              const score = Number(submission.final_score ?? submission.proposed_score)
+              if (!studentNumber || !columnId || !Number.isFinite(score)) return
+              // Manual assessment_scores and the current gradebook value take
+              // precedence. OMR is only a fallback input for an empty quiz cell.
+              const currentStudentValues = next[studentNumber]
+              if (
+                currentStudentValues &&
+                Object.prototype.hasOwnProperty.call(currentStudentValues, columnId)
+              ) return
+              next[studentNumber] = { ...currentStudentValues, [columnId]: score }
+            })
+            return next
+          })
+        }
+      }
+
+      // Load the authoritative manual gradebook through a SECURITY DEFINER RPC.
+      // This avoids browser RLS hiding manual quizzes such as Final Quiz 1.
+      const { data: gradebookData, error: gradebookError } = await supabase.rpc(
+        "comptech_faculty_load_gradebook",
+        { p_class_id: selectedSectionId },
+      )
+
+      if (!active) return
+      if (gradebookError) {
+        console.error("Unable to load saved gradebook:", gradebookError)
+      } else {
+        const payload = (gradebookData ?? {}) as {
+          assessments?: any[]
+          scores?: any[]
+        }
+        const savedAssessments = Array.isArray(payload.assessments) ? payload.assessments : []
+        const savedScores = Array.isArray(payload.scores) ? payload.scores : []
+
+        savedAssessments.forEach((row: any) => {
+          const assessmentId = String(row.id)
+          assessmentIdByColumnRef.current[assessmentId] = assessmentId
+        })
+
+        setAssessmentColumns((current) => {
+          const next = current.map((column) => ({ ...column }))
+          savedAssessments.forEach((row: any) => {
+            const assessmentId = String(row.id)
+            const rawType = String(row.assessment_type ?? "").trim().toLowerCase()
+            const type: RecordAssessmentColumn["type"] =
+              rawType === "quiz" ? "Quiz" :
+              rawType === "exam" ? "Exam" :
+              rawType === "project" || rawType === "hands on" || rawType === "hands_on" || rawType === "activity"
+                ? "Hands On" :
+              rawType === "recitation" ? "Recitation" :
+              rawType === "attendance" ? "Attendance" : "Activities"
+            const term: RecordAssessmentColumn["term"] =
+              String(row.term).trim().toLowerCase() === "final" ? "Final" : "Midterm"
+            const slotForOverride: RecordAssessmentColumn = {
+              id: assessmentId,
+              assessmentId,
+              label: String(row.title),
+              type,
+              term,
+              maxScore: Number(row.max_score) || 100,
+            }
+            const savedItemOverride = readAssessmentItemOverride(selectedSectionId, slotForOverride)
+            const column: RecordAssessmentColumn = {
+              ...slotForOverride,
+              itemCount: savedItemOverride ?? undefined,
+              pointsPerItem: 1,
+              maxScore: savedItemOverride ?? (Number(row.max_score) || 100),
+            }
+            const index = next.findIndex((item) =>
+              String(item.id) === assessmentId ||
+              item.assessmentId === assessmentId ||
+              sameAssessmentSlot(item, column),
+            )
+            if (index >= 0) {
+              const previousId = String(next[index].id)
+              next[index] = { ...next[index], ...column }
+              assessmentIdByColumnRef.current[previousId] = assessmentId
+            } else {
+              next.push(column)
+            }
+          })
+          return next
+        })
+
+        setRecordValues((current) => {
+          const next = { ...current }
+          savedScores.forEach((row: any) => {
+            const studentNumber = String(row.student_number ?? "").trim()
+            const assessmentId = String(row.assessment_id ?? "").trim()
+            const score = Number(row.score)
+            if (!studentNumber || !assessmentId || !Number.isFinite(score)) return
+            const values = { ...next[studentNumber], [assessmentId]: score }
+            Object.entries(assessmentIdByColumnRef.current).forEach(([columnId, savedId]) => {
+              if (savedId === assessmentId) values[columnId] = score
+            })
+            next[studentNumber] = values
+          })
+          localDraftValuesRef.current = next
+          return next
+        })
+
+        setRecordSectionOptions((current) => current.map((section) =>
+          section.id === selectedSectionId
+            ? { ...section, assessmentCount: Math.max(databaseAssessments.length, savedAssessments.length) }
+            : section,
+        ))
+      }
+
+    }
+
+    void loadDatabaseGradebook()
+    const channel = supabase
+      .channel(`records-database-gradebook-${selectedSectionId || "none"}`)
+      .on("postgres_changes", {
+        event: "*", schema: "public", table: "omr_assessments",
+        filter: selectedSectionId ? `class_id=eq.${selectedSectionId}` : undefined,
+      }, () => void loadDatabaseGradebook())
+      .on("postgres_changes", {
+        event: "*", schema: "public", table: "omr_submissions",
+      }, () => void loadDatabaseGradebook())
+      .on("postgres_changes", {
+        event: "*", schema: "public", table: "faculty_reminders",
+        filter: selectedSectionId ? `class_id=eq.${selectedSectionId}` : undefined,
+      }, () => void loadDatabaseGradebook())
+      .subscribe()
+
+    const reloadOnFocus = () => void loadDatabaseGradebook()
+    const reloadWhenVisible = () => document.visibilityState === "visible" && void loadDatabaseGradebook()
+    window.addEventListener("focus", reloadOnFocus)
+    document.addEventListener("visibilitychange", reloadWhenVisible)
+    return () => {
+      active = false
+      window.removeEventListener("focus", reloadOnFocus)
+      document.removeEventListener("visibilitychange", reloadWhenVisible)
+      void supabase.removeChannel(channel)
+    }
+  }, [selectedSectionId])
+
+  useEffect(() => {
+    const handleAssessmentDeleted = (event: Event) => {
+      const detail = (event as CustomEvent<{
+        assessmentId: string
+        classId: string
+        title: string
+        type: string
+      }>).detail
+
+      if (!detail || detail.classId !== selectedSectionId) return
+
+      const normalize = (value: string) =>
+        String(value ?? "").trim().toLowerCase().replace(/^(midterm|final)\s+/, "").replace(/\s+/g, " ")
+
+      const removedIds = new Set<string>()
+      setAssessmentColumns((current) => current.filter((column) => {
+        const matches =
+          (detail.assessmentId && column.id === detail.assessmentId) ||
+          ((column.type === "Quiz" || column.type === "Exam") && normalize(column.label) === normalize(detail.title))
+        if (matches) removedIds.add(column.id)
+        return !matches
+      }))
+
+      setRecordValues((current) => {
+        const next: Record<string, Record<string, number | "">> = {}
+        Object.entries(current).forEach(([studentNumber, values]) => {
+          const studentValues = { ...values }
+          removedIds.forEach((id) => delete studentValues[id])
+          next[studentNumber] = studentValues
+        })
+        return next
+      })
+    }
+
+    window.addEventListener("cit-portal:gradebook-assessment-deleted", handleAssessmentDeleted)
+    return () => window.removeEventListener("cit-portal:gradebook-assessment-deleted", handleAssessmentDeleted)
+  }, [selectedSectionId])
+
+  useEffect(() => {
+    if (dailySessions[recordDate]) return
+    const term = recordDate <= "2026-10-31" ? "Midterm" : "Final"
+    const attendanceId = `daily-${recordDate}-attendance`
+    const recitationId = `daily-${recordDate}-recitation`
+    setDailySessions((sessions) => ({
+      ...sessions,
+      [recordDate]: { attendanceId, recitationId },
+    }))
+    setAssessmentColumns((columns) => {
+      const attendanceCount = columns.filter(
+        (column) => column.type === "Attendance" && column.term === term,
+      ).length
+      const recitationCount = columns.filter(
+        (column) => column.type === "Recitation" && column.term === term,
+      ).length
+      return [
+        ...columns,
+        {
+          id: attendanceId,
+          label: `${term} Attendance ${attendanceCount + 1}`,
+          type: "Attendance",
+          term,
+          maxScore: 10, itemCount: 10, pointsPerItem: 1,
+        },
+        {
+          id: recitationId,
+          label: `${term} Recitation ${recitationCount + 1}`,
+          type: "Recitation",
+          term,
+          maxScore: 10, itemCount: 10, pointsPerItem: 1,
+        },
+      ]
+    })
+  }, [dailySessions, recordDate])
+
+  useEffect(() => {
+    if (!selectedSectionId || !recordDate || recordStudents.length === 0) return
+
+    let active = true
+    let requestVersion = 0
+
+    const loadAttendanceForSelectedDate = async () => {
+      const version = ++requestVersion
+      const dayStart = new Date(`${recordDate}T00:00:00`)
+      const dayEnd = new Date(`${recordDate}T23:59:59.999`)
+
+      const { data: sessions, error: sessionError } = await supabase
+        .from("attendance_sessions")
+        .select("id, class_id, started_at, ended_at, status")
+        .eq("class_id", selectedSectionId)
+        .gte("started_at", dayStart.toISOString())
+        .lte("started_at", dayEnd.toISOString())
+        .order("started_at", { ascending: true })
+
+      if (!active || version !== requestVersion) return
+      if (sessionError) {
+        console.error("Unable to synchronize Daily Tracker attendance:", sessionError)
+        return
+      }
+
+      const sessionRows = sessions ?? []
+      // No class session means no attendance decision yet. Do not mark everyone absent.
+      if (sessionRows.length === 0) return
+
+      const rosterResults = await Promise.all(
+        sessionRows.map((session: any) =>
+          supabase.rpc("faculty_get_live_attendance", {
+            p_session_id: String(session.id),
+          }),
+        ),
+      )
+      if (!active || version !== requestVersion) return
+
+      const attendanceRows = rosterResults.flatMap((result) => {
+        if (result.error) {
+          console.error("Unable to load synchronized attendance roster:", result.error)
+          return []
+        }
+        return Array.isArray(result.data) ? result.data : []
+      })
+
+      const statusByStudent = new Map<string, string>()
+      attendanceRows.forEach((row: any) => {
+        const status = String(row.status ?? "Present").trim() || "Present"
+        const keys = [row.student_id, row.user_id, row.profile_id, row.student_number, row.student_no]
+          .map((value) => String(value ?? "").trim())
+          .filter(Boolean)
+        keys.forEach((key) => statusByStudent.set(key, status))
+      })
+
+      const attendanceColumnId = `daily-${recordDate}-attendance`
+      const nextStatuses: Record<string, string> = {}
+      const nextScores: Record<string, string> = {}
+
+      recordStudents.forEach((student) => {
+        const matchedStatus = [student.userId, student.id]
+          .map((value) => String(value ?? "").trim())
+          .filter(Boolean)
+          .map((key) => statusByStudent.get(key))
+          .find(Boolean)
+        const normalized = String(matchedStatus ?? "Absent").toLowerCase()
+        const status = normalized === "late"
+          ? "Late"
+          : normalized === "excused"
+            ? "Excused"
+            : normalized === "present"
+              ? "Present"
+              : "Absent"
+        nextStatuses[`${recordDate}:${student.id}`] = status
+        nextScores[student.id] = status === "Present" || status === "Excused"
+          ? "10"
+          : status === "Late"
+            ? "7"
+            : "0"
+      })
+
+      setStudentStatuses((current) => {
+        const next = { ...current }
+        Object.entries(nextStatuses).forEach(([key, status]) => {
+          if (!manualAttendanceOverrides[key]) next[key] = status
+        })
+        return next
+      })
+      setRecordValues((current) => {
+        const next = { ...current }
+        Object.entries(nextScores).forEach(([studentId, score]) => {
+          const attendanceKey = `${recordDate}:${studentId}`
+          if (manualAttendanceOverrides[attendanceKey]) return
+          next[studentId] = { ...(next[studentId] ?? {}), [attendanceColumnId]: score }
+        })
+        return next
+      })
+    }
+
+    void loadAttendanceForSelectedDate()
+    const refreshTimer = window.setInterval(() => void loadAttendanceForSelectedDate(), 10000)
+    const attendanceChannel = supabase
+      .channel(`records-attendance-sync-${selectedSectionId}-${recordDate}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "attendance" }, () => {
+        void loadAttendanceForSelectedDate()
+      })
+      .on("postgres_changes", {
+        event: "*",
+        schema: "public",
+        table: "attendance_sessions",
+        filter: `class_id=eq.${selectedSectionId}`,
+      }, () => {
+        void loadAttendanceForSelectedDate()
+      })
+      .subscribe()
+
+    return () => {
+      active = false
+      window.clearInterval(refreshTimer)
+      void supabase.removeChannel(attendanceChannel)
+    }
+  }, [selectedSectionId, recordDate, recordStudents, manualAttendanceOverrides])
+
+  useEffect(() => {
+    const normalizeAssessmentLabel = (value: string) =>
+      value.trim().toLowerCase().replace(/^(midterm|final)\s+/, "").replace(/\s+/g, " ")
+
+    const handleAssessmentSaved = (event: Event) => {
+      const detail = (event as CustomEvent<{
+        assessmentId: string
+        classId: string
+        title: string
+        type: "quiz" | "exam" | "handson"
+        term: "midterm" | "final"
+      }>).detail
+
+      if (!detail || detail.classId !== selectedSectionId) return
+
+      const columnType: RecordAssessmentColumn["type"] = detail.type === "exam" ? "Exam" : "Quiz"
+      const columnTerm: RecordAssessmentColumn["term"] = detail.term === "final" ? "Final" : "Midterm"
+      const normalizedTitle = normalizeAssessmentLabel(detail.title)
+      const detailIndex = Number(detail.title.match(/\d+/)?.[0])
+
+      setAssessmentColumns((current) => {
+        const existing = current.find((column) => {
+          const columnIndex = Number(column.label.match(/\d+/)?.[0])
+          return column.id === detail.assessmentId ||
+            (
+              column.type === columnType &&
+              column.term === columnTerm &&
+              (
+                normalizeAssessmentLabel(column.label) === normalizedTitle ||
+                (Number.isFinite(detailIndex) && detailIndex > 0 && columnIndex === detailIndex)
+              )
+            )
+        })
+
+        if (existing) {
+          return current.map((column) =>
+            column.id === existing.id
+              ? { ...column, label: detail.title, type: columnType, term: columnTerm, maxScore: detail.maxScore, itemCount: detail.maxScore, pointsPerItem: 1 }
+              : column,
+          )
+        }
+
+        const newColumn: RecordAssessmentColumn = {
+          id: detail.assessmentId,
+          label: detail.title,
+          type: columnType,
+          term: columnTerm,
+          maxScore: detail.maxScore,
+          itemCount: detail.maxScore,
+          pointsPerItem: 1,
+        }
+        const lastMatchingIndex = current.reduce(
+          (lastIndex, column, index) =>
+            column.type === columnType && column.term === columnTerm ? index : lastIndex,
+          -1,
+        )
+        const insertAt = lastMatchingIndex < 0 ? current.length : lastMatchingIndex + 1
+        return [...current.slice(0, insertAt), newColumn, ...current.slice(insertAt)]
+      })
+    }
+
+    window.addEventListener("cit-portal:gradebook-assessment-saved", handleAssessmentSaved)
+    return () => window.removeEventListener("cit-portal:gradebook-assessment-saved", handleAssessmentSaved)
+  }, [selectedSectionId])
+
+  useEffect(() => {
+    const normalizeAssessmentLabel = (value: string) =>
+      value
+        .trim()
+        .toLowerCase()
+        .replace(/^(midterm|final)\s+/, "")
+        .replace(/\s+/g, " ")
+
+    const handleDraftOmrScore = (event: Event) => {
+      const detail = (event as CustomEvent<{
+        assessmentId: string
+        classId: string
+        studentNumber: string
+        title: string
+        type: "quiz" | "exam"
+        term: "midterm" | "final"
+        maxScore: number
+        score: number
+        status: "published"
+      }>).detail
+
+      if (!detail || detail.classId !== selectedSectionId) return
+
+      const columnType: RecordAssessmentColumn["type"] =
+        detail.type === "exam" ? "Exam" : detail.type === "handson" ? "Hands On" : "Quiz"
+      const columnTerm: RecordAssessmentColumn["term"] =
+        detail.term === "final" ? "Final" : "Midterm"
+      const normalizedTitle = normalizeAssessmentLabel(detail.title)
+
+      setAssessmentColumns((current) => {
+        // Reuse a default/manual column such as "Midterm Quiz 2" when the
+        // published OMR assessment is titled "Quiz 2". Only create a new
+        // column when no matching type, term, and title exists.
+        const existing = current.find((column) =>
+          column.id === detail.assessmentId ||
+          (
+            column.type === columnType &&
+            column.term === columnTerm &&
+            normalizeAssessmentLabel(column.label) === normalizedTitle
+          ),
+        )
+        const targetColumnId = existing?.id ?? detail.assessmentId
+
+        setRecordValues((values) => ({
+          ...values,
+          [detail.studentNumber]: {
+            ...values[detail.studentNumber],
+            [targetColumnId]: detail.score,
+          },
+        }))
+
+        if (existing) {
+          return current.map((column) =>
+            column.id === existing.id
+              ? { ...column, label: detail.title, type: columnType, term: columnTerm }
+              : column,
+          )
+        }
+
+        const newColumn: RecordAssessmentColumn = {
+          id: detail.assessmentId,
+          label: detail.title,
+          type: columnType,
+          term: columnTerm,
+        }
+        const lastMatchingIndex = current.reduce(
+          (lastIndex, column, index) =>
+            column.type === columnType && column.term === columnTerm ? index : lastIndex,
+          -1,
+        )
+        const insertAt = lastMatchingIndex < 0 ? current.length : lastMatchingIndex + 1
+        return [...current.slice(0, insertAt), newColumn, ...current.slice(insertAt)]
+      })
+    }
+
+    window.addEventListener("cit-portal:gradebook-score-drafted", handleDraftOmrScore)
+    return () => window.removeEventListener("cit-portal:gradebook-score-drafted", handleDraftOmrScore)
+  }, [selectedSectionId])
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("cit-portal:gradebook")
+      if (!saved) return
+
+      const parsed = JSON.parse(saved)
+      if (Array.isArray(parsed.students) && parsed.students.length > 0) setRecordStudents(parsed.students)
+      if (parsed.statuses && typeof parsed.statuses === "object") {
+        const scopedStatuses = Object.fromEntries(
+          Object.entries(parsed.statuses).filter(([key]) => /^\d{4}-\d{2}-\d{2}:/.test(key)),
+        )
+        setStudentStatuses(scopedStatuses as Record<string, string>)
+      }
+      if (parsed.manualAttendanceOverrides && typeof parsed.manualAttendanceOverrides === "object") {
+        setManualAttendanceOverrides(parsed.manualAttendanceOverrides)
+      }
+      if (parsed.dailySessions && typeof parsed.dailySessions === "object") setDailySessions(parsed.dailySessions)
+      if (parsed.dailySummaryItems && typeof parsed.dailySummaryItems === "object") {
+        setDailySummaryItems((current) => ({ ...current, ...parsed.dailySummaryItems }))
+      }
+      if (parsed.remarks && typeof parsed.remarks === "object") setDailyRemarks(parsed.remarks)
+      if (["Draft", "Published"].includes(parsed.publicationStatus)) {
+        setRecordPublicationStatus(parsed.publicationStatus)
+      }
+      if (typeof parsed.savedAt === "string") setDraftSavedAt(parsed.savedAt)
+
+      // Restore every saved Gradebook column, including editable Quiz and Exam
+      // item counts. Supabase still supplies assessment identity and labels, but
+      // the professor's saved item-count override wins for the same term/type/index.
+      const savedColumns: RecordAssessmentColumn[] = Array.isArray(parsed.columns)
+        ? parsed.columns
+        : []
+      const savedValues = parsed.values && typeof parsed.values === "object"
+        ? parsed.values as Record<string, Record<string, number | "">>
+        : {}
+      const cleanedValues: Record<string, Record<string, number | "">> = savedValues
+      localDraftValuesRef.current = cleanedValues
+
+      setAssessmentColumns((current) => {
+        const merged = current.map((column) => {
+          const savedColumn = savedColumns.find((candidate) =>
+            candidate.id === column.id || sameAssessmentSlot(candidate, column),
+          )
+          if (!savedColumn) return column
+
+          const savedItems = Number(savedColumn.itemCount)
+          const savedPointsPerItem = Number(savedColumn.pointsPerItem) > 0
+            ? Number(savedColumn.pointsPerItem)
+            : Number(column.pointsPerItem) > 0
+              ? Number(column.pointsPerItem)
+              : 1
+
+          return {
+            ...column,
+            label: savedColumn.label || column.label,
+            itemCount: savedItems > 0 ? savedItems : column.itemCount,
+            pointsPerItem: savedPointsPerItem,
+            maxScore: savedItems > 0
+              ? savedItems * savedPointsPerItem
+              : column.maxScore,
+          }
+        })
+
+        savedColumns.forEach((savedColumn) => {
+          const exists = merged.some((column) =>
+            column.id === savedColumn.id || sameAssessmentSlot(column, savedColumn),
+          )
+          if (!exists) merged.push(savedColumn)
+        })
+        return merged
+      })
+      setRecordValues((current) => {
+        const next = { ...cleanedValues }
+        Object.entries(current).forEach(([studentNumber, values]) => {
+          next[studentNumber] = { ...next[studentNumber], ...values }
+        })
+        return next
+      })
+
+      localStorage.setItem("cit-portal:gradebook", JSON.stringify({
+        ...parsed,
+        columns: savedColumns,
+        values: cleanedValues,
+      }))
+    } catch (error) {
+      console.error("Unable to restore gradebook data:", error)
+    }
+  }, [])
+
+  useEffect(() => {
+    setGradebookSaveState("saving")
+    const timer = window.setTimeout(() => {
+      localStorage.setItem("cit-portal:gradebook", JSON.stringify({
+        students: recordStudents,
+        values: recordValues,
+        statuses: studentStatuses,
+        manualAttendanceOverrides,
+        columns: assessmentColumns,
+        dailySessions,
+        dailySummaryItems,
+        remarks: dailyRemarks,
+        publicationStatus: recordPublicationStatus,
+        selectedSectionId,
+        savedAt: new Date().toISOString(),
+      }))
+      setDraftSavedAt(new Date().toISOString())
+      setGradebookSaveState("saved")
+    }, 500)
+    return () => window.clearTimeout(timer)
+  }, [recordStudents, recordValues, studentStatuses, manualAttendanceOverrides, assessmentColumns, dailySessions, dailySummaryItems, dailyRemarks, recordPublicationStatus, selectedSectionId])
+
+  const normalizeCsvHeader = (value: string) =>
+    value.trim().toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "")
+
+  const parseCsv = (text: string) => {
+    const rows: string[][] = []
+    let row: string[] = []
+    let field = ""
+    let quoted = false
+    for (let index = 0; index < text.length; index += 1) {
+      const character = text[index]
+      const nextCharacter = text[index + 1]
+      if (character === '"' && quoted && nextCharacter === '"') {
+        field += '"'
+        index += 1
+      } else if (character === '"') {
+        quoted = !quoted
+      } else if (character === "," && !quoted) {
+        row.push(field.trim())
+        field = ""
+      } else if ((character === "\n" || character === "\r") && !quoted) {
+        if (character === "\r" && nextCharacter === "\n") index += 1
+        row.push(field.trim())
+        if (row.some((cell) => cell !== "")) rows.push(row)
+        row = []
+        field = ""
+      } else {
+        field += character
+      }
+    }
+    row.push(field.trim())
+    if (row.some((cell) => cell !== "")) rows.push(row)
+    return rows
+  }
+
+  const importGradebookCsv = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    event.target.value = ""
+    if (!file) return
+    try {
+      const rows = parseCsv((await file.text()).replace(/^\uFEFF/, ""))
+      if (rows.length < 2) {
+        showMessage("The CSV must contain a header row and at least one student row.", "error", "CSV could not be imported")
+        return
+      }
+      const headers = rows[0].map(normalizeCsvHeader)
+      const findHeader = (...names: string[]) => headers.findIndex((header) => names.includes(header))
+      const idIndex = findHeader("student_id", "student_number", "id", "student_no")
+      const nameIndex = findHeader("student_name", "name", "full_name")
+      const statusIndex = findHeader("status", "attendance_status", "attendance")
+      if (idIndex < 0 || nameIndex < 0) {
+        showMessage("The CSV needs Student ID and Student Name columns.", "error", "CSV columns are missing")
+        return
+      }
+
+      const importedStudents: typeof students = []
+      const importedValues: Record<string, Record<string, number | "">> = {}
+      const importedStatuses: Record<string, string> = {}
+      const normalizedColumns = new Map<string, string>()
+      assessmentColumns.forEach((column) => {
+        normalizedColumns.set(normalizeCsvHeader(column.label), column.id)
+        normalizedColumns.set(normalizeCsvHeader(column.id), column.id)
+      })
+      const fixedScoreHeaders: Record<string, string> = {
+        midterm_written: "midterm-written",
+        midterm_actual: "midterm-actual",
+        final_written: "final-written",
+        final_actual: "final-actual",
+      }
+
+      rows.slice(1).forEach((cells) => {
+        const id = String(cells[idIndex] ?? "").trim()
+        const name = String(cells[nameIndex] ?? "").trim()
+        if (!id || !name) return
+        const status = String(statusIndex >= 0 ? cells[statusIndex] ?? "Present" : "Present").trim() || "Present"
+        importedStudents.push({ name, id, score: 0, attendance: status })
+        importedStatuses[id] = status
+        const values: Record<string, number | ""> = {}
+        headers.forEach((header, headerIndex) => {
+          const columnId = fixedScoreHeaders[header] ?? normalizedColumns.get(header)
+          if (!columnId) return
+          const rawValue = String(cells[headerIndex] ?? "").trim()
+          if (rawValue === "") values[columnId] = ""
+          else {
+            const numericValue = Number(rawValue)
+            if (Number.isFinite(numericValue)) values[columnId] = Math.max(0, numericValue)
+          }
+        })
+        importedValues[id] = values
+      })
+
+      if (importedStudents.length === 0) {
+        showMessage("No valid student rows were found in the CSV.", "error", "CSV could not be imported")
+        return
+      }
+      setRecordStudents(importedStudents)
+      setRecordValues(importedValues)
+      setStudentStatuses(importedStatuses)
+      showToast(`${importedStudents.length} students imported successfully.`)
+    } catch (error) {
+      showMessage(error instanceof Error ? error.message : "Unable to read the CSV file.", "error", "CSV import failed")
+    }
+  }
+
+  const exportGradebookCsv = () => {
+    if (sectionsLoading || recordSectionOptions.length === 0) return
+
+    const escapeCsvCell = (value: string | number) => {
+      const text = String(value ?? "")
+      return /[",\n\r]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text
+    }
+
+    const fixedColumns = [
+      { id: "midterm-written", label: "Midterm Written" },
+      { id: "midterm-actual", label: "Midterm Actual" },
+      { id: "final-written", label: "Final Written" },
+      { id: "final-actual", label: "Final Actual" },
+    ]
+    const dynamicColumns = assessmentColumns.filter(
+      (column) => !fixedColumns.some((fixed) => fixed.id === column.id),
+    )
+    const scoreColumns = [...fixedColumns, ...dynamicColumns]
+    if (enrolledStudentsLoading) {
+      showMessage("Please wait until the enrolled students finish loading before exporting.", "error", "Gradebook is still loading")
+      return
+    }
+    if (recordStudents.length === 0) {
+      showMessage("There are no enrolled students to export for this class.", "error", "Gradebook is empty")
+      return
+    }
+
+    const headers = [
+      "Student ID",
+      "Student Name",
+      "Status",
+      ...scoreColumns.map((column) => column.label),
+      "Final Grade",
+      "Result",
+    ]
+    const rows = recordStudents.map((student) => {
+      const values = recordValues[student.id] ?? {}
+      return [
+        student.id,
+        student.name,
+        studentStatuses[student.id] ?? student.attendance,
+        ...scoreColumns.map((column) => values[column.id] ?? ""),
+        finalGrade(student).toFixed(2),
+        finalGrade(student) >= 75 ? "Passed" : "Failed",
+      ]
+    })
+    const csv = [headers, ...rows]
+      .map((row) => row.map((cell) => escapeCsvCell(cell)).join(","))
+      .join("\r\n")
+    const blob = new Blob(["\uFEFF", csv], { type: "text/csv;charset=utf-8" })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement("a")
+    const safeClassName = `${selectedSection.code}-${selectedSection.subject}`
+      .replace(/[^a-z0-9]+/gi, "-")
+      .replace(/^-|-$/g, "")
+      .toLowerCase()
+
+    link.href = url
+    link.download = `${safeClassName || "gradebook"}-gradebook.csv`
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+    URL.revokeObjectURL(url)
+    showToast("Gradebook exported successfully.")
+  }
+
+  const selectedSection =
+    recordSectionOptions.find((section) => section.id === selectedSectionId) ??
+    recordSectionOptions[0] ?? {
+      id: "",
+      subject: sectionsLoading ? "Loading classes..." : "No classes available",
+      code: sectionsLoading ? "Loading" : "No class",
+      schedule: sectionsLoading ? "Loading schedule..." : "Create a class to begin using Records",
+      students: 0,
+      assessmentCount: assessmentColumns.length,
+      academicYear: "Academic year",
+    }
+  const dailySession = dailySessions[recordDate]
+  const dailySessionTerm = recordDate <= "2026-10-31" ? "Midterm" : "Final"
+  const dailySessionNumber = Math.max(
+    1,
+    assessmentColumns
+      .filter(
+        (column) =>
+          column.type === "Attendance" && column.term === dailySessionTerm,
+      )
+      .findIndex((column) => column.id === dailySession?.attendanceId) + 1,
+  )
+  const dailySessionLabel = `${
+    dailySessionTerm === "Final" ? "Finals" : dailySessionTerm
+  } Session ${dailySessionNumber}`
+
+  const switchDailySessionTerm = (term: "Midterm" | "Final") => {
+    const day = Math.min(Number(recordDate.slice(-2)), 30)
+      .toString()
+      .padStart(2, "0")
+    setRecordDate(`${term === "Midterm" ? "2026-10" : "2026-11"}-${day}`)
+  }
+
+  const filtered = useMemo(() => {
+    const normalize = (value: unknown) =>
+      String(value ?? "").trim().toLowerCase()
+    const compact = (value: unknown) =>
+      normalize(value).replace(/[^a-z0-9]/g, "")
+
+    const searchText = normalize(query)
+    const compactSearchText = compact(query)
+    if (!searchText) return recordStudents
+
+    return recordStudents.filter((student) => {
+      const searchableValues = [
+        student.name,
+        student.id,
+        student.userId,
+      ]
+
+      return searchableValues.some((value) => {
+        const normalizedValue = normalize(value)
+        const compactValue = compact(value)
+        return (
+          normalizedValue.includes(searchText) ||
+          (compactSearchText.length > 0 && compactValue.includes(compactSearchText))
+        )
+      })
+    })
+  }, [query, recordStudents])
+  const selectedRecordDate = new Date(`${recordDate}T12:00:00`)
+  const calendarDays = Array.from(
+    {
+      length:
+        new Date(
+          calendarMonth.getFullYear(),
+          calendarMonth.getMonth() + 1,
+          0,
+        ).getDate() +
+        new Date(
+          calendarMonth.getFullYear(),
+          calendarMonth.getMonth(),
+          1,
+        ).getDay(),
+    },
+    (_, index) => {
+      const firstDayOffset = new Date(
+        calendarMonth.getFullYear(),
+        calendarMonth.getMonth(),
+        1,
+      ).getDay()
+      return index < firstDayOffset
+        ? null
+        : new Date(
+            calendarMonth.getFullYear(),
+            calendarMonth.getMonth(),
+            index - firstDayOffset + 1,
+          )
+    },
+  )
+
+  const selectRecordDate = (date: Date) => {
+    setRecordDate(
+      `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`,
+    )
+    setCalendarMonth(new Date(date.getFullYear(), date.getMonth(), 1))
+    setDatePickerOpen(false)
+  }
+
+  const deduplicatedAssessmentColumns = assessmentColumns.filter((column, index, columns) =>
+    columns.findIndex((candidate) => sameAssessmentSlot(candidate, column)) === index,
+  )
+  const quizColumns = deduplicatedAssessmentColumns.filter(
+    (column) => column.type === "Quiz",
+  )
+  const midtermQuizColumns = quizColumns.filter(
+    (column) => column.term === "Midterm",
+  ).slice(0, 8)
+  const finalQuizColumns = quizColumns.filter(
+    (column) => column.term === "Final",
+  ).slice(0, 8)
+  const visibleQuizColumns = [...midtermQuizColumns, ...finalQuizColumns]
+  const midtermQuizCount = midtermQuizColumns.length
+  const finalQuizCount = finalQuizColumns.length
+  const midtermProjectColumns = deduplicatedAssessmentColumns.filter(
+    (column) => column.type === "Hands On" && column.term === "Midterm",
+  ).slice(0, 10)
+  const finalProjectColumns = deduplicatedAssessmentColumns.filter(
+    (column) => column.type === "Hands On" && column.term === "Final",
+  ).slice(0, 12)
+  const midtermRecitationColumns = deduplicatedAssessmentColumns.filter(
+    (column) =>
+      column.type === "Recitation" &&
+      column.term === "Midterm" &&
+      String(column.id).startsWith("daily-"),
+  )
+  const finalRecitationColumns = deduplicatedAssessmentColumns.filter(
+    (column) =>
+      column.type === "Recitation" &&
+      column.term === "Final" &&
+      String(column.id).startsWith("daily-"),
+  )
+  const midtermAttendanceColumns = deduplicatedAssessmentColumns.filter(
+    (column) =>
+      column.type === "Attendance" &&
+      column.term === "Midterm" &&
+      String(column.id).startsWith("daily-"),
+  )
+  const finalAttendanceColumns = deduplicatedAssessmentColumns.filter(
+    (column) =>
+      column.type === "Attendance" &&
+      column.term === "Final" &&
+      String(column.id).startsWith("daily-"),
+  )
+
+  const addAssessmentColumn = (
+    type: "Quiz" | "Hands On" | "Recitation" | "Attendance",
+    term: "Midterm" | "Final",
+  ) => {
+    if (!selectedSectionId) return
+
+    const existingCount = deduplicatedAssessmentColumns.filter((column) =>
+      column.type === type && column.term === term,
+    ).length
+    const limit = type === "Quiz"
+      ? 8
+      : type === "Hands On"
+        ? term === "Midterm" ? 10 : 12
+        : 1
+    if (existingCount >= limit) {
+      showToast(
+        `${term} ${type === "Hands On" ? "Project/Activity" : type} is limited to ${limit} columns by the class-record format.`,
+        "error",
+      )
+      return
+    }
+
+    // Match the class-record format: every manually added assessment must
+    // declare its number of items before the score column is created.
+    const defaultItems = type === "Attendance" || type === "Recitation" ? 10 : 20
+    const itemResponse = window.prompt(
+      `Enter the number of items for this ${term.toLowerCase()} ${type === "Hands On" ? "project/activity" : type.toLowerCase()}:`,
+      String(defaultItems),
+    )
+    if (itemResponse === null) return
+
+    const requestedItems = Number(itemResponse)
+    if (!Number.isInteger(requestedItems) || requestedItems < 1 || requestedItems > 1000) {
+      showToast("Number of items must be a whole number from 1 to 1000.", "error")
+      return
+    }
+
+    const pointsResponse = window.prompt(
+      "Enter the points per item:",
+      "1",
+    )
+    if (pointsResponse === null) return
+
+    const requestedPointsPerItem = Number(pointsResponse)
+    if (!Number.isFinite(requestedPointsPerItem) || requestedPointsPerItem <= 0 || requestedPointsPerItem > 100) {
+      showToast("Points per item must be greater than 0 and no more than 100.", "error")
+      return
+    }
+
+    const requestedMaximum = requestedItems * requestedPointsPerItem
+
+    setAssessmentColumns((columns) => {
+      // Count unique visible slots only. Realtime/database synchronization may
+      // temporarily provide the same slot under a local ID and a database UUID.
+      const uniqueMatchingColumns = columns
+        .filter((column) => column.type === type && column.term === term)
+        .filter((column, index, matching) =>
+          matching.findIndex((candidate) => sameAssessmentSlot(candidate, column)) === index,
+        )
+      const maximum =
+        type === "Quiz"
+          ? 8
+          : type === "Hands On"
+            ? term === "Midterm"
+              ? 10
+              : 12
+            : term === "Midterm"
+              ? 20
+              : 15
+
+      if (uniqueMatchingColumns.length >= maximum) {
+        showToast(`The ${term.toLowerCase()} ${type === "Hands On" ? "project" : type.toLowerCase()} limit is ${maximum}.`, "error")
+        return columns
+      }
+
+      const usedIndexes = new Set(
+        uniqueMatchingColumns
+          .map((column) => assessmentColumnIndex(column))
+          .filter((index) => Number.isFinite(index) && index > 0),
+      )
+      let nextIndex = 1
+      while (usedIndexes.has(nextIndex) && nextIndex <= maximum) nextIndex += 1
+      if (nextIndex > maximum) return columns
+
+      const displayType = type === "Quiz" ? "Quiz" : type === "Hands On" ? "Project" : type
+      const label = `${term} ${displayType} ${nextIndex}`
+      const newColumn: RecordAssessmentColumn = {
+        id: `local:${selectedSectionId}:${term.toLowerCase()}:${type.toLowerCase().replace(/ /g, "-")}:${nextIndex}:${Date.now()}`,
+        label,
+        type,
+        term,
+        maxScore: requestedMaximum,
+        itemCount: requestedItems,
+        pointsPerItem: requestedPointsPerItem,
+      }
+      const lastMatchingIndex = columns.reduce(
+        (lastIndex, column, index) =>
+          column.type === type && column.term === term ? index : lastIndex,
+        -1,
+      )
+      const insertAt = lastMatchingIndex === -1 ? columns.length : lastMatchingIndex + 1
+      const next = [
+        ...columns.slice(0, insertAt),
+        newColumn,
+        ...columns.slice(insertAt),
+      ]
+
+      setRecordPublicationStatus("Draft")
+      showToast(`${label} added to ${selectedSection.code}. Enter a score to save it.`)
+      return next
+    })
+
+    // Keep the menu open so its counters update immediately and the instructor
+    // can add another assessment without reopening the panel.
+    setAssessmentMenuOpen(true)
+  }
+
+  const assessmentScore = (
+    _studentScore: number,
+    _column: RecordAssessmentColumn,
+    _index: number,
+  ) => 0
+
+  const recordValue = (
+    student: typeof students[number],
+    columnId: string,
+    fallback: number,
+  ) =>
+    recordValues[student.id]?.[columnId] ??
+    omrDraftScores[`${student.id}:${columnId}`] ??
+    fallback
+
+  const assessmentPoints = (
+    student: typeof students[number],
+    columns: RecordAssessmentColumn[],
+  ) =>
+    columns.reduce((total, column) => {
+      const columnIndex = assessmentColumns.findIndex(
+        (item) => item.id === column.id,
+      )
+      const value = recordValue(
+        student,
+        column.id,
+        assessmentScore(student.score, column, columnIndex),
+      )
+      return total + (typeof value === "number" ? value : 0)
+    }, 0)
+
+  const percentageFromColumns = (
+    student: typeof students[number],
+    columns: RecordAssessmentColumn[],
+  ) =>
+    columns.length
+      ? (assessmentPoints(student, columns) /
+          columns.reduce(
+            (total, column) =>
+              total +
+              maxScoreForColumn(column),
+            0,
+          )) *
+        100
+      : 0
+
+  const percentageFromScores = (scores: number[]) =>
+    scores.length
+      ? Math.min(100, Math.max(0, scores.reduce((total, score) => total + score, 0) / scores.length))
+      : 0
+
+  const weightedContribution = (percentage: number, weight: number) =>
+    Math.min(weight, Math.max(0, (percentage / 100) * weight))
+
+  const updateDailySummaryItems = (
+    field: keyof typeof dailySummaryItems,
+    rawValue: string,
+  ) => {
+    const items = Math.min(1000, Math.max(1, Math.round(Number(rawValue) || 1)))
+    setDailySummaryItems((current) => ({ ...current, [field]: items }))
+  }
+
+  const updateProjectDescription = (columnId: string, rawValue: string) => {
+    const trimmed = rawValue.slice(0, 40)
+    setAssessmentColumns((columns) => columns.map((column) =>
+      column.id === columnId ? { ...column, label: trimmed } : column,
+    ))
+  }
+
+  const updateAssessmentItemCount = async (columnId: string, rawValue: string) => {
+    const items = Math.min(1000, Math.max(1, Math.round(Number(rawValue) || 1)))
+    const targetColumn = assessmentColumns.find((column) => column.id === columnId)
+    if (!targetColumn || !selectedSectionId) return
+    const pointsPerItem = Number(targetColumn.pointsPerItem) > 0 ? Number(targetColumn.pointsPerItem) : 1
+    const maximum = items * pointsPerItem
+
+    localStorage.setItem(assessmentItemOverrideKey(selectedSectionId, targetColumn), String(items))
+    setAssessmentColumns((columns) => columns.map((column) =>
+      column.id === columnId || sameAssessmentSlot(column, targetColumn)
+        ? { ...column, itemCount: items, pointsPerItem, maxScore: maximum }
+        : column,
+    ))
+    setGradebookSaveState("saving")
+    try {
+      if (targetColumn.type === "Quiz" || targetColumn.type === "Exam") {
+        const { error } = await supabase.from("omr_assessments")
+          .update({ item_count: items, points_per_item: pointsPerItem })
+          .eq("class_id", selectedSectionId)
+          .eq("assessment_type", targetColumn.type.toLowerCase())
+          .eq("academic_term", targetColumn.term === "Final" ? "final" : "midterm")
+          .eq("assessment_index", assessmentColumnIndex(targetColumn))
+        if (error) throw error
+      }
+      const publicId = assessmentIdByColumnRef.current[String(targetColumn.id)]
+      if (publicId) {
+        const { error } = await supabase.from("assessments")
+          .update({ max_score: maximum }).eq("id", publicId).eq("class_id", selectedSectionId)
+        if (error) throw error
+      }
+      const savedAt = new Date().toISOString()
+      setDraftSavedAt(savedAt)
+      setGradebookSaveState("saved")
+    } catch (error) {
+      console.warn("Assessment metadata sync was unavailable; the Gradebook item override remains saved:", error)
+      setDraftSavedAt(new Date().toISOString())
+      setGradebookSaveState("saved")
+    }
+  }
+
+  const updateExamMaximum = (field: keyof typeof examMaximums, rawValue: string) => {
+    const maximum = Math.min(1000, Math.max(1, Math.round(Number(rawValue) || 1)))
+    setExamMaximums((current) => {
+      const next = { ...current, [field]: maximum }
+      if (selectedSectionId) {
+        localStorage.setItem(
+          `cit-portal:exam-maximums:${selectedSectionId}`,
+          JSON.stringify(next),
+        )
+      }
+      return next
+    })
+    setDraftSavedAt(new Date().toISOString())
+    setGradebookSaveState("saved")
+  }
+
+  const examEarnedTotal = (
+    student: typeof students[number],
+    term: "midterm" | "final",
+  ) =>
+    Number(recordValue(student, `${term}-written`, 0)) +
+    Number(recordValue(student, `${term}-actual`, 0))
+
+  const examMaximumTotal = (term: "midterm" | "final") =>
+    examMaximums[`${term}-written`] + examMaximums[`${term}-actual`]
+
+  const examSubtotal = (
+    student: typeof students[number],
+    term: "midterm" | "final",
+  ) => {
+    const written = Number(recordValue(student, `${term}-written`, 0))
+    const actual = Number(recordValue(student, `${term}-actual`, 0))
+    const possible = examMaximums[`${term}-written`] + examMaximums[`${term}-actual`]
+    return possible > 0
+      ? Math.min(100, Math.max(0, ((written + actual) / possible) * 100))
+      : 0
+  }
+
+  const dailySummaryScore = (
+    student: typeof students[number],
+    field: keyof typeof dailySummaryItems,
+    columns: RecordAssessmentColumn[],
+  ) => {
+    const override = recordValues[student.id]?.[`summary-${field}`]
+    const maximum = dailySummaryItems[field]
+    if (override !== undefined && override !== "") {
+      return Math.min(maximum, Math.max(0, Number(override) || 0))
+    }
+    return Math.min(assessmentPoints(student, columns), maximum)
+  }
+
+  const updateDailySummaryScore = (
+    studentId: string,
+    field: keyof typeof dailySummaryItems,
+    rawValue: string,
+  ) => {
+    const maximum = dailySummaryItems[field]
+    const value = rawValue === ""
+      ? ""
+      : String(Math.min(maximum, Math.max(0, Number(rawValue) || 0)))
+    setRecordValues((current) => ({
+      ...current,
+      [studentId]: {
+        ...(current[studentId] ?? {}),
+        [`summary-${field}`]: value,
+      },
+    }))
+  }
+
+  const finalGrade = (student: typeof students[number]) => {
+    // Workbook logic:
+    // Exam = average of Midterm% and Final%
+    // Quiz = combined earned / combined available
+    // Project = average of Midterm% and Final%
+    // Recitation and Attendance = combined Midterm + Final summary scores
+    const examRating = percentageFromScores([
+      examSubtotal(student, "midterm"),
+      examSubtotal(student, "final"),
+    ])
+
+    const quizRating = percentageFromColumns(student, visibleQuizColumns)
+
+    const projectRating = percentageFromScores([
+      percentageFromColumns(student, midtermProjectColumns),
+      percentageFromColumns(student, finalProjectColumns),
+    ])
+
+    const recitationEarned =
+      dailySummaryScore(student, "midterm-recitation", midtermRecitationColumns) +
+      dailySummaryScore(student, "final-recitation", finalRecitationColumns)
+    const recitationPossible =
+      dailySummaryItems["midterm-recitation"] + dailySummaryItems["final-recitation"]
+    const recitationRating = recitationPossible > 0
+      ? (recitationEarned / recitationPossible) * 100
+      : 0
+
+    const attendanceEarned =
+      dailySummaryScore(student, "midterm-attendance", midtermAttendanceColumns) +
+      dailySummaryScore(student, "final-attendance", finalAttendanceColumns)
+    const attendancePossible =
+      dailySummaryItems["midterm-attendance"] + dailySummaryItems["final-attendance"]
+    const attendanceRating = attendancePossible > 0
+      ? (attendanceEarned / attendancePossible) * 100
+      : 0
+
+    return Math.min(100, Math.max(0,
+      examRating * 0.25 +
+      quizRating * 0.20 +
+      projectRating * 0.25 +
+      recitationRating * 0.20 +
+      attendanceRating * 0.10,
+    ))
+  }
+
+  const gradeEquivalent = (percentage: number) => {
+    // Exact conversion table from the reference Excel workbook named range
+    // mynerves (CD16:CF26), applied as an approximate lookup.
+    if (percentage >= 97) return 1.00
+    if (percentage >= 94) return 1.25
+    if (percentage >= 91) return 1.50
+    if (percentage >= 88) return 1.75
+    if (percentage >= 85) return 2.00
+    if (percentage >= 82) return 2.25
+    if (percentage >= 79) return 2.50
+    if (percentage >= 76) return 2.75
+    if (percentage >= 75) return 3.00
+    return 5.00
+  }
+
+  const gradeResult = (percentage: number) =>
+    gradeEquivalent(percentage) >= 5 ? "Fail" : "Pass"
+
+  const deleteAssessmentColumn = async () => {
+    const column = assessmentToDelete
+    if (!column || assessmentDeleting) return
+    setAssessmentDeleting(true)
+
+    try {
+      const slotIndex = assessmentColumnIndex(column)
+      const columnId = String(column.id)
+      const assessmentId = column.assessmentId
+        ? String(column.assessmentId)
+        : /^[0-9a-f-]{36}$/i.test(columnId)
+          ? columnId
+          : null
+
+      // Delete only the selected assessment record. Never delete other columns
+      // merely because they have the same type, term, or displayed index.
+      if (assessmentId) {
+        const { error: assessmentDeleteError } = await supabase
+          .from("assessments")
+          .delete()
+          .eq("id", assessmentId)
+          .eq("class_id", selectedSectionId)
+
+        if (assessmentDeleteError) throw assessmentDeleteError
+      }
+
+      // Quiz and exam columns can have one linked OMR source. Match every
+      // identifying field so deleting Quiz 3 cannot remove Quiz 1, 2, 4, etc.
+      if (
+        (column.type === "Quiz" || column.type === "Exam") &&
+        Number.isFinite(slotIndex)
+      ) {
+        const omrType = column.type === "Exam" ? "exam" : "quiz"
+        const { data: omrRows, error: omrReadError } = await supabase
+          .from("omr_assessments")
+          .select("id")
+          .eq("class_id", selectedSectionId)
+          .eq("assessment_type", omrType)
+          .eq("academic_term", column.term === "Final" ? "final" : "midterm")
+          .eq("assessment_index", slotIndex)
+
+        if (omrReadError) throw omrReadError
+
+        const omrIds = (omrRows ?? []).map((row: any) => String(row.id))
+        if (omrIds.length) {
+          const { error: reminderError } = await supabase
+            .from("faculty_reminders")
+            .delete()
+            .in("omr_assessment_id", omrIds)
+          if (reminderError) throw reminderError
+
+          const { error: omrDeleteError } = await supabase
+            .from("omr_assessments")
+            .delete()
+            .in("id", omrIds)
+          if (omrDeleteError) throw omrDeleteError
+        }
+      }
+
+      // Remove exactly one gradebook column and all student cells belonging
+      // to that column. Other quizzes, projects, recitations, attendance,
+      // activities, and exams remain untouched.
+      setAssessmentColumns((current) =>
+        current.filter((item) => String(item.id) !== columnId),
+      )
+      setRecordValues((current) => {
+        const next: Record<string, Record<string, number | "">> = {}
+        Object.entries(current).forEach(([studentNumber, values]) => {
+          const studentValues = { ...values }
+          delete studentValues[columnId]
+          if (assessmentId) delete studentValues[assessmentId]
+          next[studentNumber] = studentValues
+        })
+        localDraftValuesRef.current = next
+        return next
+      })
+
+      setAssessmentToDelete(null)
+      showToast(`${column.label} column deleted permanently.`)
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unknown database error"
+      showToast(`Unable to delete ${column.label}: ${message}`, "error")
+    } finally {
+      setAssessmentDeleting(false)
+    }
+  }
+
+  const renderAssessmentHeader = (column: RecordAssessmentColumn) => (
+    <th key={column.id} scope="col" className="assessment-column-heading">
+      <span>{column.label}</span>
+      <button
+        type="button"
+        className="assessment-column-delete"
+        onClick={() => setAssessmentToDelete(column)}
+        aria-label={`Delete ${column.label}`}
+        title={`Delete ${column.label}`}
+      >×</button>
+    </th>
+  )
+
+  const gradeComponents = (student: RecordStudent) => {
+    const exam = percentageFromScores([examSubtotal(student, "midterm"), examSubtotal(student, "final")])
+    const quizzes = percentageFromColumns(student, visibleQuizColumns)
+    const projects = percentageFromColumns(student, [...midtermProjectColumns, ...finalProjectColumns])
+    const recitationEarned =
+      dailySummaryScore(student, "midterm-recitation", midtermRecitationColumns) +
+      dailySummaryScore(student, "final-recitation", finalRecitationColumns)
+    const recitationPossible =
+      dailySummaryItems["midterm-recitation"] + dailySummaryItems["final-recitation"]
+    const recitation = recitationPossible > 0 ? (recitationEarned / recitationPossible) * 100 : 0
+
+    const attendanceEarned =
+      dailySummaryScore(student, "midterm-attendance", midtermAttendanceColumns) +
+      dailySummaryScore(student, "final-attendance", finalAttendanceColumns)
+    const attendancePossible =
+      dailySummaryItems["midterm-attendance"] + dailySummaryItems["final-attendance"]
+    const attendance = attendancePossible > 0 ? (attendanceEarned / attendancePossible) * 100 : 0
+    return { exam, quizzes, projects, recitation, attendance }
+  }
+
+  const saveGradeRecords = async (status: "Draft" | "Published") => {
+    if (!selectedSectionId) throw new Error("Select a class before saving grades.")
+    const savedAt = new Date().toISOString()
+    const {
+      data: { user: authenticatedFaculty },
+      error: facultyAuthError,
+    } = await supabase.auth.getUser()
+
+    if (facultyAuthError || !authenticatedFaculty) {
+      throw new Error("Your faculty session has expired. Sign in again before publishing grades.")
+    }
+
+    const rows = recordStudents.map((student) => {
+      if (!student.userId) throw new Error(`Missing Supabase student ID for ${student.name}.`)
+      const components = gradeComponents(student)
+      const grade = finalGrade(student)
+      return {
+        class_id: selectedSectionId,
+        student_id: student.userId,
+        student_number: student.id,
+        faculty_id: authenticatedFaculty.id,
+        final_grade: Number(grade.toFixed(2)),
+        exam_percentage: Number(components.exam.toFixed(2)),
+        quiz_percentage: Number(components.quizzes.toFixed(2)),
+        project_percentage: Number(components.projects.toFixed(2)),
+        recitation_percentage: Number(components.recitation.toFixed(2)),
+        attendance_percentage: Number(components.attendance.toFixed(2)),
+        result: grade >= 75 ? "Passed" : "Failed",
+        status: status.toLowerCase(),
+        published_at: status === "Published" ? savedAt : null,
+        updated_at: savedAt,
+      }
+    })
+    if (rows.length === 0) {
+      throw new Error("There are no enrolled students to publish.")
+    }
+
+    const { error } = await supabase
+      .from("student_grades")
+      .upsert(rows, {
+        onConflict: "class_id,student_id",
+        ignoreDuplicates: false,
+      })
+
+    if (error) {
+      console.error("Unable to save student_grades:", {
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code,
+        rows,
+      })
+
+      if (error.code === "42P10") {
+        throw new Error(
+          "Publishing requires a unique database constraint for class_id and student_id. Run the supplied student_grades SQL fix in Supabase, then publish again.",
+        )
+      }
+
+      if (error.code === "42501") {
+        throw new Error(
+          "Supabase blocked grade publishing because the student_grades Row Level Security policy does not allow this faculty account to insert or update grades.",
+        )
+      }
+
+      throw new Error(
+        [error.message, error.details, error.hint].filter(Boolean).join(" ") ||
+          "Unable to publish grades.",
+      )
+    }
+
+    setRecordPublicationStatus(status)
+    setLastPublishedAt(status === "Published" ? savedAt : null)
+  }
+
+  const publishGrades = async () => {
+    if (publishingRecords) return
+    setPublishingRecords(true)
+    try {
+      await saveGradeRecords("Published")
+      setPublishConfirmationOpen(false)
+      showToast("Grades published. Students can now view their final grades.")
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : "Unable to publish grades.", "error")
+    } finally {
+      setPublishingRecords(false)
+    }
+  }
+
+  const changeRecordStatus = async (status: "Draft" | "Published") => {
+    if (status === "Published") {
+      setPublishConfirmationOpen(true)
+      return
+    }
+    if (publishingRecords) return
+    setPublishingRecords(true)
+    try {
+      await saveGradeRecords("Draft")
+      showToast("Grades saved as Draft and hidden from students.")
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : "Unable to save Draft grades.", "error")
+    } finally {
+      setPublishingRecords(false)
+    }
+  }
+
+  const renderAssessmentScore = (
+    student: typeof students[number],
+    column: RecordAssessmentColumn,
+  ) => {
+    const columnIndex = assessmentColumns.findIndex(
+      (item) => item.id === column.id,
+    )
+    return (
+      <td key={column.id}>
+        <input
+          className="record-score-input"
+          type="number"
+          min="0"
+          max={maxScoreForColumn(column)}
+          value={recordValue(
+            student,
+            column.id,
+            assessmentScore(student.score, column, columnIndex),
+          )}
+          onChange={(event) =>
+            updateRecordValue(
+              student.id,
+              column.id,
+              event.target.value,
+              maxScoreForColumn(column),
+            )
+          }
+          aria-label={`Edit ${column.label} score for ${student.name}`}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") event.preventDefault()
+          }}
+        />
+      </td>
+    )
+  }
+
+  const updateRecordValue = (
+    studentId: string,
+    columnId: string,
+    value: string,
+    maximum = 100,
+  ) => {
+    const nextValue =
+      value === "" ? "" : Math.min(maximum, Math.max(0, Number(value)))
+
+    setRecordValues((current) => {
+      const nextValues = {
+        ...current,
+        [studentId]: {
+          ...current[studentId],
+          [columnId]: nextValue,
+        },
+      }
+      const savedAt = new Date().toISOString()
+      localStorage.setItem("cit-portal:gradebook", JSON.stringify({
+        students: recordStudents,
+        values: nextValues,
+        statuses: studentStatuses,
+        columns: assessmentColumns,
+        dailySessions,
+        dailySummaryItems,
+        remarks: dailyRemarks,
+        publicationStatus: recordPublicationStatus,
+        selectedSectionId,
+        savedAt,
+      }))
+      localDraftValuesRef.current = nextValues
+      setRecordPublicationStatus("Draft")
+      setDraftSavedAt(savedAt)
+      return nextValues
+    })
+
+    if (nextValue === "" || !selectedSectionId) return
+
+    // Daily Tracker entries are session data, not standalone assessment rows.
+    // Keep these values in the local draft and summarize them in Gradebook.
+    if (columnId.startsWith("daily-")) return
+
+    const fixedGradebookColumns: Record<string, RecordAssessmentColumn> = {
+      "midterm-written": {
+        id: "midterm-written",
+        label: "Midterm Written Exam",
+        type: "Exam",
+        term: "Midterm",
+        maxScore: examMaximums["midterm-written"],
+        itemCount: examMaximums["midterm-written"],
+        pointsPerItem: 1,
+      },
+      "midterm-actual": {
+        id: "midterm-actual",
+        label: "Midterm Actual Exam",
+        type: "Exam",
+        term: "Midterm",
+        maxScore: examMaximums["midterm-actual"],
+        itemCount: examMaximums["midterm-actual"],
+        pointsPerItem: 1,
+      },
+      "final-written": {
+        id: "final-written",
+        label: "Final Written Exam",
+        type: "Exam",
+        term: "Final",
+        maxScore: examMaximums["final-written"],
+        itemCount: examMaximums["final-written"],
+        pointsPerItem: 1,
+      },
+      "final-actual": {
+        id: "final-actual",
+        label: "Final Actual Exam",
+        type: "Exam",
+        term: "Final",
+        maxScore: examMaximums["final-actual"],
+        itemCount: examMaximums["final-actual"],
+        pointsPerItem: 1,
+      },
+    }
+
+    // Dynamic quizzes and projects are stored in assessmentColumns.
+    // Daily Tracker attendance and recitation are handled above. The four permanent exam fields are resolved here so
+    // they use the same save, toast, Draft, and notification workflow.
+    const column =
+      assessmentColumns.find((item) => String(item.id) === String(columnId)) ??
+      fixedGradebookColumns[String(columnId)]
+    if (!column) {
+      showToast("This gradebook element could not be saved because its assessment definition is missing.", "error")
+      return
+    }
+
+    const saveKey = `${studentId}:${columnId}`
+    const previousTimer = scoreSaveTimersRef.current[saveKey]
+    if (previousTimer) window.clearTimeout(previousTimer)
+
+    const requestedMaximum = Number(maximum)
+    const resolvedMaximum =
+      Number.isFinite(requestedMaximum) && requestedMaximum > 0
+        ? requestedMaximum
+        : maxScoreForColumn(column)
+
+    scoreSaveTimersRef.current[saveKey] = window.setTimeout(async () => {
+      const typeMap: Record<RecordAssessmentColumn["type"], "exam" | "quiz" | "project" | "recitation" | "attendance"> = {
+        Exam: "exam",
+        Quiz: "quiz",
+        "Hands On": "project",
+        Activities: "project",
+        Recitation: "recitation",
+        Attendance: "attendance",
+      }
+
+      try {
+        const resolveExistingAssessmentId = async () => {
+          // Dynamic Quiz/Exam columns already carry the linked public
+          // assessments.id in assessmentId. Reuse it instead of asking
+          // saveStudentScore to insert another definition with the same
+          // class/type/term/index identity.
+          const directAssessmentId = column.assessmentId
+            ? String(column.assessmentId)
+            : /^[0-9a-f-]{36}$/i.test(String(column.id))
+              ? String(column.id)
+              : undefined
+          const cached =
+            assessmentIdByColumnRef.current[String(column.id)] ?? directAssessmentId
+          if (cached) {
+            assessmentIdByColumnRef.current[String(column.id)] = cached
+            assessmentIdByColumnRef.current[cached] = cached
+            return cached
+          }
+
+          const { data: freshGradebook, error: lookupError } = await supabase.rpc(
+            "comptech_faculty_load_gradebook",
+            { p_class_id: selectedSectionId },
+          )
+          if (lookupError) throw lookupError
+
+          const definitions = Array.isArray((freshGradebook as any)?.assessments)
+            ? (freshGradebook as any).assessments
+            : []
+          const wantedType = typeMap[column.type]
+          const wantedTerm = column.term === "Final" ? "final" : "midterm"
+          const wantedIndex = assessmentColumnIndex(column)
+          const normalizedTitle = String(column.label).trim().toLowerCase()
+
+          const match = definitions.find((row: any) => {
+            const rowType = String(row.assessment_type ?? row.type ?? "").toLowerCase()
+            const rowTerm = String(row.term ?? row.academic_term ?? "").toLowerCase()
+            const rowTitle = String(row.title ?? "").trim().toLowerCase()
+            const rowIndex = Number(
+              row.assessment_index ?? rowTitle.match(/\d+/)?.[0] ?? Number.NaN,
+            )
+            return rowType === wantedType && rowTerm === wantedTerm && (
+              rowIndex === wantedIndex || rowTitle === normalizedTitle
+            )
+          })
+
+          if (!match?.id) return undefined
+          const id = String(match.id)
+          assessmentIdByColumnRef.current[String(column.id)] = id
+          assessmentIdByColumnRef.current[id] = id
+          return id
+        }
+
+        let resolvedAssessmentId = await resolveExistingAssessmentId()
+        const saveScore = (assessmentId?: string) => saveStudentScore({
+          classId: selectedSectionId,
+          studentNumber: studentId,
+          title: column.label,
+          type: typeMap[column.type],
+          term: column.term === "Final" ? "final" : "midterm",
+          maxScore: resolvedMaximum,
+          score: Number(nextValue),
+          status: "draft",
+          assessmentId,
+        })
+
+        let savedAssessmentId: string
+        try {
+          savedAssessmentId = await saveScore(resolvedAssessmentId)
+        } catch (saveError: any) {
+          const duplicateIdentity =
+            String(saveError?.code ?? "") === "23505" ||
+            String(saveError?.message ?? saveError).includes("assessments_unique_gradebook_identity")
+          if (!duplicateIdentity) throw saveError
+
+          // A definition already exists but the original ID was stale or absent.
+          // Reload the authoritative Gradebook and retry with that existing ID.
+          delete assessmentIdByColumnRef.current[String(column.id)]
+          resolvedAssessmentId = await resolveExistingAssessmentId()
+          if (!resolvedAssessmentId) throw saveError
+          savedAssessmentId = await saveScore(resolvedAssessmentId)
+        }
+
+        assessmentIdByColumnRef.current[String(column.id)] = savedAssessmentId
+        assessmentIdByColumnRef.current[savedAssessmentId] = savedAssessmentId
+
+        const isFixedExamField = [
+          "midterm-written",
+          "midterm-actual",
+          "final-written",
+          "final-actual",
+        ].includes(String(column.id))
+
+        // Permanent exam inputs are rendered with stable IDs. Keep those IDs in
+        // local state even after Supabase returns the assessment UUID, otherwise
+        // the realtime reload makes the edited value appear to reset.
+        if (!isFixedExamField && String(column.id) !== savedAssessmentId) {
+          setRecordValues((current) => {
+            const next = { ...current }
+            Object.keys(next).forEach((studentNumber) => {
+              const values = next[studentNumber]
+              if (Object.prototype.hasOwnProperty.call(values ?? {}, String(column.id))) {
+                next[studentNumber] = {
+                  ...values,
+                  [savedAssessmentId]: values[String(column.id)],
+                }
+                delete next[studentNumber][String(column.id)]
+              }
+            })
+            localDraftValuesRef.current = next
+            return next
+          })
+        }
+
+        if (!isFixedExamField) {
+          setAssessmentColumns((current) => current.map((item) =>
+            item.id === column.id
+              ? { ...item, id: savedAssessmentId, assessmentId: savedAssessmentId }
+              : item,
+          ))
+        }
+
+        const editedStudent = recordStudents.find((student) => student.id === studentId)
+        const {
+          data: { user: facultyUser },
+        } = await supabase.auth.getUser()
+
+        if (facultyUser) {
+          const { error: notificationError } = await supabase
+            .from("faculty_notifications")
+            .insert({
+              recipient_id: facultyUser.id,
+              kind: "gradebook",
+              title: `${column.label} updated`,
+              message: `${editedStudent?.name ?? studentId}'s ${column.label} score was changed to ${nextValue}/${resolvedMaximum} in ${selectedSection.subject} - ${selectedSection.code}. The gradebook is now Draft until grades are published again.`,
+              target_page: "records",
+              class_id: selectedSectionId,
+              entity_id: savedAssessmentId,
+            })
+
+          // A notification failure must not undo a successfully saved score.
+          if (notificationError) {
+            console.error("Unable to create gradebook edit notification:", notificationError)
+          } else {
+            window.dispatchEvent(new CustomEvent("cit-portal:notifications-changed"))
+          }
+        }
+
+        showToast(
+          `${editedStudent?.name ?? studentId}: ${column.label} saved as ${nextValue}/${resolvedMaximum}. Gradebook changed to Draft.`,
+        )
+      } catch (error) {
+        console.error("Unable to save score:", error)
+        showToast(error instanceof Error ? error.message : "Unable to save score.", "error")
+      } finally {
+        delete scoreSaveTimersRef.current[saveKey]
+      }
+    }, 600)
+  }
+
+  return (
+    <>
+      <Header
+        title="Class records"
+        onNotify={() => setPage("notifications")}
+        onProfile={() => setPage("profile")}
+      />
+      <section className="records-section-manager" aria-label="Section manager">
+        <div className="records-section-summary">
+          <span className="records-section-icon">
+            <Icon name="book" size={20} />
+          </span>
+          <div>
+            <p className="eyebrow">Teaching load</p>
+            <strong>{sectionsLoading ? "Loading sections..." : `${recordSectionOptions.length} active section${recordSectionOptions.length === 1 ? "" : "s"}`}</strong>
+            <small>Switch subjects without leaving your gradebook.</small>
+          </div>
+        </div>
+        <div className="section-switcher">
+          <button
+            className="section-switcher-trigger"
+            onClick={() => !sectionsLoading && setSectionMenuOpen((open) => !open)}
+            aria-expanded={sectionMenuOpen}
+            disabled={sectionsLoading || recordSectionOptions.length === 0}
+            aria-controls="records-section-menu"
+          >
+            <span>
+              <small>Currently managing</small>
+              <strong>
+                {sectionsLoading
+                  ? "Loading..."
+                  : `${selectedSection.subject} - ${selectedSection.code}`}
+              </strong>
+            </span>
+            <Icon name="chevron" size={17} />
+          </button>
+          {sectionMenuOpen && (
+            <div
+              id="records-section-menu"
+              className="section-switcher-menu"
+              role="menu"
+            >
+              <div className="section-switcher-menu-heading">
+                <span>Choose a section</span>
+                <small>{sectionsLoading ? "Loading" : `${recordSectionOptions.length} active this term`}</small>
+              </div>
+              {recordSectionOptions.map((section) => (
+                <button
+                  key={section.id}
+                  className={section.id === selectedSection.id ? "active" : ""}
+                  role="menuitem"
+                  onClick={() => {
+                    setSelectedSectionId(section.id)
+                    setSectionMenuOpen(false)
+                    setQuery("")
+                  }}
+                >
+                  <span className="section-menu-code">{section.code}</span>
+                  <span className="section-menu-copy">
+                    <strong>{section.subject}</strong>
+                    <small>{section.schedule}</small>
+                  </span>
+                  <span className="section-menu-students">
+                    {section.students} students
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+      <div className={`page-intro records-course-identity${sectionsLoading ? " records-course-loading" : ""}`}>
+        <div>
+          {sectionsLoading ? (
+            <div className="records-course-skeleton" aria-label="Loading class information">
+              <span />
+              <span />
+              <span />
+            </div>
+          ) : recordSectionOptions.length === 0 ? (
+            <>
+              <p className="eyebrow">Class records</p>
+              <h2>No classes created yet</h2>
+              <p>Create a class first. Only real classes from the database will appear here.</p>
+            </>
+          ) : (
+            <>
+              <p className="eyebrow">{selectedSection.academicYear}</p>
+              <h2>{selectedSection.code}: {selectedSection.subject}</h2>
+              <p>
+                {selectedSection.code} · {selectedSection.schedule} · {enrolledStudentsLoading
+                    ? "Loading enrolled students..."
+                    : enrolledStudentsError
+                      ? "Enrollment list unavailable"
+                      : selectedSection.students === 0
+                        ? "No enrolled students yet"
+                        : `${selectedSection.students} student${selectedSection.students === 1 ? "" : "s"}`}
+              </p>
+            </>
+          )}
+        </div>
+        <button
+          type="button"
+          className="records-file-import"
+          title="Export the current gradebook as CSV"
+          onClick={exportGradebookCsv}
+          disabled={sectionsLoading || recordSectionOptions.length === 0}
+        >
+          <Icon name="clipboard" size={15} /> Export Gradebook
+        </button>
+      </div>
+      <div
+        className={`records-card ${
+          gradebookView === "summary" ? "master" : "daily"
+        }`}
+      >
+        <div
+          className="records-view-tabs"
+          role="tablist"
+          aria-label="Gradebook views"
+        >
+          <button
+            className={gradebookView === "daily" ? "active" : ""}
+            role="tab"
+            aria-selected={gradebookView === "daily"}
+            onClick={() => setGradebookView("daily")}
+          >
+            <Icon name="calendar" size={14} /> Daily Tracker
+          </button>
+          <button
+            className={gradebookView === "summary" ? "active" : ""}
+            role="tab"
+            aria-selected={gradebookView === "summary"}
+            onClick={() => setGradebookView("summary")}
+          >
+            <Icon name="book" size={14} /> Gradebook (Summary)
+          </button>
+        </div>
+        <div className="records-tools">
+          <label>
+            <Icon name="search" />
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search student name or ID..."
+            />
+          </label>
+          <div className="records-date-picker">
+            {datePickerOpen && (
+              <section
+                id="records-date-calendar"
+                className="records-date-calendar"
+                role="dialog"
+                aria-label="Choose a record date"
+              >
+                <div className="records-calendar-header">
+                  <button
+                    className="records-calendar-nav previous"
+                    type="button"
+                    onClick={() =>
+                      setCalendarMonth(
+                        (month) =>
+                          new Date(
+                            month.getFullYear(),
+                            month.getMonth() - 1,
+                            1,
+                          ),
+                      )
+                    }
+                    aria-label="Previous month"
+                  >
+                    <Icon name="chevron" size={14} />
+                  </button>
+                  <strong>
+                    {new Intl.DateTimeFormat("en", {
+                      month: "long",
+                      year: "numeric",
+                    }).format(calendarMonth)}
+                  </strong>
+                  <button
+                    className="records-calendar-nav"
+                    type="button"
+                    onClick={() =>
+                      setCalendarMonth(
+                        (month) =>
+                          new Date(
+                            month.getFullYear(),
+                            month.getMonth() + 1,
+                            1,
+                          ),
+                      )
+                    }
+                    aria-label="Next month"
+                  >
+                    <Icon name="chevron" size={14} />
+                  </button>
+                </div>
+                <div className="records-calendar-weekdays" aria-hidden="true">
+                  {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((day) => (
+                    <span key={day}>{day}</span>
+                  ))}
+                </div>
+                <div className="records-calendar-days">
+                  {calendarDays.map((date, index) =>
+                    date ? (
+                      <button
+                        key={date.toISOString()}
+                        className={
+                          date.toDateString() ===
+                          selectedRecordDate.toDateString()
+                            ? "selected"
+                            : ""
+                        }
+                        type="button"
+                        onClick={() => selectRecordDate(date)}
+                        aria-label={new Intl.DateTimeFormat("en", {
+                          weekday: "long",
+                          month: "long",
+                          day: "numeric",
+                          year: "numeric",
+                        }).format(date)}
+                      >
+                        {date.getDate()}
+                      </button>
+                    ) : (
+                      <span key={`blank-${index}`} />
+                    ),
+                  )}
+                </div>
+              </section>
+            )}
+          </div>
+          <div className="gradebook-autosave-status" role="status" aria-live="polite">
+            <span className={`gradebook-autosave-icon ${gradebookSaveState}`}>
+              {gradebookSaveState === "saving" ? "↻" : "✓"}
+            </span>
+            <span>
+              <strong>{gradebookSaveState === "saving" ? "Saving changes..." : "Saved"}</strong>
+              <small>
+                {gradebookSaveState === "saved" && draftSavedAt
+                  ? `Last saved at ${new Date(draftSavedAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}`
+                  : "Changes are saved automatically"}
+              </small>
+            </span>
+          </div>
+        </div>
+        <div className="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col" rowSpan={2}>
+                  Student
+                </th>
+                <th scope="colgroup" colSpan={3}>
+                  Midterm Exam · 25%
+                </th>
+                <th scope="colgroup" colSpan={3}>
+                  Final Exam · 25%
+                </th>
+                <th scope="colgroup" colSpan={midtermQuizCount + 1}>
+                  Midterm Quizzes · 20%
+                </th>
+                <th scope="colgroup" colSpan={finalQuizCount + 1}>
+                  Final Quizzes · 20%
+                </th>
+                <th scope="colgroup" colSpan={midtermProjectColumns.length + 1}>
+                  Midterm{"\u00a0\u00a0"}ACTIVITIES/Projects · 25%
+                </th>
+                <th scope="colgroup" colSpan={finalProjectColumns.length + 1}>
+                  Final{"\u00a0\u00a0"}ACTIVITIES/Projects · 25%
+                </th>
+                <th
+                  scope="colgroup"
+                  colSpan={1}
+                  className="daily-summary-group recitation-summary-group"
+                >
+                  Midterm Recitation · 20%
+                </th>
+                <th
+                  scope="colgroup"
+                  colSpan={1}
+                  className="daily-summary-group recitation-summary-group"
+                >
+                  Final Recitation · 20%
+                </th>
+                <th
+                  scope="colgroup"
+                  colSpan={1}
+                  className="daily-summary-group attendance-summary-group"
+                >
+                  Midterm Attendance · 10%
+                </th>
+                <th
+                  scope="colgroup"
+                  colSpan={1}
+                  className="daily-summary-group attendance-summary-group"
+                >
+                  Final Attendance · 10%
+                </th>
+                <th scope="col" rowSpan={2} className="final-grade-heading">
+                  Final Grade
+                </th>
+              </tr>
+              <tr>
+                {([
+                  ["midterm-written", "Written"],
+                  ["midterm-actual", "Actual"],
+                ] as const).map(([field, label]) => (
+                  <th scope="col" key={field} className={label === "Written" ? "exam-written-heading" : undefined}>
+                    <div className="assessment-heading-content">
+                      <span>{label}</span>
+                      <label className="gradebook-items-editor">
+                        <input type="number" min="1" max="1000" value={examMaximums[field]}
+                          onChange={(event) => updateExamMaximum(field, event.target.value)}
+                          aria-label={`${label} midterm number of items`} />
+                        <span>items</span>
+                      </label>
+                    </div>
+                  </th>
+                ))}
+                <th scope="col" className="term-total-heading">
+                  <span>Total</span>
+                  <small>{examMaximumTotal("midterm")} items</small>
+                </th>
+                {([
+                  ["final-written", "Written"],
+                  ["final-actual", "Actual"],
+                ] as const).map(([field, label]) => (
+                  <th scope="col" key={field} className={label === "Written" ? "exam-written-heading" : undefined}>
+                    <div className="assessment-heading-content">
+                      <span>{label}</span>
+                      <label className="gradebook-items-editor">
+                        <input type="number" min="1" max="1000" value={examMaximums[field]}
+                          onChange={(event) => updateExamMaximum(field, event.target.value)}
+                          aria-label={`${label} final number of items`} />
+                        <span>items</span>
+                      </label>
+                    </div>
+                  </th>
+                ))}
+                <th scope="col" className="term-total-heading">
+                  <span>Total</span>
+                  <small>{examMaximumTotal("final")} items</small>
+                </th>
+                {midtermQuizColumns.map((column) => (
+                  <th scope="col" key={column.id} className="assessment-column-heading">
+                    <div className="assessment-heading-content">
+                      <span>{column.label.replace("Midterm ", "").replace("Final ", "")}</span>
+                      <label className="gradebook-items-editor">
+                        <input
+                          type="number"
+                          min="1"
+                          max="1000"
+                          value={itemCountForColumn(column)}
+                          onChange={(event) => void updateAssessmentItemCount(column.id, event.target.value)}
+                          onClick={(event) => event.stopPropagation()}
+                          aria-label={`Number of items for ${column.label}`}
+                        />
+                        <span>items</span>
+                      </label>
+                    </div>
+                    <button
+                      type="button"
+                      className="assessment-column-delete"
+                      onClick={() => setAssessmentToDelete(column)}
+                      aria-label={`Delete ${column.label}`}
+                      title={`Delete ${column.label}`}
+                    >×</button>
+                  </th>
+                ))}
+                <th scope="col" className="term-total-heading">
+                  <span>Total</span>
+                  <small>{midtermQuizColumns.reduce((sum, column) => sum + maxScoreForColumn(column), 0)} items</small>
+                </th>
+                {finalQuizColumns.map((column) => (
+                  <th scope="col" key={column.id} className="assessment-column-heading">
+                    <div className="assessment-heading-content">
+                      <span>{column.label.replace("Midterm ", "").replace("Final ", "")}</span>
+                      <label className="gradebook-items-editor">
+                        <input
+                          type="number"
+                          min="1"
+                          max="1000"
+                          value={itemCountForColumn(column)}
+                          onChange={(event) => void updateAssessmentItemCount(column.id, event.target.value)}
+                          onClick={(event) => event.stopPropagation()}
+                          aria-label={`Number of items for ${column.label}`}
+                        />
+                        <span>items</span>
+                      </label>
+                    </div>
+                    <button
+                      type="button"
+                      className="assessment-column-delete"
+                      onClick={() => setAssessmentToDelete(column)}
+                      aria-label={`Delete ${column.label}`}
+                      title={`Delete ${column.label}`}
+                    >×</button>
+                  </th>
+                ))}
+                <th scope="col" className="term-total-heading">
+                  <span>Total</span>
+                  <small>{finalQuizColumns.reduce((sum, column) => sum + maxScoreForColumn(column), 0)} items</small>
+                </th>
+                {midtermProjectColumns.map((column, index) => (
+                  <th scope="col" key={column.id} className="assessment-column-heading project-assessment-heading">
+                    <div className="assessment-heading-content">
+                      <strong className="project-column-number">{index + 1}</strong>
+                      <textarea
+                        className="gradebook-project-description-editor"
+                        value={column.label.replace("Midterm ", "").replace(/^Project \d+$/i, "")}
+                        maxLength={80}
+                        rows={3}
+                        placeholder="Description"
+                        onChange={(event) =>
+                          updateProjectDescription(column.id, `Midterm ${event.target.value}`)
+                        }
+                        onClick={(event) => event.stopPropagation()}
+                        aria-label={`Description for Midterm project ${index + 1}`}
+                      />
+                      <label className="gradebook-items-editor">
+                        <input
+                          type="number"
+                          min="1"
+                          max="1000"
+                          value={itemCountForColumn(column)}
+                          onChange={(event) => void updateAssessmentItemCount(column.id, event.target.value)}
+                          onClick={(event) => event.stopPropagation()}
+                          aria-label={`Number of items for ${column.label}`}
+                        />
+                        <span>items</span>
+                      </label>
+                    </div>
+                    <button
+                      type="button"
+                      className="assessment-column-delete"
+                      onClick={() => setAssessmentToDelete(column)}
+                      aria-label={`Delete ${column.label}`}
+                      title={`Delete ${column.label}`}
+                    >×</button>
+                  </th>
+                ))}
+                <th scope="col" className="term-total-heading">
+                  <span>Total</span>
+                  <small>{midtermProjectColumns.reduce((sum, column) => sum + maxScoreForColumn(column), 0)} items</small>
+                </th>
+                {finalProjectColumns.map((column, index) => (
+                  <th scope="col" key={column.id} className="assessment-column-heading project-assessment-heading">
+                    <div className="assessment-heading-content">
+                      <strong className="project-column-number">{index + 1}</strong>
+                      <textarea
+                        className="gradebook-project-description-editor"
+                        value={column.label.replace("Final ", "").replace(/^Project \d+$/i, "")}
+                        maxLength={80}
+                        rows={3}
+                        placeholder="Description"
+                        onChange={(event) =>
+                          updateProjectDescription(column.id, `Final ${event.target.value}`)
+                        }
+                        onClick={(event) => event.stopPropagation()}
+                        aria-label={`Description for Final project ${index + 1}`}
+                      />
+                      <label className="gradebook-items-editor">
+                        <input
+                          type="number"
+                          min="1"
+                          max="1000"
+                          value={itemCountForColumn(column)}
+                          onChange={(event) => void updateAssessmentItemCount(column.id, event.target.value)}
+                          onClick={(event) => event.stopPropagation()}
+                          aria-label={`Number of items for ${column.label}`}
+                        />
+                        <span>items</span>
+                      </label>
+                    </div>
+                    <button
+                      type="button"
+                      className="assessment-column-delete"
+                      onClick={() => setAssessmentToDelete(column)}
+                      aria-label={`Delete ${column.label}`}
+                      title={`Delete ${column.label}`}
+                    >×</button>
+                  </th>
+                ))}
+                <th scope="col" className="term-total-heading">
+                  <span>Total</span>
+                  <small>{finalProjectColumns.reduce((sum, column) => sum + maxScoreForColumn(column), 0)} items</small>
+                </th>
+                <th scope="col" className="daily-summary-heading">
+                  <span>Midterm</span>
+                  <label className="daily-summary-items-editor">
+                    <input
+                      type="number"
+                      min="1"
+                      max="1000"
+                      value={dailySummaryItems["midterm-recitation"]}
+                      onChange={(event) => updateDailySummaryItems("midterm-recitation", event.target.value)}
+                      aria-label="Midterm recitation number of items"
+                    />
+                    <small>items</small>
+                  </label>
+                </th>
+                <th scope="col" className="daily-summary-heading">
+                  <span>Finals</span>
+                  <label className="daily-summary-items-editor">
+                    <input
+                      type="number"
+                      min="1"
+                      max="1000"
+                      value={dailySummaryItems["final-recitation"]}
+                      onChange={(event) => updateDailySummaryItems("final-recitation", event.target.value)}
+                      aria-label="Finals recitation number of items"
+                    />
+                    <small>items</small>
+                  </label>
+                </th>
+                <th scope="col" className="daily-summary-heading">
+                  <span>Midterm</span>
+                  <label className="daily-summary-items-editor">
+                    <input
+                      type="number"
+                      min="1"
+                      max="1000"
+                      value={dailySummaryItems["midterm-attendance"]}
+                      onChange={(event) => updateDailySummaryItems("midterm-attendance", event.target.value)}
+                      aria-label="Midterm attendance number of items"
+                    />
+                    <small>items</small>
+                  </label>
+                </th>
+                <th scope="col" className="daily-summary-heading">
+                  <span>Finals</span>
+                  <label className="daily-summary-items-editor">
+                    <input
+                      type="number"
+                      min="1"
+                      max="1000"
+                      value={dailySummaryItems["final-attendance"]}
+                      onChange={(event) => updateDailySummaryItems("final-attendance", event.target.value)}
+                      aria-label="Finals attendance number of items"
+                    />
+                    <small>items</small>
+                  </label>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map((student) => (
+                <tr key={student.id}>
+                  <td>
+                    <div className="student-name">
+                      <span>
+                        {student.name
+                          .split(/[ ,]/)
+                          .filter(Boolean)
+                          .slice(0, 2)
+                          .map((n) => n[0])
+                          .join("")}
+                      </span>
+                      <div>
+                        <strong>{student.name}</strong>
+                        <small>{student.id}</small>
+                      </div>
+                    </div>
+                  </td>
+                  {[
+                    ["midterm-written", 0, "Midterm written"],
+                    ["midterm-actual", 0, "Midterm actual"],
+                  ].map(([id, fallback, label]) => (
+                    <td key={id}>
+                      <input
+                        className="record-score-input"
+                        type="number"
+                        min="0"
+                        max={examMaximums[String(id) as keyof typeof examMaximums]}
+                        value={recordValue(student, String(id), Number(fallback))}
+                        onChange={(event) =>
+                          updateRecordValue(
+                            student.id,
+                            String(id),
+                            event.target.value,
+                            examMaximums[String(id) as keyof typeof examMaximums],
+                          )
+                        }
+                        aria-label={`Edit ${label} score for ${student.name}`}
+                        onKeyDown={(event) => {
+                          if (event.key === "Enter") event.preventDefault()
+                        }}
+                      />
+                    </td>
+                  ))}
+                  <td className="term-total-cell exam-total-cell">
+                    <output>
+                      {examEarnedTotal(student, "midterm").toFixed(0)} / {examMaximumTotal("midterm")}
+                    </output>
+                    <small>{examSubtotal(student, "midterm").toFixed(2)}%</small>
+                    <strong className="weighted-term-score">
+                      {weightedContribution(examSubtotal(student, "midterm"), 25).toFixed(2)} / 25
+                    </strong>
+                  </td>
+                  {[
+                    ["final-written", 0, "Final written"],
+                    ["final-actual", 0, "Final actual"],
+                  ].map(([id, fallback, label]) => (
+                    <td key={id}>
+                      <input
+                        className="record-score-input"
+                        type="number"
+                        min="0"
+                        max={examMaximums[String(id) as keyof typeof examMaximums]}
+                        value={recordValue(student, String(id), Number(fallback))}
+                        onChange={(event) =>
+                          updateRecordValue(
+                            student.id,
+                            String(id),
+                            event.target.value,
+                            examMaximums[String(id) as keyof typeof examMaximums],
+                          )
+                        }
+                        aria-label={`Edit ${label} score for ${student.name}`}
+                        onKeyDown={(event) => {
+                          if (event.key === "Enter") event.preventDefault()
+                        }}
+                      />
+                    </td>
+                  ))}
+                  <td className="term-total-cell exam-total-cell">
+                    <output>
+                      {examEarnedTotal(student, "final").toFixed(0)} / {examMaximumTotal("final")}
+                    </output>
+                    <small>{examSubtotal(student, "final").toFixed(2)}%</small>
+                    <strong className="weighted-term-score">
+                      {weightedContribution(examSubtotal(student, "final"), 25).toFixed(2)} / 25
+                    </strong>
+                  </td>
+                  {midtermQuizColumns.map((column) =>
+                    renderAssessmentScore(student, column),
+                  )}
+                  <td className="term-total-cell">
+                    <output>
+                      {assessmentPoints(student, midtermQuizColumns).toFixed(0)}{" "}
+                      / {midtermQuizColumns.reduce((total, column) => total + maxScoreForColumn(column), 0)}
+                    </output>
+                    <small>{percentageFromColumns(student, midtermQuizColumns).toFixed(2)}%</small>
+                    <strong className="weighted-term-score">
+                      {weightedContribution(percentageFromColumns(student, midtermQuizColumns), 20).toFixed(2)} / 20
+                    </strong>
+                  </td>
+                  {finalQuizColumns.map((column) =>
+                    renderAssessmentScore(student, column),
+                  )}
+                  <td className="term-total-cell">
+                    <output>
+                      {assessmentPoints(student, finalQuizColumns).toFixed(0)} /{" "}
+                      {finalQuizColumns.reduce((total, column) => total + maxScoreForColumn(column), 0)}
+                    </output>
+                    <small>{percentageFromColumns(student, finalQuizColumns).toFixed(2)}%</small>
+                    <strong className="weighted-term-score">
+                      {weightedContribution(percentageFromColumns(student, finalQuizColumns), 20).toFixed(2)} / 20
+                    </strong>
+                  </td>
+                  {midtermProjectColumns.map((column) =>
+                    renderAssessmentScore(student, column),
+                  )}
+                  <td className="term-total-cell">
+                    <output>
+                      {assessmentPoints(student, midtermProjectColumns).toFixed(
+                        0,
+                      )}{" "}
+                      / {midtermProjectColumns.reduce((total, column) => total + maxScoreForColumn(column), 0)}
+                    </output>
+                    <small>{percentageFromColumns(student, midtermProjectColumns).toFixed(2)}%</small>
+                    <strong className="weighted-term-score">
+                      {weightedContribution(percentageFromColumns(student, midtermProjectColumns), 25).toFixed(2)} / 25
+                    </strong>
+                  </td>
+                  {finalProjectColumns.map((column) =>
+                    renderAssessmentScore(student, column),
+                  )}
+                  <td className="term-total-cell">
+                    <output>
+                      {assessmentPoints(student, finalProjectColumns).toFixed(
+                        0,
+                      )}{" "}
+                      / {finalProjectColumns.reduce((total, column) => total + maxScoreForColumn(column), 0)}
+                    </output>
+                    <small>{percentageFromColumns(student, finalProjectColumns).toFixed(2)}%</small>
+                    <strong className="weighted-term-score">
+                      {weightedContribution(percentageFromColumns(student, finalProjectColumns), 25).toFixed(2)} / 25
+                    </strong>
+                  </td>
+                  <td className="daily-summary-cell">
+                    <label className="daily-summary-score-editor">
+                      <input
+                        type="number"
+                        min="0"
+                        max={dailySummaryItems["midterm-recitation"]}
+                        value={recordValues[student.id]?.["summary-midterm-recitation"] ?? dailySummaryScore(student, "midterm-recitation", midtermRecitationColumns)}
+                        onChange={(event) => updateDailySummaryScore(student.id, "midterm-recitation", event.target.value)}
+                        aria-label="Midterm recitation score for ${student.name}"
+                      />
+                      <span>/ {dailySummaryItems["midterm-recitation"]}</span>
+                    </label>
+                  </td>
+                  <td className="daily-summary-cell">
+                    <label className="daily-summary-score-editor">
+                      <input
+                        type="number"
+                        min="0"
+                        max={dailySummaryItems["final-recitation"]}
+                        value={recordValues[student.id]?.["summary-final-recitation"] ?? dailySummaryScore(student, "final-recitation", finalRecitationColumns)}
+                        onChange={(event) => updateDailySummaryScore(student.id, "final-recitation", event.target.value)}
+                        aria-label="Final recitation score for ${student.name}"
+                      />
+                      <span>/ {dailySummaryItems["final-recitation"]}</span>
+                    </label>
+                  </td>
+                  <td className="daily-summary-cell">
+                    <label className="daily-summary-score-editor">
+                      <input
+                        type="number"
+                        min="0"
+                        max={dailySummaryItems["midterm-attendance"]}
+                        value={recordValues[student.id]?.["summary-midterm-attendance"] ?? dailySummaryScore(student, "midterm-attendance", midtermAttendanceColumns)}
+                        onChange={(event) => updateDailySummaryScore(student.id, "midterm-attendance", event.target.value)}
+                        aria-label="Midterm attendance score for ${student.name}"
+                      />
+                      <span>/ {dailySummaryItems["midterm-attendance"]}</span>
+                    </label>
+                  </td>
+                  <td className="daily-summary-cell">
+                    <label className="daily-summary-score-editor">
+                      <input
+                        type="number"
+                        min="0"
+                        max={dailySummaryItems["final-attendance"]}
+                        value={recordValues[student.id]?.["summary-final-attendance"] ?? dailySummaryScore(student, "final-attendance", finalAttendanceColumns)}
+                        onChange={(event) => updateDailySummaryScore(student.id, "final-attendance", event.target.value)}
+                        aria-label="Final attendance score for ${student.name}"
+                      />
+                      <span>/ {dailySummaryItems["final-attendance"]}</span>
+                    </label>
+                  </td>
+                  <td
+                    className={`final-grade-cell ${
+                      finalGrade(student) >= 75 ? "pass" : "fail"
+                    }`}
+                  >
+                    <output>
+                      <strong>{finalGrade(student).toFixed(2)}</strong>
+                      <small>
+                        {gradeResult(finalGrade(student))} · {gradeEquivalent(finalGrade(student)).toFixed(2)}
+                      </small>
+                    </output>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <section className="daily-tracker-panel" aria-label="Daily tracker">
+          <div className="daily-session-bar">
+            <div className="daily-session-controls">
+              <label>
+                <span>Session date</span>
+                <input
+                  type="date"
+                  value={recordDate}
+                  onChange={(event) => setRecordDate(event.target.value)}
+                />
+                <span
+                  className="daily-session-badge"
+                  aria-label={dailySessionLabel}
+                >
+                  <Icon name="clipboard" size={12} />
+                  {dailySessionLabel}
+                </span>
+              </label>
+              <div
+                className="daily-term-switcher"
+                role="group"
+                aria-label="Select grading term"
+              >
+                <button
+                  className={dailySessionTerm === "Midterm" ? "active" : ""}
+                  type="button"
+                  onClick={() => switchDailySessionTerm("Midterm")}
+                >
+                  Midterm
+                </button>
+                <button
+                  className={dailySessionTerm === "Final" ? "active" : ""}
+                  type="button"
+                  onClick={() => switchDailySessionTerm("Final")}
+                >
+                  Finals
+                </button>
+              </div>
+            </div>
+          </div>
+          <div className="daily-student-search" role="search">
+            <label htmlFor="daily-student-search-input">
+              <Icon name="search" size={18} />
+              <input
+                id="daily-student-search-input"
+                type="search"
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="Search student name or ID"
+                autoComplete="off"
+              />
+            </label>
+            <span className="daily-search-result-count" aria-live="polite">
+              {query
+                ? `${filtered.length} of ${recordStudents.length} students`
+                : `${recordStudents.length} students`}
+            </span>
+            {query && (
+              <button
+                type="button"
+                className="daily-search-clear"
+                onClick={() => setQuery("")}
+              >
+                Clear
+              </button>
+            )}
+          </div>
+          <div className="daily-table-wrap">
+            <table className="daily-tracker-table">
+              <thead>
+                <tr>
+                  <th>Student name</th>
+                  <th>Attendance status</th>
+                  <th>Daily recitation score (max 10)</th>
+                  <th>Remarks</th>
+                </tr>
+              </thead>
+              <tbody>
+                {enrolledStudentsLoading ? (
+                  <tr><td colSpan={99} className="records-empty-row">Loading enrolled students...</td></tr>
+                ) : enrolledStudentsError ? (
+                  <tr><td colSpan={99} className="records-empty-row error">Unable to load enrolled students: {enrolledStudentsError}</td></tr>
+                ) : filtered.length === 0 ? (
+                  <tr><td colSpan={99} className="records-empty-row">{query ? "No students match the search." : "No students have joined this class yet."}</td></tr>
+                ) : filtered.map((student) => (
+                  <tr key={student.id}>
+                    <td>
+                      <strong>{student.name}</strong>
+                      <small>{student.id}</small>
+                    </td>
+                    <td>
+                      <select
+                        className={`status-select attendance ${(studentStatuses[`${recordDate}:${student.id}`] ?? "Absent").toLowerCase()}${
+                          student.id === "2026-0025"
+                            ? " selected-attendance-background"
+                            : ""
+                        }`}
+                        value={
+                          studentStatuses[`${recordDate}:${student.id}`] ?? "Absent"
+                        }
+                        onChange={(event) => {
+                          const status = event.target.value
+                          const attendanceKey = `${recordDate}:${student.id}`
+                          setManualAttendanceOverrides((current) => ({
+                            ...current,
+                            [attendanceKey]: true,
+                          }))
+                          setStudentStatuses((current) => ({
+                            ...current,
+                            [attendanceKey]: status,
+                          }))
+                          updateRecordValue(
+                            student.id,
+                            dailySession?.attendanceId ?? `daily-${recordDate}-attendance`,
+                            String(
+                              status === "Present" || status === "Excused"
+                                ? 10
+                                : status === "Late"
+                                  ? 7
+                                  : 0,
+                            ),
+                            10,
+                          )
+                        }}
+                      >
+                        <option>Present</option>
+                        <option>Late</option>
+                        <option>Absent</option>
+                        <option>Excused</option>
+                      </select>
+                    </td>
+                    <td>
+                      <input
+                        className="record-score-input"
+                        type="number"
+                        min="0"
+                        max="10"
+                        value={recordValue(
+                          student,
+                          dailySession?.recitationId ?? "midterm-recitation-1",
+                          0,
+                        )}
+                        onChange={(event) =>
+                          updateRecordValue(
+                            student.id,
+                            dailySession?.recitationId ??
+                              "midterm-recitation-1",
+                            event.target.value,
+                            10,
+                          )
+                        }
+                      />
+                    </td>
+                    <td>
+                      <input
+                        className="daily-remarks-input"
+                        value={
+                          dailyRemarks[`${recordDate}:${student.id}`] ?? ""
+                        }
+                        onChange={(event) =>
+                          setDailyRemarks((remarks) => ({
+                            ...remarks,
+                            [`${recordDate}:${student.id}`]: event.target.value,
+                          }))
+                        }
+                        placeholder="Add a note"
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+      {assessmentToDelete && (
+        <div className="modal-backdrop class-confirm-backdrop" onMouseDown={(event) => {
+          if (event.target === event.currentTarget && !assessmentDeleting) setAssessmentToDelete(null)
+        }}>
+          <section className="class-confirm-modal" role="alertdialog" aria-modal="true" aria-labelledby="delete-assessment-title" aria-describedby="delete-assessment-description">
+            <button type="button" className="class-confirm-close" onClick={() => setAssessmentToDelete(null)} disabled={assessmentDeleting} aria-label="Close delete assessment dialog">×</button>
+            <div className="class-confirm-header">
+              <span className="class-confirm-icon" aria-hidden="true"><Icon name="minus" size={18} /></span>
+              <div>
+                <h2 id="delete-assessment-title">Delete assessment?</h2>
+                <p id="delete-assessment-description">Only the <strong>{assessmentToDelete.label}</strong> column will be permanently removed, including every student score in that column{assessmentToDelete.type === "Quiz" || assessmentToDelete.type === "Exam" ? " and its matching OMR record" : ""}. Other gradebook columns will not be changed. This action cannot be undone.</p>
+              </div>
+            </div>
+            <div className="class-confirm-actions">
+              <button type="button" className="secondary-button" onClick={() => setAssessmentToDelete(null)} disabled={assessmentDeleting}>Cancel</button>
+              <button type="button" className="danger-button" onClick={() => void deleteAssessmentColumn()} disabled={assessmentDeleting}>{assessmentDeleting ? "Deleting..." : "Delete assessment"}</button>
+            </div>
+          </section>
+        </div>
+      )}
+    </>
+  )
+}
+
+function ActivitiesPage({
+  setPage,
+  reminders,
+  setReminders,
+}: {
+  setPage: (page: string) => void
+  reminders: ActivityItem[]
+  setReminders: React.Dispatch<React.SetStateAction<ActivityItem[]>>
+}) {
+  const activityTypes = ["Quiz", "Exam", "Class activity", "Hands-on activity"]
+  const reminderDate = (value: string) => new Date(`${value}T12:00:00`)
+  const formatReminderDay = (value: string) => {
+    if (!value) return "--"
+    return new Intl.DateTimeFormat("en", { day: "2-digit" }).format(
+      reminderDate(value),
+    )
+  }
+  const formatReminderMonth = (value: string) => {
+    if (!value) return "---"
+    return new Intl.DateTimeFormat("en", { month: "short" })
+      .format(reminderDate(value))
+      .toUpperCase()
+  }
+  const formatReminderDateLong = (value: string) => {
+    if (!value) return "Select a date"
+    return new Intl.DateTimeFormat("en", {
+      weekday: "long",
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+    }).format(reminderDate(value))
+  }
+  const [editing, setEditing] = useState<number | null>(null)
+  const [activeGroupId, setActiveGroupId] = useState<string | null>(null)
+  const [draft, setDraft] = useState<ActivityItem>(createActivityDraft)
+  const [remindersLoading, setRemindersLoading] = useState(true)
+  const [reminderClasses, setReminderClasses] = useState<Array<{ id: string; subject: string; code: string }>>([])
+  const [reminderSaving, setReminderSaving] = useState(false)
+  const [reminderNotice, setReminderNotice] = useState("")
+  const [reminderToDelete, setReminderToDelete] = useState<ActivityItem | null>(null)
+  const [reminderDeleting, setReminderDeleting] = useState(false)
+  const [quizOpenStates, setQuizOpenStates] = useState<Record<string, boolean>>({})
+  const [quizStatusSavingId, setQuizStatusSavingId] = useState<string | null>(null)
+  const [assessmentRoster, setAssessmentRoster] = useState<Array<{ id: string; name: string; studentNumber: string }>>([])
+  const [assessmentRosterLoading, setAssessmentRosterLoading] = useState(false)
+  const [assessmentRosterOpen, setAssessmentRosterOpen] = useState(false)
+
+  useEffect(() => {
+    let active = true
+    const loadAssessmentRoster = async () => {
+      if (!draft.classId || editing === null) {
+        if (active) setAssessmentRoster([])
+        return
+      }
+      setAssessmentRosterLoading(true)
+      const { data, error } = await supabase
+        .from("class_students")
+        .select("*")
+        .eq("class_id", String(draft.classId))
+      if (!active) return
+      if (error) {
+        console.error("Unable to load assessment roster:", error)
+        setAssessmentRoster([])
+      } else {
+        setAssessmentRoster((data ?? []).map((row: any, index: number) => ({
+          id: String(row.student_id ?? row.profile_id ?? row.user_id ?? row.id ?? index),
+          name: String(row.student_name ?? row.full_name ?? row.name ?? "Student"),
+          studentNumber: String(row.student_number ?? row.student_no ?? row.school_id ?? row.student_code ?? ""),
+        })).sort((a, b) => a.name.localeCompare(b.name)))
+      }
+      setAssessmentRosterLoading(false)
+    }
+    void loadAssessmentRoster()
+    setAssessmentRosterOpen(false)
+    return () => { active = false }
+  }, [draft.classId, editing])
+
+  const mapReminderRow = (row: any): ActivityItem => ({
+    id: String(row.id),
+    classId: row.class_id ?? "",
+    date: String(row.reminder_date ?? ""),
+    title: String(row.title ?? ""),
+    assessmentIndex: Math.max(1, Number(row.assessment_index) || Number(String(row.title ?? "").match(/\d+/)?.[0]) || 1),
+    description: String(row.description ?? ""),
+    type: String(row.activity_type ?? "Quiz"),
+    startTime: String(row.start_time ?? "").slice(0, 5),
+    endTime: String(row.end_time ?? "").slice(0, 5),
+    participation: String(row.participation ?? "Individual"),
+    groups: Array.isArray(row.groups) ? row.groups : [],
+    itemCount: Math.min(50, Math.max(1, Number(row.item_count) || 50)),
+    pointsPerItem: Math.max(0.01, Number(row.points_per_item) || 1),
+    omrAssessmentId: row.omr_assessment_id ? String(row.omr_assessment_id) : undefined,
+    answerKey: Array.from({ length: 50 }, () => ""),
+  })
+
+  const loadReminderClasses = async () => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+    const { data, error } = await supabase
+      .from("classes")
+      .select("id, subject, code")
+      .eq("faculty_id", user.id)
+      .neq("status", "Archived")
+      .order("subject", { ascending: true })
+    if (error) {
+      setReminderNotice(`Unable to load classes: ${error.message}`)
+      setReminderClasses([])
+      return
+    }
+    setReminderClasses((data ?? []).map((item: any) => ({
+      id: String(item.id),
+      subject: String(item.subject ?? "Untitled class"),
+      code: String(item.code ?? ""),
+    })))
+  }
+
+  const loadReminders = async () => {
+    setRemindersLoading(true)
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+      setReminders([])
+      setRemindersLoading(false)
+      return
+    }
+    const { data, error } = await supabase
+      .from("faculty_reminders")
+      .select("id, class_id, reminder_date, title, assessment_index, description, activity_type, start_time, end_time, participation, groups, item_count, points_per_item, omr_assessment_id")
+      .eq("faculty_id", user.id)
+      .order("reminder_date", { ascending: true })
+      .order("start_time", { ascending: true })
+    if (error) {
+      setReminderNotice(`Unable to load reminders: ${error.message}`)
+    } else {
+      const mappedReminders = (data ?? []).map(mapReminderRow)
+      setReminders(mappedReminders)
+
+      const assessmentIds = mappedReminders
+        .map((item) => item.omrAssessmentId)
+        .filter((id): id is string => Boolean(id))
+
+      if (assessmentIds.length > 0) {
+        const { data: statusRows, error: statusError } = await supabase
+          .from("omr_assessments")
+          .select("id, status")
+          .in("id", assessmentIds)
+
+        if (statusError) {
+          console.error("Unable to load quiz open states:", statusError)
+        } else {
+          setQuizOpenStates(Object.fromEntries(
+            (statusRows ?? []).map((row: any) => [String(row.id), String(row.status) === "open"]),
+          ))
+        }
+      } else {
+        setQuizOpenStates({})
+      }
+    }
+    setRemindersLoading(false)
+  }
+
+  useEffect(() => {
+    if (editing === -1 && !draft.classId && reminderClasses.length > 0) {
+      setDraft((current) => ({ ...current, classId: reminderClasses[0].id }))
+    }
+  }, [editing, draft.classId, reminderClasses])
+
+  useEffect(() => {
+    void loadReminderClasses()
+    void loadReminders()
+    const channel = supabase
+      .channel("faculty-reminders-sync")
+      .on("postgres_changes", { event: "*", schema: "public", table: "faculty_reminders" }, () => void loadReminders())
+      .on("postgres_changes", { event: "*", schema: "public", table: "omr_assessments" }, () => void loadReminders())
+      .subscribe()
+    return () => { void supabase.removeChannel(channel) }
+  }, [])
+
+  const [studentConcerns, setStudentConcerns] = useState(initialStudentConcerns)
+  const [studentConcernsLoading, setStudentConcernsLoading] = useState(true)
+  const [reviewSavingId, setReviewSavingId] = useState<string | null>(null)
+  const [draftSavingId, setDraftSavingId] = useState<string | null>(null)
+  const [savedDraftIds, setSavedDraftIds] = useState<Record<string, boolean>>({})
+  const [concernView, setConcernView] = useState<"open" | "reviewed">("open")
+  const [assessmentView, setAssessmentView] = useState<"active" | "finished">("active")
+  const [assessmentSearch, setAssessmentSearch] = useState("")
+  const [assessmentSort, setAssessmentSort] = useState<"newest" | "oldest" | "title">("newest")
+
+  const formatRequestSubmittedAt = (value: string) => {
+    const date = new Date(value)
+    if (Number.isNaN(date.getTime())) return "Recently"
+    return new Intl.DateTimeFormat("en-US", {
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+    }).format(date)
+  }
+
+  const loadStudentRequests = async () => {
+    setStudentConcernsLoading(true)
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+      setStudentConcerns([])
+      setStudentConcernsLoading(false)
+      return
+    }
+    const { data, error } = await supabase
+      .from("student_requests")
+      .select("id, student_id, student_name, category, message, section, status, faculty_reply, review_draft, draft_decision, draft_saved_at, reviewed_at, created_at")
+      .eq("faculty_id", user.id)
+      .order("created_at", { ascending: false })
+    if (error) {
+      showToast(`Unable to load student requests: ${error.message}`, "error")
+      setStudentConcerns([])
+    } else {
+      setStudentConcerns((data ?? []).map((row: any) => ({
+        id: String(row.id),
+        studentId: String(row.student_id ?? ""),
+        studentName: String(row.student_name ?? "Student"),
+        category: String(row.category ?? "Student request"),
+        message: String(row.message ?? ""),
+        section: String(row.section ?? "Unassigned class"),
+        submittedAt: formatRequestSubmittedAt(String(row.created_at ?? "")),
+        createdAt: String(row.created_at ?? ""),
+        status: String(row.status ?? "Open").toLowerCase() === "accepted"
+          ? "Accepted"
+          : String(row.status ?? "Open").toLowerCase() === "denied"
+            ? "Denied"
+            : "Open",
+        facultyReply: String(row.faculty_reply ?? ""),
+        reviewDraft: String(row.review_draft ?? ""),
+        draftDecision:
+          row.draft_decision === "Accepted" || row.draft_decision === "Denied"
+            ? row.draft_decision
+            : undefined,
+        draftSavedAt: String(row.draft_saved_at ?? ""),
+      })))
+    }
+    setStudentConcernsLoading(false)
+  }
+
+  useEffect(() => {
+    void loadStudentRequests()
+    const channel = supabase
+      .channel("faculty-student-requests")
+      .on("postgres_changes", { event: "*", schema: "public", table: "student_requests" }, () => void loadStudentRequests())
+      .subscribe()
+    return () => { void supabase.removeChannel(channel) }
+  }, [])
+
+  useEffect(() => {
+    const replies: Record<string, string> = {}
+    const decisions: Record<string, "Accepted" | "Denied"> = {}
+    const draftIds: Record<string, boolean> = {}
+
+    studentConcerns.forEach((concern) => {
+      if (concern.reviewDraft) replies[concern.id] = concern.reviewDraft
+      if (concern.draftDecision) decisions[concern.id] = concern.draftDecision
+      if (concern.reviewDraft || concern.draftDecision || concern.draftSavedAt) {
+        draftIds[concern.id] = true
+      }
+    })
+
+    setConcernReplies((current) => {
+      const next = { ...current }
+      Object.entries(replies).forEach(([id, value]) => {
+        if (!(id in next)) next[id] = value
+      })
+      return next
+    })
+    setConcernDecisions((current) => {
+      const next = { ...current }
+      Object.entries(decisions).forEach(([id, value]) => {
+        if (!(id in next)) next[id] = value
+      })
+      return next
+    })
+    setSavedDraftIds(draftIds)
+  }, [studentConcerns])
+
+  const saveConcernDraft = async (concern: StudentConcern) => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+      showMessage("Your session expired. Please sign in again.")
+      return
+    }
+
+    setDraftSavingId(concern.id)
+    const savedAt = new Date().toISOString()
+    const draftReply = concernReplies[concern.id]?.trim() || null
+    const draftDecision = concernDecisions[concern.id] ?? null
+
+    const { error } = await supabase
+      .from("student_requests")
+      .update({
+        review_draft: draftReply,
+        draft_decision: draftDecision,
+        draft_saved_at: savedAt,
+        updated_at: savedAt,
+      })
+      .eq("id", concern.id)
+      .eq("faculty_id", user.id)
+
+    setDraftSavingId(null)
+    if (error) {
+      showToast(`Unable to save draft: ${error.message}`, "error")
+      return
+    }
+
+    setSavedDraftIds((current) => ({ ...current, [concern.id]: true }))
+    setStudentConcerns((current) => current.map((item) =>
+      item.id === concern.id
+        ? {
+            ...item,
+            reviewDraft: draftReply ?? "",
+            draftDecision: draftDecision ?? undefined,
+            draftSavedAt: savedAt,
+          }
+        : item,
+    ))
+    showToast("Concern review draft saved and synchronized.")
+  }
+
+  const removeConcernDraft = async (concernId: string, facultyId: string) => {
+    const { error } = await supabase
+      .from("student_requests")
+      .update({
+        review_draft: null,
+        draft_decision: null,
+        draft_saved_at: null,
+      })
+      .eq("id", concernId)
+      .eq("faculty_id", facultyId)
+
+    if (error) console.error("Unable to clear concern draft:", error)
+    setSavedDraftIds((current) => {
+      const next = { ...current }
+      delete next[concernId]
+      return next
+    })
+  }
+
+  const submitRequestReview = async (concern: StudentConcern) => {
+    const decision = concernDecisions[concern.id]
+    const reply = concernReplies[concern.id]?.trim()
+    if (!decision || !reply) return
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+      showMessage("Your session expired. Please sign in again.")
+      return
+    }
+    setReviewSavingId(concern.id)
+    const { error } = await supabase
+      .from("student_requests")
+      .update({
+        status: decision,
+        faculty_reply: reply,
+        reviewed_at: new Date().toISOString(),
+        review_draft: null,
+        draft_decision: null,
+        draft_saved_at: null,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", concern.id)
+      .eq("faculty_id", user.id)
+    setReviewSavingId(null)
+    if (error) {
+      showToast(`Unable to send review: ${error.message}`, "error")
+      return
+    }
+    setExpandedConcernId(null)
+    setConcernDecisions((current) => {
+      const next = { ...current }
+      delete next[concern.id]
+      return next
+    })
+    setConcernReplies((current) => {
+      const next = { ...current }
+      delete next[concern.id]
+      return next
+    })
+    await removeConcernDraft(concern.id, user.id)
+    setStudentConcerns((current) => current.map((item) =>
+      item.id === concern.id
+        ? { ...item, status: decision, facultyReply: reply }
+        : item,
+    ))
+    showToast(`Concern ${decision.toLowerCase()} successfully.`)
+    await loadStudentRequests()
+  }
+
+  const [expandedConcernId, setExpandedConcernId] = useState<string | null>(
+    null,
+  )
+  const [concernDecisions, setConcernDecisions] =
+    useState<Record<string, "Accepted" | "Denied">>({})
+  const [concernReplies, setConcernReplies] = useState<Record<string, string>>(
+    {},
+  )
+  const [sentReviewNotice, setSentReviewNotice] = useState("")
+  const [currentTime, setCurrentTime] = useState(() => Date.now())
+  useEffect(() => {
+    if (!sentReviewNotice) return
+    const timeout = window.setTimeout(() => setSentReviewNotice(""), 4000)
+    return () => window.clearTimeout(timeout)
+  }, [sentReviewNotice])
+
+  useEffect(() => {
+    const interval = window.setInterval(
+      () => setCurrentTime(Date.now()),
+      15_000,
+    )
+    return () => window.clearInterval(interval)
+  }, [])
+
+  const getActivityStatus = (activity: ActivityItem, index: number) => {
+    const startAt = new Date(`${activity.date}T${activity.startTime}`).getTime()
+    const endAt = new Date(`${activity.date}T${activity.endTime}`).getTime()
+    if (!Number.isNaN(endAt) && currentTime >= endAt) return "Finished"
+    if (!Number.isNaN(startAt) && currentTime >= startAt) return "In progress"
+    return index === 0 ? "Next up" : "Scheduled"
+  }
+
+  const isQuizManuallyOpen = (activity: ActivityItem) =>
+    Boolean(
+      activity.type === "Quiz" &&
+      activity.omrAssessmentId &&
+      quizOpenStates[activity.omrAssessmentId],
+    )
+  const activeAssessments = reminders.filter((activity, index) =>
+    isQuizManuallyOpen(activity) || getActivityStatus(activity, index) !== "Finished",
+  )
+  const finishedAssessments = reminders.filter((activity, index) =>
+    !isQuizManuallyOpen(activity) && getActivityStatus(activity, index) === "Finished",
+  )
+  const selectedAssessments = assessmentView === "finished"
+    ? finishedAssessments
+    : activeAssessments
+  const normalizedAssessmentSearch = assessmentSearch.trim().toLowerCase()
+  const visibleAssessments = selectedAssessments
+    .filter((activity) => {
+      if (!normalizedAssessmentSearch) return true
+      const activityClass = reminderClasses.find((item) => item.id === activity.classId)
+      return [activity.title, activity.description, activity.type, activityClass?.subject, activityClass?.code]
+        .some((value) => String(value ?? "").toLowerCase().includes(normalizedAssessmentSearch))
+    })
+    .sort((a, b) => {
+      if (assessmentSort === "title") {
+        return a.title.localeCompare(b.title, undefined, { numeric: true })
+      }
+      const aTime = new Date(`${a.date}T${a.startTime || "00:00"}:00`).getTime()
+      const bTime = new Date(`${b.date}T${b.startTime || "00:00"}:00`).getTime()
+      return assessmentSort === "oldest" ? aTime - bTime : bTime - aTime
+    })
+
+  const openNewReminder = () => {
+    setDraft({ ...createActivityDraft(), classId: reminderClasses[0]?.id ?? "" })
+    setActiveGroupId(null)
+    setEditing(-1)
+  }
+
+  const addGroup = () => {
+    const id = `group-${Date.now()}`
+    setDraft((current) => ({
+      ...current,
+      groups: [
+        ...current.groups,
+        { id, name: `Group ${current.groups.length + 1}`, studentIds: [] },
+      ],
+    }))
+    setActiveGroupId(id)
+  }
+
+  const updateGroupName = (groupId: string, name: string) =>
+    setDraft((current) => ({
+      ...current,
+      groups: current.groups.map((group) =>
+        group.id === groupId ? { ...group, name } : group,
+      ),
+    }))
+
+  const removeGroup = (groupId: string) => {
+    setDraft((current) => ({
+      ...current,
+      groups: current.groups.filter((group) => group.id !== groupId),
+    }))
+    setActiveGroupId((activeId) => (activeId === groupId ? null : activeId))
+  }
+
+  const toggleStudentInGroup = (groupId: string, studentId: string) =>
+    setDraft((current) => ({
+      ...current,
+      groups: current.groups.map((group) => {
+        const isTarget = group.id === groupId
+        const isAlreadyAssigned = group.studentIds.includes(studentId)
+        if (isTarget)
+          return {
+            ...group,
+            studentIds: isAlreadyAssigned
+              ? group.studentIds.filter((id) => id !== studentId)
+              : [...group.studentIds, studentId],
+          }
+        return {
+          ...group,
+          studentIds: group.studentIds.filter((id) => id !== studentId),
+        }
+      }),
+    }))
+
+  const openAssessmentEditor = async (activity: ActivityItem, index: number) => {
+    const nextDraft: ActivityItem = {
+      ...activity,
+      groups: activity.groups.map((group) => ({ ...group, studentIds: [...group.studentIds] })),
+      answerKey: Array.from({ length: 50 }, (_, answerIndex) => activity.answerKey?.[answerIndex] ?? ""),
+    }
+
+    if (activity.omrAssessmentId && (activity.type === "Quiz" || activity.type === "Exam")) {
+      const { data, error } = await supabase
+        .from("omr_answer_keys")
+        .select("answers")
+        .eq("assessment_id", activity.omrAssessmentId)
+        .maybeSingle()
+
+      if (error) showToast(`Unable to load answer key: ${error.message}`, "error")
+      const savedAnswers = Array.isArray(data?.answers) ? data.answers : []
+      nextDraft.answerKey = Array.from({ length: 50 }, (_, answerIndex) => String(savedAnswers[answerIndex] ?? ""))
+    }
+
+    setDraft(nextDraft)
+    setActiveGroupId(null)
+    setEditing(index)
+  }
+
+  const assessmentClassLocked = editing !== -1 && Boolean(draft.omrAssessmentId)
+  const omrEligible = (draft.type === "Quiz" || draft.type === "Exam") && draft.participation === "Individual"
+
+  const saveReminder = async () => {
+    if (!draft.title.trim()) {
+      showToast("Enter a reminder title.", "error")
+      return
+    }
+    if (!draft.classId) {
+      showToast("Select a class before saving the reminder.", "error")
+      return
+    }
+    if (!draft.date || !draft.startTime || !draft.endTime) {
+      showToast("Complete the required date and time fields.", "error")
+      return
+    }
+    if (draft.endTime <= draft.startTime) {
+      showToast("End time must be later than start time.", "error")
+      return
+    }
+    if (draft.type !== "Hands-on activity" && draft.participation === "Group" && draft.groups.length === 0) {
+      showToast("Add at least one group for a group activity.", "error")
+      return
+    }
+    if (draft.itemCount < 1 || draft.itemCount > 50) {
+      showToast("Number of items must be between 1 and 50.", "error")
+      return
+    }
+    if (draft.pointsPerItem <= 0) {
+      showToast("Points per item must be greater than zero.", "error")
+      return
+    }
+    const requiresAnswerKey = omrEligible
+    const completedAnswers = draft.answerKey.slice(0, draft.itemCount).filter(Boolean).length
+    if (requiresAnswerKey && completedAnswers !== draft.itemCount) {
+      showToast(`Complete all ${draft.itemCount} answer-key items before saving.`, "error")
+      return
+    }
+
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+      setReminderNotice("Your session expired. Sign in again before saving.")
+      return
+    }
+
+    setReminderSaving(true)
+    setReminderNotice("")
+
+    if (assessmentClassLocked && draft.omrAssessmentId) {
+      const { data: originalAssessment, error: originalAssessmentError } = await supabase
+        .from("omr_assessments")
+        .select("class_id")
+        .eq("id", draft.omrAssessmentId)
+        .eq("faculty_id", user.id)
+        .maybeSingle()
+
+      if (originalAssessmentError || !originalAssessment) {
+        setReminderSaving(false)
+        showToast(
+          originalAssessmentError?.message ?? "The original assessment could not be verified.",
+          "error",
+        )
+        return
+      }
+
+      if (String(originalAssessment.class_id) !== String(draft.classId)) {
+        setReminderSaving(false)
+        showToast(
+          "The subject and section are locked after an assessment is created. Create a new assessment for another class.",
+          "error",
+        )
+        return
+      }
+    }
+
+    let omrAssessmentId = draft.omrAssessmentId
+    const isOmrAssessment = omrEligible
+    const canonicalAssessmentTitle = isOmrAssessment
+      ? `${draft.type} ${draft.assessmentIndex}`
+      : draft.title.trim()
+
+    if (isOmrAssessment) {
+      const omrPayload = {
+        faculty_id: user.id,
+        class_id: String(draft.classId),
+        title: canonicalAssessmentTitle,
+        assessment_index: draft.assessmentIndex,
+        description: draft.description.trim(),
+        assessment_type: draft.type.toLowerCase(),
+        item_count: draft.itemCount,
+        points_per_item: draft.pointsPerItem,
+        scheduled_date: draft.date,
+        start_time: draft.startTime,
+        end_time: draft.endTime,
+      }
+
+      if (omrAssessmentId) {
+        const { error: omrUpdateError } = await supabase
+          .from("omr_assessments")
+          .update(omrPayload)
+          .eq("id", omrAssessmentId)
+          .eq("faculty_id", user.id)
+        if (omrUpdateError) {
+          setReminderSaving(false)
+          showToast(`Unable to update OMR assessment: ${omrUpdateError.message}`, "error")
+          return
+        }
+      } else {
+        // Read the faculty's existing Test IDs and choose an actually unused
+        // three-digit value. Do not treat every 23505 conflict as a Test ID
+        // collision because class/type/term/index also has a unique rule.
+        const { data: existingTestRows, error: existingTestError } = await supabase
+          .from("omr_assessments")
+          .select("test_id")
+          .eq("faculty_id", user.id)
+
+        if (existingTestError) {
+          setReminderSaving(false)
+          showToast(`Unable to prepare a Test ID: ${existingTestError.message}`, "error")
+          return
+        }
+
+        const usedTestIds = new Set(
+          (existingTestRows ?? []).map((row: any) => String(row.test_id ?? "")),
+        )
+        const availableTestIds = Array.from({ length: 900 }, (_, index) => String(index + 100))
+          .filter((value) => !usedTestIds.has(value))
+
+        if (availableTestIds.length === 0) {
+          setReminderSaving(false)
+          showToast("All three-digit Test IDs from 100 to 999 are already used.", "error")
+          return
+        }
+
+        // Randomize the first choice, then retry only when the database reports
+        // the faculty/test_id unique constraint. Other conflicts are real form
+        // errors and must be shown to the faculty immediately.
+        const startAt = Math.floor(Math.random() * availableTestIds.length)
+        const candidates = [
+          ...availableTestIds.slice(startAt),
+          ...availableTestIds.slice(0, startAt),
+        ]
+        let created: { id: string } | null = null
+        let createError: any = null
+
+        for (const testId of candidates.slice(0, 20)) {
+          const result = await supabase
+            .from("omr_assessments")
+            .insert({ ...omrPayload, test_id: testId, status: "draft" })
+            .select("id")
+            .single()
+
+          if (!result.error) {
+            created = result.data
+            break
+          }
+
+          const errorText = [
+            result.error.message,
+            result.error.details,
+            result.error.hint,
+          ].filter(Boolean).join(" ").toLowerCase()
+          const isTestIdConflict =
+            result.error.code === "23505" &&
+            (errorText.includes("test_id") || errorText.includes("faculty_test_id"))
+
+          if (!isTestIdConflict) {
+            createError = result.error
+            break
+          }
+        }
+
+        if (!created) {
+          setReminderSaving(false)
+          const errorText = String(createError?.message ?? "Unable to create the OMR assessment.")
+          const duplicateAssessment =
+            createError?.code === "23505" &&
+            (errorText.toLowerCase().includes("assessment_index") ||
+              errorText.toLowerCase().includes("class_type_term_index"))
+          showToast(
+            duplicateAssessment
+              ? `${draft.type} ${draft.assessmentIndex} already exists for this class and term. Use another index or edit the existing assessment.`
+              : `Unable to create OMR assessment: ${errorText}`,
+            "error",
+          )
+          return
+        }
+        omrAssessmentId = created.id
+      }
+    }
+
+    if (isOmrAssessment && omrAssessmentId) {
+      const { error: answerKeyError } = await supabase
+        .from("omr_answer_keys")
+        .upsert({
+          assessment_id: omrAssessmentId,
+          faculty_id: user.id,
+          answers: draft.answerKey.slice(0, draft.itemCount),
+          verified_at: new Date().toISOString(),
+        }, { onConflict: "assessment_id" })
+
+      if (answerKeyError) {
+        setReminderSaving(false)
+        showToast(`Unable to save answer key: ${answerKeyError.message}`, "error")
+        return
+      }
+    }
+
+    const payload = {
+      faculty_id: user.id,
+      class_id: String(draft.classId),
+      reminder_date: draft.date,
+      title: canonicalAssessmentTitle,
+      assessment_index: draft.assessmentIndex,
+      description: draft.description.trim(),
+      activity_type: draft.type,
+      start_time: draft.startTime,
+      end_time: draft.endTime,
+      participation: draft.type === "Hands-on activity" ? "Individual" : draft.participation,
+      groups: draft.type === "Hands-on activity" ? [] : draft.groups,
+      item_count: draft.itemCount,
+      points_per_item: draft.pointsPerItem,
+      omr_assessment_id: isOmrAssessment ? omrAssessmentId : null,
+      updated_at: new Date().toISOString(),
+    }
+
+    const result = draft.id
+      ? await supabase.from("faculty_reminders").update(payload).eq("id", draft.id).eq("faculty_id", user.id)
+      : await supabase.from("faculty_reminders").insert(payload)
+
+    setReminderSaving(false)
+    if (result.error) {
+      showToast(`Unable to save assessment: ${result.error.message}`, "error")
+      return
+    }
+    if (isOmrAssessment && omrAssessmentId) {
+      // The current form does not yet expose a term selector. Keep the existing
+      // portal convention: dates through October are Midterm, later dates Final.
+      const assessmentTerm: "midterm" | "final" =
+        new Date(`${draft.date}T12:00:00`).getMonth() <= 9 ? "midterm" : "final"
+
+      window.dispatchEvent(new CustomEvent("cit-portal:gradebook-assessment-saved", {
+        detail: {
+          assessmentId: omrAssessmentId,
+          classId: String(draft.classId),
+          title: canonicalAssessmentTitle,
+          type: draft.type.toLowerCase(),
+          term: assessmentTerm,
+        },
+      }))
+    }
+
+    setEditing(null)
+    showToast(draft.id ? "Assessment updated successfully." : "Assessment added successfully.")
+    await loadReminders()
+  }
+
+  const toggleQuizOpen = async (activity: ActivityItem) => {
+    if (!activity.omrAssessmentId || activity.type !== "Quiz") return
+
+    const isOpen = Boolean(quizOpenStates[activity.omrAssessmentId])
+    const nextStatus = isOpen ? "closed" : "open"
+    setQuizStatusSavingId(activity.omrAssessmentId)
+
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+      setQuizStatusSavingId(null)
+      showToast("Your session expired. Sign in again.", "error")
+      return
+    }
+
+    const { error } = await supabase
+      .from("omr_assessments")
+      .update({ status: nextStatus, updated_at: new Date().toISOString() })
+      .eq("id", activity.omrAssessmentId)
+      .eq("faculty_id", user.id)
+
+    setQuizStatusSavingId(null)
+    if (error) {
+      showToast(`Unable to ${isOpen ? "close" : "open"} quiz: ${error.message}`, "error")
+      return
+    }
+
+    setQuizOpenStates((current) => ({
+      ...current,
+      [activity.omrAssessmentId as string]: !isOpen,
+    }))
+    showToast(
+      isOpen
+        ? `${activity.title} is now closed to students.`
+        : `${activity.title} is now open to enrolled students.`,
+    )
+  }
+
+  const generatePrintableOmrPaper = async (activity: ActivityItem) => {
+    if (!activity.omrAssessmentId || (activity.type !== "Quiz" && activity.type !== "Exam")) {
+      showToast("Only saved Quiz and Exam assessments can generate an OMR paper.", "error")
+      return
+    }
+
+    try {
+      const { data: assessment, error: assessmentError } = await supabase
+        .from("omr_assessments")
+        .select("id, title, description, test_id, item_count, points_per_item, scheduled_date")
+        .eq("id", activity.omrAssessmentId)
+        .single()
+
+      if (assessmentError) throw assessmentError
+
+      const activityClass = reminderClasses.find((item) => item.id === activity.classId)
+      const paperCode = `CIT-OMR|${assessment.id}|${assessment.test_id}`
+      const qrDataUrl = await QRCode.toDataURL(paperCode, {
+        errorCorrectionLevel: "H",
+        margin: 1,
+        width: 480,
+        color: { dark: "#000000", light: "#ffffff" },
+      })
+
+      const itemCount = Math.min(50, Math.max(1, Number(assessment.item_count) || 1))
+      const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" })
+      const pageWidth = 210
+      const pageHeight = 297
+      const navy = [23, 59, 99] as const
+      const blue = [31, 110, 171] as const
+      const pale = [238, 246, 252] as const
+      const line = [83, 123, 158] as const
+      const muted = [85, 105, 123] as const
+
+      const drawLabelLine = (label: string, value: string, x: number, y: number, width: number) => {
+        pdf.setFont("helvetica", "bold")
+        pdf.setFontSize(6.4)
+        pdf.setTextColor(...navy)
+        pdf.text(`${label}:`, x, y)
+        pdf.setFont("helvetica", "normal")
+        pdf.setTextColor(34, 52, 70)
+        const clipped = pdf.splitTextToSize(value, Math.max(10, width - 23))[0] ?? ""
+        pdf.text(clipped, x + 23, y)
+        pdf.setDrawColor(130, 160, 185)
+        pdf.setLineWidth(0.25)
+        pdf.line(x, y + 2.2, x + width, y + 2.2)
+      }
+
+      // Outer frame and registration markers used by the camera alignment flow.
+      pdf.setDrawColor(...navy)
+      pdf.setLineWidth(0.45)
+      pdf.roundedRect(8, 8, 194, 281, 3, 3)
+      pdf.setFillColor(0, 0, 0)
+      ;[[11, 11], [191, 11], [11, 278], [191, 278]].forEach(([x, y]) => pdf.rect(x, y, 8, 8, "F"))
+
+      // Header, kept clear of the QR and information panels.
+      pdf.setFillColor(...navy)
+      pdf.roundedRect(21, 14, 168, 20, 2, 2, "F")
+      pdf.setTextColor(255, 255, 255)
+      pdf.setFont("helvetica", "bold")
+      pdf.setFontSize(14.5)
+      pdf.text("CiTracker OMR ANSWER SHEET", 105, 22.5, { align: "center" })
+      pdf.setFont("helvetica", "normal")
+      pdf.setFontSize(6.8)
+      pdf.text(`${String(assessment.title).toUpperCase()}  |  ${itemCount} ITEMS  |  TEST ${assessment.test_id}`, 105, 28.7, { align: "center" })
+
+      // Student identity panel. The QR has its own separate box and can no longer be covered.
+      pdf.setFillColor(...pale)
+      pdf.setDrawColor(191, 216, 233)
+      pdf.roundedRect(18, 41, 136, 75, 2.5, 2.5, "FD")
+      pdf.setTextColor(...navy)
+      pdf.setFont("helvetica", "bold")
+      pdf.setFontSize(8.7)
+      pdf.text("STUDENT NUMBER (10 DIGITS)", 23, 49)
+      pdf.setFont("helvetica", "normal")
+      pdf.setFontSize(6)
+      pdf.setTextColor(...muted)
+      pdf.text("Shade one digit in every column using a dark pen or pencil.", 23, 54)
+
+      // Student-number grid. Coordinates intentionally remain identical to OmrScanner.
+      const studentX0 = 0.12857 * pageWidth
+      const studentDx = 0.03476 * pageWidth
+      const studentY0 = 0.20875 * pageHeight
+      const studentDy = 0.01717 * pageHeight
+      for (let column = 0; column < 10; column += 1) {
+        const x = studentX0 + column * studentDx
+        pdf.setFont("helvetica", "bold")
+        pdf.setFontSize(5.4)
+        pdf.setTextColor(...navy)
+        pdf.text(String(column + 1), x, studentY0 - 4.2, {
+          align: "center",
+          baseline: "middle",
+        })
+        for (let digit = 0; digit < 10; digit += 1) {
+          const y = studentY0 + digit * studentDy
+          pdf.setDrawColor(...line)
+          pdf.setLineWidth(0.35)
+          pdf.circle(x, y, 1.75)
+          pdf.setTextColor(18, 42, 64)
+          pdf.setFont("helvetica", "normal")
+          pdf.setFontSize(4.4)
+          pdf.text(String(digit), x, y, {
+            align: "center",
+            baseline: "middle",
+          })
+        }
+      }
+
+      drawLabelLine("NAME", "", 105, 68, 44)
+      drawLabelLine("SECTION", activityClass?.code ?? "", 105, 79, 44)
+      drawLabelLine("SUBJECT", activityClass?.subject ?? "", 105, 90, 44)
+      drawLabelLine("DESCRIPTION", String(assessment.description ?? activity.description ?? ""), 105, 101, 44)
+
+      // Dedicated official-code card placed completely outside the identity panel.
+      pdf.setFillColor(255, 255, 255)
+      pdf.setDrawColor(191, 216, 233)
+      pdf.roundedRect(159, 41, 33, 53, 2.5, 2.5, "FD")
+      pdf.addImage(qrDataUrl, "PNG", 163, 45, 25, 25, undefined, "FAST")
+      pdf.setFont("helvetica", "bold")
+      pdf.setFontSize(5.6)
+      pdf.setTextColor(...navy)
+      pdf.text("OFFICIAL PAPER", 175.5, 75, { align: "center" })
+      pdf.setFont("helvetica", "normal")
+      pdf.setFontSize(5.2)
+      pdf.text(`TEST ${assessment.test_id}`, 175.5, 80, { align: "center" })
+      pdf.setTextColor(...muted)
+      pdf.setFontSize(4.5)
+      pdf.text("Do not crop or cover", 175.5, 86, { align: "center" })
+      pdf.text("this QR code.", 175.5, 90, { align: "center" })
+
+      // Faculty workflow note. Students only answer and return the physical paper.
+      pdf.setFillColor(247, 250, 253)
+      pdf.setDrawColor(214, 226, 236)
+      pdf.roundedRect(159, 98, 33, 18, 2, 2, "FD")
+      pdf.setFont("helvetica", "bold")
+      pdf.setFontSize(5)
+      pdf.setTextColor(...navy)
+      pdf.text("PAPER WORKFLOW", 175.5, 103, { align: "center" })
+      pdf.setFont("helvetica", "normal")
+      pdf.setFontSize(4.35)
+      pdf.setTextColor(...muted)
+      pdf.text("Answer, then return", 175.5, 108, { align: "center" })
+      pdf.text("the paper to faculty.", 175.5, 112, { align: "center" })
+
+      // Answer area. Fixed normalized coordinates are retained so camera and import scans use one template.
+      const answerBlockX = [0.13810, 0.30810, 0.47810, 0.64810, 0.81810]
+      const answerStartY = 0.46465
+      const answerRowGap = 0.04040
+      const answerChoiceGap = 0.02476
+      const bubbleRadius = 0.00905 * pageWidth
+      const usedBlocks = Math.ceil(itemCount / 10)
+      const answerTop = 126
+      const answerBottom = 269
+      const answerCardRight = Math.min(194, 18 + usedBlocks * 35.7)
+
+      pdf.setFillColor(252, 254, 255)
+      pdf.setDrawColor(220, 230, 238)
+      pdf.roundedRect(18, answerTop, Math.max(36, answerCardRight - 18), answerBottom - answerTop, 2.5, 2.5, "FD")
+      pdf.setTextColor(...navy)
+      pdf.setFont("helvetica", "bold")
+      pdf.setFontSize(9.5)
+      pdf.text("ANSWERS", 20, 122.5)
+      pdf.setFont("helvetica", "normal")
+      pdf.setFontSize(5.4)
+      pdf.setTextColor(...muted)
+      pdf.text("Shade exactly one answer for each item.", 47, 122.5)
+
+      for (let block = 0; block < usedBlocks; block += 1) {
+        const firstItem = block * 10 + 1
+        const lastItem = Math.min(itemCount, firstItem + 9)
+        const blockX = answerBlockX[block] * pageWidth
+        pdf.setFillColor(...pale)
+        pdf.setDrawColor(220, 231, 239)
+        pdf.roundedRect(blockX - 8, 129, 33, 137, 2, 2, "FD")
+        pdf.setFont("helvetica", "bold")
+        pdf.setFontSize(5.2)
+        pdf.setTextColor(...navy)
+        pdf.text(`${firstItem}-${lastItem}`, blockX + 8, 134, { align: "center" })
+
+        for (let row = 0; row < 10; row += 1) {
+          const item = block * 10 + row + 1
+          if (item > itemCount) continue
+          const y = (answerStartY + row * answerRowGap) * pageHeight
+          pdf.setTextColor(...navy)
+          pdf.setFont("helvetica", "bold")
+          pdf.setFontSize(5.8)
+          pdf.text(String(item), blockX - 3, y, {
+            align: "right",
+            baseline: "middle",
+          })
+          for (let choice = 0; choice < 4; choice += 1) {
+            const x = (answerBlockX[block] + choice * answerChoiceGap) * pageWidth
+            pdf.setDrawColor(...line)
+            pdf.setLineWidth(0.35)
+            pdf.circle(x, y, bubbleRadius)
+            pdf.setTextColor(20, 49, 73)
+            pdf.setFont("helvetica", "normal")
+            pdf.setFontSize(4.8)
+            pdf.text(["A", "B", "C", "D"][choice], x, y, {
+              align: "center",
+              baseline: "middle",
+            })
+          }
+        }
+      }
+
+      // Use the unused right side for clear paper handling instructions on short assessments.
+      if (usedBlocks < 5) {
+        const instructionX = answerCardRight + 6
+        const instructionWidth = 192 - instructionX
+        if (instructionWidth >= 32) {
+          pdf.setFillColor(247, 250, 253)
+          pdf.setDrawColor(220, 230, 238)
+          pdf.roundedRect(instructionX, 129, instructionWidth, 72, 2.5, 2.5, "FD")
+          pdf.setFont("helvetica", "bold")
+          pdf.setFontSize(6.5)
+          pdf.setTextColor(...navy)
+          pdf.text("HOW TO ANSWER", instructionX + 5, 138)
+          pdf.setFont("helvetica", "normal")
+          pdf.setFontSize(5.2)
+          pdf.setTextColor(...muted)
+          const instructions = [
+            "1. Write your name.",
+            "2. Shade all 10 student-number digits.",
+            "3. Shade only one choice per item.",
+            "4. Erase changes completely.",
+            "5. Return the paper to the faculty.",
+          ]
+          instructions.forEach((text, index) => pdf.text(text, instructionX + 5, 147 + index * 9))
+          pdf.setFillColor(234, 246, 255)
+          pdf.setDrawColor(190, 218, 238)
+          pdf.roundedRect(instructionX + 4, 207, instructionWidth - 8, 30, 2, 2, "FD")
+          pdf.setFont("helvetica", "bold")
+          pdf.setFontSize(5.5)
+          pdf.setTextColor(...blue)
+          pdf.text("FACULTY EVALUATION", instructionX + 8, 215)
+          pdf.setFont("helvetica", "normal")
+          pdf.setFontSize(4.9)
+          pdf.setTextColor(...muted)
+          const facultyNote = pdf.splitTextToSize(
+            "The faculty scans, reviews, approves, exports, and publishes the result. Students do not upload this paper.",
+            instructionWidth - 16,
+          )
+          pdf.text(facultyNote, instructionX + 8, 222)
+        }
+      }
+
+      pdf.setFont("helvetica", "bold")
+      pdf.setFontSize(6.2)
+      pdf.setTextColor(0, 0, 0)
+      pdf.text("A4 PORTRAIT  |  PRINT AT 100% SCALE  |  FIT TO PAGE OFF", 105, 282, { align: "center" })
+      pdf.setFont("helvetica", "normal")
+      pdf.setFontSize(5.2)
+      pdf.text("Keep the QR code and all four corner squares visible. Return this physical paper to the faculty after answering.", 105, 286.3, { align: "center" })
+
+      const safeTitle = String(assessment.title ?? "OMR-assessment")
+        .trim()
+        .replace(/[^a-z0-9_-]+/gi, "-")
+        .replace(/^-+|-+$/g, "") || "OMR-assessment"
+      const safeClass = String(activityClass?.code ?? "class")
+        .trim()
+        .replace(/[^a-z0-9_-]+/gi, "-")
+        .replace(/^-+|-+$/g, "") || "class"
+      const fileName = `${safeTitle}-${safeClass}-Test-${assessment.test_id}-OMR.pdf`
+
+      pdf.save(fileName)
+      showToast(`${fileName} was downloaded. The faculty can print and distribute the paper.`)
+    } catch (reason) {
+      const problem = reason as { message?: string }
+      showToast(`Unable to generate OMR paper: ${problem.message ?? "Unknown error"}`, "error")
+    }
+  }
+
+  const deleteReminder = async () => {
+    if (!reminderToDelete?.id) return
+
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+      showToast("Your session expired. Sign in again.", "error")
+      return
+    }
+
+    setReminderDeleting(true)
+    const linkedAssessmentId = reminderToDelete.omrAssessmentId
+
+    try {
+      const { error: reminderError } = await supabase
+        .from("faculty_reminders")
+        .delete()
+        .eq("id", reminderToDelete.id)
+        .eq("faculty_id", user.id)
+
+      if (reminderError) throw reminderError
+
+      // Quiz and Exam reminders own their linked OMR assessment. Deleting the
+      // reminder must also remove the assessment, answer key, submissions, and
+      // Gradebook column. Answer keys/submissions cascade from omr_assessments.
+      if (linkedAssessmentId) {
+        const { error: assessmentError } = await supabase
+          .from("omr_assessments")
+          .delete()
+          .eq("id", linkedAssessmentId)
+          .eq("faculty_id", user.id)
+
+        if (assessmentError) throw assessmentError
+      }
+
+      window.dispatchEvent(new CustomEvent("cit-portal:gradebook-assessment-deleted", {
+        detail: {
+          assessmentId: linkedAssessmentId ?? "",
+          classId: reminderToDelete.classId,
+          title: reminderToDelete.title,
+          type: reminderToDelete.type.toLowerCase(),
+        },
+      }))
+
+      setReminderToDelete(null)
+      showToast("Assessment deleted from Activities, OMR, and Records.")
+      await loadReminders()
+    } catch (reason) {
+      const problem = reason as { message?: string }
+      showToast(`Unable to delete assessment: ${problem.message ?? "Unknown database error"}`, "error")
+    } finally {
+      setReminderDeleting(false)
+    }
+  }
+
+const reminderFormValid = Boolean(
+    draft.title.trim() &&
+    draft.description.trim() &&
+    draft.assessmentIndex >= 1 &&
+    draft.classId &&
+    draft.date &&
+    draft.startTime &&
+    draft.endTime &&
+    draft.endTime > draft.startTime &&
+    draft.itemCount >= 1 && draft.itemCount <= 50 &&
+    draft.pointsPerItem > 0 &&
+    (draft.participation !== "Group" || draft.groups.length > 0),
+  )
+
+  return (
+    <>
+      <Header
+        title="Activities"
+        onNotify={() => setPage("notifications")}
+        onProfile={() => setPage("profile")}
+      />
+      <div className="page-intro">
+        <div>
+          <p className="eyebrow">Faculty calendar</p>
+          <h2>Assessments & reminders</h2>
+          <p>Schedule exams, quizzes, and activities for your classes.</p>
+        </div>
+
+      </div>
+      <div className="activities-workspace">
+        <section className="activities-frame-toolbar" aria-label="Assessment and reminder actions">
+          <div>
+            <p className="eyebrow">Faculty calendar</p>
+            <h3>Scheduled assessments and reminders</h3>
+          </div>
+          <div className="assessment-toolbar-actions">
+            <div className="assessment-view-controls" role="group" aria-label="Assessment view">
+              <button
+                type="button"
+                className={assessmentView === "active" ? "active" : ""}
+                aria-pressed={assessmentView === "active"}
+                onClick={() => setAssessmentView("active")}
+              >
+                Active <span>{activeAssessments.length}</span>
+              </button>
+              <button
+                type="button"
+                className={assessmentView === "finished" ? "active" : ""}
+                aria-pressed={assessmentView === "finished"}
+                onClick={() => setAssessmentView("finished")}
+              >
+                Finished <span>{finishedAssessments.length}</span>
+              </button>
+            </div>
+            <button className="primary-button" onClick={openNewReminder} disabled={reminderClasses.length === 0}>
+              <Icon name="plus" /> {reminderClasses.length === 0 ? "Create a class first" : "Add assessment"}
+            </button>
+          </div>
+        </section>
+        <div
+          className="assessment-list-tools"
+          style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap", padding: "14px 18px", marginBottom: 16, background: "#fff", border: "1px solid #dbe6f2", borderRadius: 14 }}
+          aria-label="Search and sort assessments"
+        >
+          <label style={{ flex: "1 1 280px" }}>
+            <span className="sr-only">Search assessments</span>
+            <input
+              type="search"
+              value={assessmentSearch}
+              onChange={(event) => setAssessmentSearch(event.target.value)}
+              placeholder="Search quiz, description, class, or code"
+              aria-label="Search assessments"
+              style={{ width: "100%", minHeight: 44, padding: "10px 14px", border: "1px solid #cbd9e8", borderRadius: 10, font: "inherit", color: "#17324d", background: "#fff", boxSizing: "border-box" }}
+            />
+          </label>
+          <label style={{ display: "flex", alignItems: "center", gap: 8, color: "#526b84", fontWeight: 600 }}>
+            Sort by
+            <select
+              value={assessmentSort}
+              onChange={(event) => setAssessmentSort(event.target.value as "newest" | "oldest" | "title")}
+              aria-label="Sort assessments"
+              style={{ minHeight: 44, padding: "9px 34px 9px 12px", border: "1px solid #cbd9e8", borderRadius: 10, font: "inherit", color: "#17324d", background: "#fff" }}
+            >
+              <option value="newest">Newest first</option>
+              <option value="oldest">Oldest first</option>
+              <option value="title">Title A-Z</option>
+            </select>
+          </label>
+          <span style={{ color: "#6b7f93", fontSize: 14 }} aria-live="polite">
+            {visibleAssessments.length} {visibleAssessments.length === 1 ? "result" : "results"}
+          </span>
+        </div>
+        <section className="concerns-section" aria-labelledby="concerns-title">
+          <div className="concerns-heading">
+            <div>
+              <p className="eyebrow">Student support</p>
+              <h2 id="concerns-title">Student Concerns</h2>
+            </div>
+            <div className="concern-view-controls" role="group" aria-label="Concern view">
+              <button
+                type="button"
+                className={concernView === "open" ? "active" : ""}
+                aria-pressed={concernView === "open"}
+                onClick={() => { setConcernView("open"); setExpandedConcernId(null) }}
+              >
+                Open
+                <span>{studentConcerns.filter((concern) => concern.status === "Open").length}</span>
+              </button>
+              <button
+                type="button"
+                className={concernView === "reviewed" ? "active" : ""}
+                aria-pressed={concernView === "reviewed"}
+                onClick={() => { setConcernView("reviewed"); setExpandedConcernId(null) }}
+              >
+                Reviewed
+                <span>{studentConcerns.filter((concern) => concern.status !== "Open").length}</span>
+              </button>
+            </div>
+          </div>
+          <div className="concerns-list">
+            {studentConcernsLoading ? (
+              <p className="concerns-empty-state">Loading student concerns...</p>
+            ) : studentConcerns.filter((concern) =>
+                concernView === "open" ? concern.status === "Open" : concern.status !== "Open",
+              ).length === 0 ? (
+              <div className="concerns-empty-state">
+                <Icon name="clipboard" size={22} />
+                <strong>{concernView === "open" ? "No open concerns" : "No reviewed concerns"}</strong>
+                <span>
+                  {concernView === "open"
+                    ? "Only concerns that still need faculty review appear here."
+                    : "Accepted and denied concerns will appear here after review."}
+                </span>
+              </div>
+            ) : studentConcerns
+                .filter((concern) =>
+                  concernView === "open" ? concern.status === "Open" : concern.status !== "Open",
+                )
+                .map((concern) => {
+              const student = {
+                id: concern.studentId,
+                name: concern.studentName || "Student",
+              }
+              const decision = concernDecisions[concern.id]
+              const isExpanded = expandedConcernId === concern.id
+              return (
+                <article
+                  className={`concern-card${isExpanded ? " expanded" : ""}`}
+                  key={concern.id}
+                >
+                  <span className="concern-avatar" aria-hidden="true">
+                    {student.name
+                      .split(/[ ,]/)
+                      .filter(Boolean)
+                      .slice(0, 2)
+                      .map((name) => name[0])
+                      .join("")}
+                  </span>
+                  <div className="concern-copy">
+                    <div className="concern-meta">
+                      <strong>{student.name}</strong>
+                      {savedDraftIds[concern.id] && <span className="concern-draft-badge">Draft saved</span>}
+                    </div>
+                    <p>{concern.message}</p>
+                    <small>
+                      {concern.section} · {concern.submittedAt}
+                    </small>
+                    {concern.status !== "Open" && concern.facultyReply && (
+                      <div className="reviewed-concern-reply">
+                        <span>Faculty response</span>
+                        <p>{concern.facultyReply}</p>
+                      </div>
+                    )}
+                  </div>
+                  <button
+                    className={
+                      concern.status === "Open"
+                        ? "secondary-button compact concern-review"
+                        : `concern-reviewed ${concern.status.toLowerCase()}`
+                    }
+                    type="button"
+                    disabled={concern.status !== "Open"}
+                    onClick={() =>
+                      setExpandedConcernId((current) =>
+                        current === concern.id ? null : concern.id,
+                      )
+                    }
+                  >
+                    {concern.status === "Open"
+                      ? isExpanded
+                        ? "Close review"
+                        : savedDraftIds[concern.id] ? "Continue review" : "Review concern"
+                      : concern.status}
+                  </button>
+                  {isExpanded && (
+                    <div className="concern-review-panel">
+                      <div className="concern-review-heading">
+                        <div>
+                          <strong>Review concern</strong>
+                          <small>
+                            Save a draft or complete the review for {student.name}
+                            .
+                          </small>
+                        </div>
+                        <span className="status-pill">Awaiting decision</span>
+                      </div>
+                      <div
+                        className="concern-decision-buttons"
+                        role="group"
+                        aria-label={`Decision for ${student.name}'s concern`}
+                      >
+                        <button
+                          className={
+                            decision === "Accepted"
+                              ? "selected accept"
+                              : "accept"
+                          }
+                          type="button"
+                          onClick={() =>
+                            setConcernDecisions((decisions) => ({
+                              ...decisions,
+                              [concern.id]: "Accepted",
+                            }))
+                          }
+                          aria-pressed={decision === "Accepted"}
+                        >
+                          <Icon name="check" size={15} /> Accept concern
+                        </button>
+                        <button
+                          className={
+                            decision === "Denied" ? "selected deny" : "deny"
+                          }
+                          type="button"
+                          onClick={() =>
+                            setConcernDecisions((decisions) => ({
+                              ...decisions,
+                              [concern.id]: "Denied",
+                            }))
+                          }
+                          aria-pressed={decision === "Denied"}
+                        >
+                          <Icon name="minus" size={15} /> Deny concern
+                        </button>
+                      </div>
+                      <label className="concern-reply-field">
+                        Reply to student
+                        <textarea
+                          value={concernReplies[concern.id] ?? ""}
+                          onChange={(event) =>
+                            setConcernReplies((replies) => ({
+                              ...replies,
+                              [concern.id]: event.target.value,
+                            }))
+                          }
+                          placeholder="Write a clear, respectful response to the student..."
+                        />
+                      </label>
+                      <div className="concern-review-actions">
+                        <button
+                          className="secondary-button"
+                          type="button"
+                          onClick={() => setExpandedConcernId(null)}
+                        >
+                          Cancel
+                        </button>
+                        <button className="secondary-button concern-save-draft" type="button" disabled={draftSavingId === concern.id} onClick={() => saveConcernDraft(concern)}>
+                          {draftSavingId === concern.id ? "Saving..." : savedDraftIds[concern.id] ? "Update draft" : "Save draft"}
+                        </button>
+                        <button
+                          className="primary-button"
+                          type="button"
+                          disabled={reviewSavingId === concern.id || !decision || !concernReplies[concern.id]?.trim()}
+                          onClick={() => void submitRequestReview(concern)}
+                        >
+                          {reviewSavingId === concern.id ? "Sending..." : "Complete review"}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </article>
+              )
+            })}
+          </div>
+        </section>
+        <div className="timeline">
+          {remindersLoading ? (
+            <p className="reminder-list-state">Loading reminders...</p>
+          ) : visibleAssessments.length === 0 ? (
+            <p className="reminder-list-state">
+              {normalizedAssessmentSearch
+                ? `No assessments match “${assessmentSearch.trim()}”.`
+                : assessmentView === "finished"
+                  ? "No finished assessments yet."
+                  : "No active assessments. Select Add assessment to create one."}
+            </p>
+          ) : visibleAssessments.map((a) => {
+            const originalIndex = reminders.findIndex((item) => item.id === a.id)
+            return (
+            <article key={a.id ?? `${a.title}-${originalIndex}`}>
+              {(() => {
+                const scheduledStatus = getActivityStatus(a, originalIndex)
+                const manuallyReopened = isQuizManuallyOpen(a) && scheduledStatus === "Finished"
+                const status = manuallyReopened ? "Reopened" : scheduledStatus
+                return (
+                  <>
+                    <div className="timeline-date">
+                      <strong>{formatReminderDay(a.date)}</strong>
+                      <span>{formatReminderMonth(a.date)}</span>
+                    </div>
+                    <div className="timeline-dot" />
+                    <div className="timeline-content">
+                      <span
+                        className={`status-pill activity-status ${status
+                          .toLowerCase()
+                          .replace(/ /g, "-")}`}
+                      >
+                        {status}
+                      </span>
+                      <h3>{a.title}</h3>
+                      {a.description && <p className="assessment-description">Description: {a.description}</p>}
+                      <p>
+                        {(() => {
+                          const activityClass = reminderClasses.find(
+                            (item) => item.id === a.classId,
+                          )
+                          return activityClass
+                            ? `${activityClass.subject} - ${activityClass.code}`
+                            : "Unassigned class"
+                        })()}
+                      </p>
+                      <small className="reminder-activity-type">{a.type}</small>
+                      <small>
+                        <Icon name="clock" size={15} />
+                        {formatActivityTime(a.startTime)} –{" "}
+                        {formatActivityTime(a.endTime)}
+                      </small>
+                      {a.participation === "Group" && (
+                        <small className="group-activity-note">
+                          <Icon name="users" size={15} />
+                          Group activity · {a.groups.length}{" "}
+                          {a.groups.length === 1 ? "group" : "groups"}
+                        </small>
+                      )}
+                    </div>
+                    <div className="reminder-card-actions">
+                      {a.omrAssessmentId && (a.type === "Quiz" || a.type === "Exam") && (
+                        <button
+                          type="button"
+                          className="reminder-print-omr-button"
+                          aria-label={`Download printable OMR PDF for ${a.title}`}
+                          onClick={() => void generatePrintableOmrPaper(a)}
+                        >
+                          <span>Print OMR</span>
+                        </button>
+                      )}
+                      {a.omrAssessmentId && a.type === "Quiz" && (
+                        (scheduledStatus === "Finished" && assessmentView === "finished") ||
+                        (manuallyReopened && assessmentView === "active")
+                      ) && (
+                        <button
+                          type="button"
+                          className={`reminder-open-quiz-button${manuallyReopened ? " open" : ""}`}
+                          aria-label={`${manuallyReopened ? "Close" : "Open"} ${a.title} for students`}
+                          aria-pressed={manuallyReopened}
+                          disabled={quizStatusSavingId === a.omrAssessmentId}
+                          onClick={() => void toggleQuizOpen(a)}
+                        >
+                          {quizStatusSavingId === a.omrAssessmentId
+                            ? "Updating..."
+                            : manuallyReopened
+                              ? "Close quiz"
+                              : "Open quiz"}
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        aria-label={`Edit ${a.title}`}
+                        onClick={() => void openAssessmentEditor(a, originalIndex)}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        type="button"
+                        className="reminder-delete-button"
+                        aria-label={`Delete ${a.title}`}
+                        onClick={() => setReminderToDelete(a)}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </>
+                )
+              })()}
+            </article>
+            )
+          })}
+        </div>
+      </div>
+      {reminderToDelete && (
+        <div
+          className="modal-backdrop confirmation-backdrop"
+          onMouseDown={(event) => event.target === event.currentTarget && !reminderDeleting && setReminderToDelete(null)}
+        >
+          <section className="confirmation-modal" role="alertdialog" aria-modal="true" aria-labelledby="delete-reminder-title" aria-describedby="delete-reminder-description">
+            <span className="confirmation-modal-icon"><Icon name="minus" size={20} /></span>
+            <h2 id="delete-reminder-title">Delete reminder?</h2>
+            <p id="delete-reminder-description">
+              “{reminderToDelete.title}” will be permanently removed. This action cannot be undone.
+            </p>
+            <div className="confirmation-modal-actions">
+              <button type="button" className="secondary-button" onClick={() => setReminderToDelete(null)} disabled={reminderDeleting}>Cancel</button>
+              <button type="button" className="danger-button" onClick={() => void deleteReminder()} disabled={reminderDeleting}>
+                {reminderDeleting ? "Deleting..." : "Delete reminder"}
+              </button>
+            </div>
+          </section>
+        </div>
+      )}
+      {editing !== null && (
+        <div
+          className="modal-backdrop"
+          onMouseDown={(e) => e.target === e.currentTarget && setEditing(null)}
+        >
+          <section
+            className="reminder-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="reminder-title"
+          >
+            <button
+              className="modal-close"
+              onClick={() => setEditing(null)}
+              aria-label="Close"
+            >
+              ×
+            </button>
+            <p className="eyebrow">Faculty calendar</p>
+            <h2 id="reminder-title">
+              {editing === -1 ? "Add assessment" : "Edit assessment"}
+            </h2>
+            <p>Create or edit an assessment. Quiz and Exam settings are shared with the OMR scanner.</p>
+            {(draft.type === "Quiz" || draft.type === "Exam") ? (
+              <div className="reminder-fields assessment-identity-fields">
+                <label>
+                  <span className="reminder-field-label">{draft.type} index <em>Required</em></span>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    value={draft.assessmentIndex}
+                    onFocus={(event) => event.currentTarget.select()}
+                    onChange={(event) => {
+                      const digits = event.target.value.replace(/\D/g, "").slice(0, 3)
+                      const index = digits ? Math.max(1, Number(digits)) : 1
+                      setDraft({ ...draft, assessmentIndex: index, title: `${draft.type} ${index}` })
+                    }}
+                    required
+                  />
+                  <small>Gradebook column: {draft.type} {draft.assessmentIndex}</small>
+                </label>
+                <label>
+                  <span className="reminder-field-label">Description <em>Required</em></span>
+                  <input
+                    value={draft.description}
+                    placeholder="Example: Fundamentals"
+                    onChange={(event) => setDraft({ ...draft, description: event.target.value })}
+                    required
+                  />
+                </label>
+              </div>
+            ) : (
+              <label>
+                <span className="reminder-field-label">Title <em>Required</em></span>
+                <input
+                  value={draft.title}
+                  onChange={(event) => setDraft({ ...draft, title: event.target.value, description: event.target.value })}
+                  required
+                />
+              </label>
+            )}
+            <label>
+              <span className="reminder-field-label">Activity type <em>Required</em></span>
+              <select required
+                value={draft.type}
+                onChange={(event) => {
+                  const nextType = event.target.value
+                  const indexed = nextType === "Quiz" || nextType === "Exam"
+                  const handsOnIndividual = nextType === "Hands-on activity"
+                  setDraft({
+                    ...draft,
+                    type: nextType,
+                    title: indexed ? `${nextType} ${draft.assessmentIndex}` : draft.description || draft.title,
+                    participation: handsOnIndividual ? "Individual" : draft.participation,
+                    groups: handsOnIndividual ? [] : draft.groups,
+                  })
+                }}
+              >
+                {activityTypes.map((type) => (
+                  <option key={type} value={type}>
+                    {type}
+                  </option>
+                ))}
+              </select>
+            </label>
+            {omrEligible && (
+              <div className="reminder-fields omr-activity-settings">
+                <label>
+                  <span className="reminder-field-label">Number of items <em>Required</em></span>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    value={draft.itemCount}
+                    onFocus={(event) => event.currentTarget.select()}
+                    onChange={(event) => {
+                      const digits = event.target.value.replace(/\D/g, "").slice(0, 2)
+                      setDraft({ ...draft, itemCount: digits ? Math.min(50, Math.max(1, Number(digits))) : 1 })
+                    }}
+                    required
+                  />
+                </label>
+                <label>
+                  <span className="reminder-field-label">Points per item <em>Required</em></span>
+                  <input
+                    type="number"
+                    min="0.01"
+                    step="0.01"
+                    value={draft.pointsPerItem}
+                    onChange={(event) => setDraft({ ...draft, pointsPerItem: Math.max(0.01, Number(event.target.value) || 1) })}
+                    required
+                  />
+                </label>
+              </div>
+            )}
+            <label>
+              <span className="reminder-field-label">Class <em>Required</em></span>
+              <select
+                required
+                value={draft.classId}
+                disabled={assessmentClassLocked}
+                aria-describedby={assessmentClassLocked ? "assessment-class-lock-note" : undefined}
+                onChange={(e) =>
+                  setDraft({ ...draft, classId: e.target.value })
+                }
+              >
+                <option value="">Select a class</option>
+                {reminderClasses.map((item) => (
+                  <option key={item.id} value={item.id}>
+                    {item.subject} · {item.code}
+                  </option>
+                ))}
+              </select>
+              {assessmentClassLocked ? (
+                <small id="assessment-class-lock-note" className="reminder-field-hint">
+                  Subject and section are locked after the assessment is created. Create a new assessment to use another class.
+                </small>
+              ) : reminderClasses.length === 0 ? (
+                <small className="reminder-field-error">No database classes are available. Create a class first.</small>
+              ) : !draft.classId ? (
+                <small className="reminder-field-error">Select a class.</small>
+              ) : null}
+            </label>
+            {draft.classId && (
+              <section className="assessment-roster-summary" aria-label="Assessment student roster">
+                <div>
+                  <strong>{assessmentRosterLoading ? "Loading roster..." : `${assessmentRoster.length} enrolled ${assessmentRoster.length === 1 ? "student" : "students"}`}</strong>
+                  <small>Students currently eligible for this assessment.</small>
+                </div>
+                <button type="button" className="secondary-button compact" onClick={() => setAssessmentRosterOpen((open) => !open)} disabled={assessmentRosterLoading || assessmentRoster.length === 0}>
+                  {assessmentRosterOpen ? "Hide roster" : "View roster"}
+                </button>
+                {assessmentRosterOpen && (
+                  <div className="assessment-roster-list">
+                    {assessmentRoster.map((student) => (
+                      <div key={student.id}><span>{student.name}</span><small>{student.studentNumber || "No student number"}</small></div>
+                    ))}
+                  </div>
+                )}
+              </section>
+            )}
+            <label>
+              <span className="reminder-field-label">Participation <em>Required</em></span>
+              <select required
+                value={draft.type === "Hands-on activity" ? "Individual" : draft.participation}
+                disabled={assessmentClassLocked || draft.type === "Hands-on activity"}
+                onChange={(e) => {
+                  const participation = e.target.value
+                  setDraft({
+                    ...draft,
+                    participation,
+                    groups: participation === "Group" ? draft.groups : [],
+                    answerKey: participation === "Group" ? Array.from({ length: 50 }, () => "") : draft.answerKey,
+                  })
+                  setActiveGroupId(null)
+                }}
+              >
+                <option value="Individual">Individual</option>
+                {draft.type !== "Hands-on activity" && <option value="Group">Group</option>}
+              </select>
+              {draft.type === "Hands-on activity" ? (
+                <small className="reminder-field-hint">Hands-on activities are individual assessments. Group participation is unavailable.</small>
+              ) : assessmentClassLocked ? (
+                <small className="reminder-field-hint">Participation is locked because this assessment already has an OMR answer key.</small>
+              ) : null}
+              {draft.type !== "Hands-on activity" && draft.participation === "Group" && (draft.type === "Quiz" || draft.type === "Exam") && <small className="reminder-field-hint">OMR scanning is available only for individual quizzes and exams. Group assessments use group scoring instead.</small>}
+            </label>
+            {draft.type !== "Hands-on activity" && draft.participation === "Group" && (
+              <section
+                className="group-setup"
+                aria-labelledby="group-setup-title"
+              >
+                <div className="group-setup-heading">
+                  <div>
+                    <p className="eyebrow">Participation · Group</p>
+                    <h3 id="group-setup-title">Group setup</h3>
+                  </div>
+                  <button
+                    type="button"
+                    className="secondary-button compact"
+                    onClick={addGroup}
+                  >
+                    <Icon name="plus" size={15} /> Add group
+                  </button>
+                </div>
+                {draft.groups.length === 0 ? (
+                  <p className="group-empty">
+                    Add a group, then choose the students who will work
+                    together.
+                  </p>
+                ) : (
+                  <div className="group-list">
+                    {draft.groups.map((group) => (
+                      <section className="group-card" key={group.id}>
+                        <div className="group-card-heading">
+                          <input
+                            value={group.name}
+                            onChange={(e) =>
+                              updateGroupName(group.id, e.target.value)
+                            }
+                            aria-label="Group name"
+                          />
+                          <button
+                            type="button"
+                            className="group-remove"
+                            onClick={() => removeGroup(group.id)}
+                          >
+                            Remove
+                          </button>
+                        </div>
+                        <div className="group-card-actions">
+                          <span>
+                            {group.studentIds.length}{" "}
+                            {group.studentIds.length === 1
+                              ? "student"
+                              : "students"}
+                          </span>
+                          <button
+                            type="button"
+                            className="group-student-trigger"
+                            onClick={() =>
+                              setActiveGroupId((activeId) =>
+                                activeId === group.id ? null : group.id,
+                              )
+                            }
+                          >
+                            <Icon name="plus" size={14} />
+                            {activeGroupId === group.id
+                              ? "Hide students"
+                              : "Add students"}
+                          </button>
+                        </div>
+                        {activeGroupId === group.id && (
+                          <div className="group-students">
+                            {students.map((student) => (
+                              <label key={student.id}>
+                                <input
+                                  type="checkbox"
+                                  checked={group.studentIds.includes(
+                                    student.id,
+                                  )}
+                                  onChange={() =>
+                                    toggleStudentInGroup(group.id, student.id)
+                                  }
+                                />
+                                <span>
+                                  <strong>{student.name}</strong>
+                                  <small>{student.id}</small>
+                                </span>
+                              </label>
+                            ))}
+                          </div>
+                        )}
+                      </section>
+                    ))}
+                  </div>
+                )}
+              </section>
+            )}
+            {omrEligible && (
+              <section className="activity-answer-key" aria-labelledby="activity-answer-key-title">
+                <div className="activity-answer-key-heading">
+                  <div>
+                    <span className="eyebrow">OMR answer key</span>
+                    <div className="activity-answer-key-title-row">
+                      <input
+                        className="activity-answer-key-item-input"
+                        type="text"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
+                        aria-label="Number of OMR answer key items"
+                        value={draft.itemCount}
+                        onFocus={(event) => event.currentTarget.select()}
+                        onChange={(event) => {
+                          const digits = event.target.value.replace(/\D/g, "").slice(0, 2)
+                          const nextCount = digits ? Math.min(50, Math.max(1, Number(digits))) : 1
+                          setDraft((current) => ({ ...current, itemCount: nextCount }))
+                        }}
+                      />
+                      <h3 id="activity-answer-key-title">-item answer key</h3>
+                    </div>
+                    <small>Type a value from 1 to 50. The answer grid updates automatically.</small>
+                  </div>
+                  <strong>{draft.answerKey.slice(0, draft.itemCount).filter(Boolean).length}/{draft.itemCount} complete</strong>
+                </div>
+                <div className="activity-answer-key-progress"><i style={{ width: `${draft.itemCount ? (draft.answerKey.slice(0, draft.itemCount).filter(Boolean).length / draft.itemCount) * 100 : 0}%` }} /></div>
+                <div className="activity-answer-key-grid">
+                  {draft.answerKey.slice(0, draft.itemCount).map((answer, answerIndex) => (
+                    <fieldset key={answerIndex} className={answer ? "complete" : ""}>
+                      <legend>{answerIndex + 1}</legend>
+                      {(["A", "B", "C", "D"] as const).map((choice) => (
+                        <label key={choice}>
+                          <input
+                            type="radio"
+                            name={`activity-answer-${answerIndex}`}
+                            checked={answer === choice}
+                            onChange={() => setDraft((current) => ({
+                              ...current,
+                              answerKey: current.answerKey.map((value, index) => index === answerIndex ? choice : value),
+                            }))}
+                          />
+                          <span>{choice}</span>
+                        </label>
+                      ))}
+                    </fieldset>
+                  ))}
+                </div>
+              </section>
+            )}
+            <label>
+              <span className="reminder-field-label">Date <em>Required</em></span>
+              <input
+                type="date"
+                value={draft.date}
+                onChange={(e) => setDraft({ ...draft, date: e.target.value })}
+                required
+              />
+              <small className="reminder-date-preview">
+                {formatReminderDateLong(draft.date)}
+              </small>
+            </label>
+            <div className="reminder-fields">
+              <label>
+                <span className="reminder-field-label">Start time <em>Required</em></span>
+                <input
+                  type="time"
+                  value={draft.startTime}
+                  onChange={(e) =>
+                    setDraft({ ...draft, startTime: e.target.value })
+                  }
+                  required
+                />
+              </label>
+              <label>
+                <span className="reminder-field-label">End time <em>Required</em></span>
+                <input
+                  type="time"
+                  min={draft.startTime}
+                  value={draft.endTime}
+                  onChange={(e) =>
+                    setDraft({ ...draft, endTime: e.target.value })
+                  }
+                  required
+                />
+              </label>
+            </div>
+            <button
+              type="button"
+              className="primary-button"
+              onClick={() => void saveReminder()}
+              disabled={reminderSaving || ((draft.type === "Quiz" || draft.type === "Exam") && draft.answerKey.slice(0, draft.itemCount).filter(Boolean).length !== draft.itemCount)}
+            >
+              {reminderSaving ? "Saving..." : editing === -1 ? "Save assessment" : "Save changes"}
+            </button>
+          </section>
+        </div>
+      )}
+    </>
+  )
+}
+
+function ProfilePage({ setPage, onLogout }: { setPage: (page: string) => void; onLogout: () => void }) {
+  type ProfilePanel = "profile" | "notifications" | "security" | "classes" | "exports" | "attendance" | null
+  const [profile, setProfile] = useState<FacultyProfile>(emptyFacultyProfile)
+  const [draftProfile, setDraftProfile] = useState<FacultyProfile>(emptyFacultyProfile)
+  const [editingProfile, setEditingProfile] = useState(false)
+  const [savingProfile, setSavingProfile] = useState(false)
+  const [uploadingPhoto, setUploadingPhoto] = useState(false)
+  const [activePanel, setActivePanel] = useState<ProfilePanel>(null)
+  const [notifications, setNotifications] = useState({ classStarts: true, studentRequests: true, attendance: true, reminders: true })
+  const [attendanceSettings, setAttendanceSettings] = useState({ lateMinutes: 15, closeMinutes: 30, allowExcused: true })
+
+  const loadProfile = async () => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+    const loaded = profileFromUser(user)
+    setProfile(loaded)
+    setDraftProfile(loaded)
+  }
+  useEffect(() => { void loadProfile() }, [])
+
+  const uploadProfilePhoto = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    event.target.value = ""
+    if (!file) return
+    if (!file.type.startsWith("image/")) {
+      showMessage("Please choose a JPG, PNG, or WebP image.", "error", "Invalid profile picture")
+      return
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      showMessage("Profile pictures must be 5 MB or smaller.", "error", "Image is too large")
+      return
+    }
+
+    setUploadingPhoto(true)
+    const temporaryUrl = URL.createObjectURL(file)
+    setDraftProfile((current) => ({ ...current, photoUrl: temporaryUrl }))
+
+    try {
+      const { data: { user }, error: userError } = await supabase.auth.getUser()
+      if (userError || !user) throw new Error("Your session expired. Please sign in again.")
+      const extension = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "")
+      const filePath = `${user.id}/profile-${Date.now()}.${extension || "jpg"}`
+      const { error: uploadError } = await supabase.storage
+        .from("avatars")
+        .upload(filePath, file, { cacheControl: "3600", upsert: true, contentType: file.type })
+      if (uploadError) throw uploadError
+      const { data: publicData } = supabase.storage.from("avatars").getPublicUrl(filePath)
+      const photoUrl = publicData.publicUrl
+      setDraftProfile((current) => ({ ...current, photoUrl }))
+      showMessage("Profile picture uploaded. Select Save changes to publish it.", "success", "Photo ready")
+    } catch (error) {
+      setDraftProfile((current) => ({ ...current, photoUrl: profile.photoUrl }))
+      const uploadMessage = error instanceof Error
+        ? error.message
+        : "The profile picture could not be uploaded."
+      const bucketMissing = /bucket\s+not\s+found/i.test(uploadMessage)
+      showMessage(
+        bucketMissing
+          ? "The avatars bucket is missing from the Supabase project currently used by this app. Confirm that VITE_SUPABASE_URL points to the same project where you created the public avatars bucket, then restart the app."
+          : uploadMessage,
+        "error",
+        bucketMissing ? "Avatar storage is not connected" : "Upload failed",
+      )
+    } finally {
+      URL.revokeObjectURL(temporaryUrl)
+      setUploadingPhoto(false)
+    }
+  }
+
+  const saveProfile = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    setSavingProfile(true)
+    const updated = {
+      ...draftProfile,
+      name: draftProfile.name.trim(),
+      department: draftProfile.department.trim(),
+      facultyNumber: draftProfile.facultyNumber.trim(),
+      email: draftProfile.email.trim(),
+    }
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+      setSavingProfile(false)
+      showMessage("Your session expired. Please sign in again.")
+      return
+    }
+
+    // Keep the university email read-only here. Updating an authenticated email
+    // may require confirmation and can fail as a generic "Error updating user".
+    const stableEmail = String(user.email ?? updated.email).trim()
+    const { error: metadataError } = await supabase.auth.updateUser({
+      data: {
+        full_name: updated.name,
+        department: updated.department,
+        faculty_number: updated.facultyNumber,
+        avatar_url: updated.photoUrl,
+      },
+    })
+    if (metadataError) {
+      setSavingProfile(false)
+      showMessage(`Unable to save profile: ${metadataError.message}`)
+      return
+    }
+
+    const { error: profileError } = await supabase
+      .from("faculty_profiles")
+      .upsert(
+        {
+          id: user.id,
+          email: stableEmail,
+          full_name: updated.name,
+          department: updated.department,
+          faculty_number: updated.facultyNumber,
+          avatar_url: updated.photoUrl,
+          role: "faculty",
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: "id" },
+      )
+
+    setSavingProfile(false)
+    if (profileError) {
+      showMessage(`Unable to save profile details: ${profileError.message}`)
+      return
+    }
+    const savedProfile = { ...updated, email: stableEmail }
+    setProfile(savedProfile)
+    setDraftProfile(savedProfile)
+    setEditingProfile(false)
+    showToast("Profile updated successfully.")
+  }
+
+  const savePreferencePanel = () => {
+    setActivePanel(null)
+    showToast("Settings saved successfully.")
+  }
+
+  const panelTitle: Record<Exclude<ProfilePanel, null>, string> = {
+    profile: "Profile information", notifications: "Notification preferences", security: "Privacy & security",
+    classes: "Class defaults", exports: "Records & exports", attendance: "Attendance settings",
+  }
+
+  return (<>
+    <Header title="Profile" onNotify={() => setPage("notifications")} onProfile={() => setPage("profile")} />
+    <main className="profile-page-compact">
+    <section className="profile-hero">
+      <img src={profile.photoUrl} alt="Faculty profile" />
+      <div className="profile-identity">
+        <span className="status-pill">Faculty</span>
+        {profile.name ? (
+          <>
+            <h2>{profile.name}</h2>
+            <div className="profile-visible-details">
+              <span><strong>University email</strong>{profile.email || "Not set"}</span>
+              <span><strong>College or department</strong>{profile.department || "Not set"}</span>
+              <span><strong>Faculty number</strong>{profile.facultyNumber || "Not set"}</span>
+            </div>
+          </>
+        ) : <div className="profile-hero-loading"><span/><span/><span/></div>}
+      </div>
+      <button className="secondary-button" disabled={!profile.name} onClick={() => { setDraftProfile(profile); setEditingProfile(true) }}>Edit profile</button>
+    </section>
+
+    <div className="profile-panels profile-settings-grid">
+      <section className="profile-panel"><p className="eyebrow">Account</p><h3>Personal settings</h3>
+        <button onClick={() => setActivePanel("profile")}>Profile information<Icon name="chevron" /></button>
+        <button onClick={() => setActivePanel("notifications")}>Notification preferences<Icon name="chevron" /></button>
+        <button onClick={() => setActivePanel("security")}>Privacy & security<Icon name="chevron" /></button>
+      </section>
+      <section className="profile-panel"><p className="eyebrow">Teaching</p><h3>Teaching settings</h3>
+        <button onClick={() => setActivePanel("classes")}>Class defaults<Icon name="chevron" /></button>
+        <button onClick={() => setActivePanel("exports")}>Records & exports<Icon name="chevron" /></button>
+        <button onClick={() => setActivePanel("attendance")}>Attendance settings<Icon name="chevron" /></button>
+      </section>
+    </div>
+
+
+
+    <button type="button" className="profile-mobile-logout" onClick={onLogout}><Icon name="logout" size={18} /> Log out</button>
+    </main>
+
+    {activePanel && <div className="modal-backdrop" onMouseDown={e => e.target === e.currentTarget && setActivePanel(null)}><section className="profile-settings-modal" role="dialog" aria-modal="true" aria-labelledby="profile-settings-title">
+      <button className="modal-close" onClick={() => setActivePanel(null)} aria-label="Close">×</button><p className="eyebrow">Profile settings</p><h2 id="profile-settings-title">{panelTitle[activePanel as Exclude<ProfilePanel, null>]}</h2>
+      {activePanel === "profile" && <div className="settings-summary-list"><p><strong>Full name</strong><span>{profile.name || "Not set"}</span></p><p><strong>Email</strong><span>{profile.email || "Not set"}</span></p><p><strong>Department</strong><span>{profile.department || "Not set"}</span></p><p><strong>Faculty number</strong><span>{profile.facultyNumber || "Not set"}</span></p><button className="primary-button" onClick={() => { setDraftProfile(profile); setActivePanel(null); setEditingProfile(true) }}>Edit profile information</button></div>}
+      {activePanel === "notifications" && <div className="settings-toggle-list">{[["classStarts","Class-start reminders"],["studentRequests","Student request notifications"],["attendance","Attendance reminders"],["reminders","Activity and quiz reminders"]].map(([key,label]) => <label key={key}><span>{label}</span><input type="checkbox" checked={notifications[key as keyof typeof notifications]} onChange={e => setNotifications({...notifications,[key]:e.target.checked})}/></label>)}<button className="primary-button" onClick={savePreferencePanel}>Save preferences</button></div>}
+      {activePanel === "security" && <div className="settings-summary-list"><button onClick={() => showMessage("Use the password-reset link from the sign-in page to change your password.", "info", "Change password")}>Change password<Icon name="chevron" /></button><button onClick={() => void supabase.auth.signOut().then(onLogout)}>Sign out from this device<Icon name="chevron" /></button></div>}
+      {activePanel === "classes" && <div className="settings-summary-list"><p><strong>Default semester</strong><span>Use each class semester dates</span></p><p><strong>Default room</strong><span>To be confirmed</span></p><button className="primary-button" onClick={savePreferencePanel}>Save defaults</button></div>}
+      {activePanel === "exports" && <div className="settings-summary-list"><p>Export attendance and grade records from the Records page after selecting a class.</p><button className="primary-button" onClick={() => { setActivePanel(null); setPage("records") }}>Open records</button></div>}
+      {activePanel === "attendance" && <div className="settings-form-list"><label>Late after (minutes)<input type="number" min="0" max="180" value={attendanceSettings.lateMinutes} onChange={e => setAttendanceSettings({...attendanceSettings,lateMinutes:Number(e.target.value)})}/></label><label>Close attendance after (minutes)<input type="number" min="1" max="240" value={attendanceSettings.closeMinutes} onChange={e => setAttendanceSettings({...attendanceSettings,closeMinutes:Number(e.target.value)})}/></label><label className="settings-checkbox"><input type="checkbox" checked={attendanceSettings.allowExcused} onChange={e => setAttendanceSettings({...attendanceSettings,allowExcused:e.target.checked})}/>Allow excused absences</label><button className="primary-button" onClick={savePreferencePanel}>Save settings</button></div>}
+    </section></div>}
+
+    {editingProfile && <div className="modal-backdrop"><section className="profile-edit-modal" role="dialog" aria-modal="true" aria-labelledby="edit-profile-title"><button type="button" className="profile-modal-close" onClick={() => setEditingProfile(false)} aria-label="Close edit profile" title="Close">×</button><p className="eyebrow">Faculty profile</p><h2 id="edit-profile-title">Edit profile</h2><p>Changes synchronize with the header profile card.</p><form onSubmit={saveProfile}><div className="profile-photo-summary profile-photo-uploader"><div className="profile-photo-preview"><img src={draftProfile.photoUrl || profile.photoUrl} alt="Faculty profile preview"/><label className="profile-photo-edit-button" title="Upload profile picture"><input type="file" accept="image/png,image/jpeg,image/webp" onChange={uploadProfilePhoto} disabled={uploadingPhoto}/><Icon name="edit" size={16}/><span>{uploadingPhoto ? "Uploading..." : "Change photo"}</span></label></div><div><strong>{draftProfile.name || profile.name}</strong><small>Upload a JPG, PNG, or WebP image up to 5 MB.</small></div></div><div className="profile-form-fields"><label><span className="profile-field-heading">Full name <em>Required</em></span><input value={draftProfile.name} onChange={e => setDraftProfile({...draftProfile,name:e.target.value})} required/></label><label><span className="profile-field-heading">University email <em>Required</em></span><input type="email" value={draftProfile.email} readOnly aria-readonly="true" required/><small className="profile-readonly-note">University email is managed by the signed-in account.</small></label><label><span className="profile-field-heading">College or department <em>Required</em></span><input value={draftProfile.department} onChange={e => setDraftProfile({...draftProfile,department:e.target.value})} required/></label><label><span className="profile-field-heading">Faculty number <em>Required</em></span><input value={draftProfile.facultyNumber} onChange={e => setDraftProfile({...draftProfile,facultyNumber:e.target.value})} required/></label></div><div className="profile-form-actions"><button type="button" className="secondary-button" onClick={() => setEditingProfile(false)}>Cancel</button><button className="primary-button" disabled={savingProfile || uploadingPhoto}>{uploadingPhoto ? "Uploading photo..." : savingProfile ? "Saving..." : "Save changes"}</button></div></form></section></div>}
+  </>)
+}
+
+function NotificationsPage({ setPage }: { setPage: (page: string) => void }) {
+  const [items, setItems] = useState<FacultyNotification[]>([])
+  const [loading, setLoading] = useState(true)
+  const [notificationView, setNotificationView] = useState<"all" | "unread">("all")
+
+  const load = async () => {
+    setLoading(true)
+    setItems(await loadFacultyNotifications())
+    setLoading(false)
+  }
+
+  const markRead = async (item: FacultyNotification) => {
+    if (!item.readAt) {
+      const readAt = new Date().toISOString()
+      const { error } = await supabase
+        .from("faculty_notifications")
+        .update({ read_at: readAt })
+        .eq("id", item.id)
+      if (!error) setItems((current) => current.map((notice) =>
+        notice.id === item.id ? { ...notice, readAt } : notice,
+      ))
+    }
+
+    if (item.targetPage === "records") {
+      if (item.classId) sessionStorage.setItem("records-target-class", item.classId)
+      sessionStorage.setItem("records-target-view", "summary")
+    }
+    if (item.targetPage === "activities" && item.entityId) {
+      sessionStorage.setItem("activities-target-entity", item.entityId)
+    }
+    setPage(item.targetPage ?? "home")
+  }
+
+  const markAllRead = async () => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+    const readAt = new Date().toISOString()
+    const { error } = await supabase
+      .from("faculty_notifications")
+      .update({ read_at: readAt })
+      .eq("recipient_id", user.id)
+      .is("read_at", null)
+    if (!error) setItems((current) => current.map((item) => ({ ...item, readAt: item.readAt ?? readAt })))
+  }
+
+  useEffect(() => {
+    void load()
+    const channel = supabase.channel("faculty-notifications-page")
+      .on("postgres_changes", { event: "*", schema: "public", table: "faculty_notifications" }, load)
+      .subscribe()
+    return () => { void supabase.removeChannel(channel) }
+  }, [])
+
+  const visibleItems = notificationView === "unread"
+    ? items.filter((item) => !item.readAt)
+    : items
+  const unreadCount = items.filter((item) => !item.readAt).length
+
+  return (<>
+    <Header title="Notifications" onNotify={() => setPage("notifications")} onProfile={() => setPage("profile")} />
+    <section className="notifications-page" aria-labelledby="notifications-title">
+      <div className="section-heading">
+        <div><p className="eyebrow">Teacher updates</p><h2 id="notifications-title">Notifications</h2></div>
+        <div className="notification-heading-actions">
+          <div className="notification-view-controls" role="group" aria-label="Notification view">
+            <button type="button" className={notificationView === "all" ? "active" : ""} onClick={() => setNotificationView("all")}>All <span>{items.length}</span></button>
+            <button type="button" className={notificationView === "unread" ? "active" : ""} onClick={() => setNotificationView("unread")}>Unread <span>{unreadCount}</span></button>
+          </div>
+          {unreadCount > 0 && <button type="button" onClick={() => void markAllRead()}>Mark all read</button>}
+          <button type="button" onClick={() => void load()}>Refresh</button>
+        </div>
+      </div>
+      {loading ? <p className="notification-empty">Loading notifications...</p> : visibleItems.length === 0 ? <div className="empty-prompt"><span><Icon name="bell"/></span><h3>{notificationView === "unread" ? "No unread notifications" : "You’re all caught up"}</h3><p>Concerns, assessments, quiz access, OMR results, and gradebook updates will appear here.</p></div> : <div className="notification-list">{visibleItems.map(item => <button key={item.id} className={`notification-item ${item.kind}${item.readAt ? " read" : " unread"}`} onClick={() => void markRead(item)}><span className="notification-item-icon"><Icon name={item.kind === "omr" ? "scan" : item.kind === "concern" ? "users" : item.kind === "gradebook" ? "chart" : item.kind === "quiz" ? "book" : "clipboard"}/></span><span><strong>{item.title}</strong><small>{item.message}</small><time>{new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }).format(new Date(item.createdAt))}</time></span>{!item.readAt && <i className="notification-unread-dot" aria-label="Unread"/>}<Icon name="chevron" size={16}/></button>)}</div>}
+    </section>
+  </>)
+}
+
+function ActiveClass({
+  item,
+  activeOccurrence,
+  onClose,
+  onEnd,
+  onMinimize,
+  initialStarted = false,
+  initialStartedAt,
+  viewOnly = false,
+  scheduledToday,
+}: {
+  item: ClassItem
+  activeOccurrence: ClassSchedule | null
+  onClose: () => void
+  onEnd: (attendanceSessionId: string | null) => void
+  onMinimize: (startedAt: number) => void
+  initialStarted?: boolean
+  initialStartedAt?: number
+  viewOnly?: boolean
+  scheduledToday: boolean
+}) {
+  const [started, setStarted] = useState(initialStarted)
+  const [startedAt, setStartedAt] = useState(initialStartedAt)
+  const [sessionNow, setSessionNow] = useState(() => Date.now())
+  const [scannerMode, setScannerMode] = useState<"attendance" | "performance">(
+    "attendance",
+  )
+  // The scan handler is created when scanning starts, so it reads the
+  // current mode and term through refs.
+  const scannerModeRef = useRef(scannerMode)
+  useEffect(() => { scannerModeRef.current = scannerMode }, [scannerMode])
+
+  // Performance mode: hands-on points for the scanned student, saved to the
+  // gradebook through comptech_performance_points, the same database function
+  // as the CompTech app's professor scanner. It records no attendance.
+  type PerformanceColumn = {
+    id: string
+    title: string
+    maxScore: number
+    currentScore: number | null
+  }
+  type PerformanceStudent = {
+    id: string
+    name: string
+    studentNumber: string
+    cardUid: string
+    cardPayload: string
+  }
+  type RubricCriterion = { id: string; name: string; max: number }
+  const defaultRubric: RubricCriterion[] = [
+    { id: "accuracy", name: "Accuracy", max: 5 },
+    { id: "technique", name: "Technique", max: 5 },
+    { id: "completion", name: "Completion", max: 5 },
+    { id: "safety", name: "Safety", max: 5 },
+  ]
+  const rubricStorageKey = `cit-portal:performance-rubric:${item.id}`
+  const [performanceStudent, setPerformanceStudent] = useState<PerformanceStudent | null>(null)
+  const [performanceTerm, setPerformanceTerm] = useState<"midterm" | "final">("midterm")
+  const performanceTermRef = useRef(performanceTerm)
+  useEffect(() => { performanceTermRef.current = performanceTerm }, [performanceTerm])
+  const [performanceColumns, setPerformanceColumns] = useState<PerformanceColumn[]>([])
+  const [performanceColumnId, setPerformanceColumnId] = useState("")
+  const [performanceLoading, setPerformanceLoading] = useState(false)
+  const [performanceSaving, setPerformanceSaving] = useState(false)
+  const [performanceMessage, setPerformanceMessage] = useState("")
+  const [performanceError, setPerformanceError] = useState("")
+  const [performanceRemarks, setPerformanceRemarks] = useState("")
+  // The rubric is edited by the professor and kept on this device per class.
+  const [rubric, setRubric] = useState<RubricCriterion[]>(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem(rubricStorageKey) ?? "null")
+      if (
+        Array.isArray(saved) && saved.length > 0 &&
+        saved.every((c: any) => typeof c?.id === "string" && typeof c?.name === "string" && Number(c?.max) > 0)
+      ) return saved.map((c: any) => ({ id: c.id, name: c.name, max: Number(c.max) }))
+    } catch {
+      // Use the default rubric.
+    }
+    return defaultRubric
+  })
+  useEffect(() => {
+    try {
+      localStorage.setItem(rubricStorageKey, JSON.stringify(rubric))
+    } catch {
+      // Not saved on this device; the rubric still works for this session.
+    }
+  }, [rubric, rubricStorageKey])
+  const [rubricScores, setRubricScores] = useState<Record<string, number>>({})
+  const [rubricEditing, setRubricEditing] = useState(false)
+  const rubricMax = rubric.reduce((sum, criterion) => sum + criterion.max, 0)
+  const rubricTotal = rubric.reduce(
+    (sum, criterion) => sum + Math.min(criterion.max, rubricScores[criterion.id] ?? 0),
+    0,
+  )
+  const performanceColumn =
+    performanceColumns.find((column) => column.id === performanceColumnId) ?? null
+  // The rubric total, scaled to the column's maximum (15/20 → 75/100).
+  const scaledPoints = performanceColumn && rubricMax > 0
+    ? Math.round((rubricTotal / rubricMax) * performanceColumn.maxScore * 100) / 100
+    : 0
+
+  const performanceErrorText = (error: any) => {
+    const code = error?.code === "PGRST202" ? "SETUP_REQUIRED" : String(error?.message ?? "")
+    return ({
+      CARD_NOT_RECOGNIZED: "This card isn't assigned to a student. Assign it in the student app first.",
+      NOT_ENROLLED: "This student isn't enrolled in this class.",
+      CLASS_NOT_OWNED: "This class doesn't belong to the signed-in faculty account.",
+      COLUMN_NOT_FOUND: "That hands-on column no longer exists. Pick another one.",
+      SETUP_REQUIRED:
+        "Performance scoring isn't set up in the database yet. Run the latest 20261104020000_performance_points.sql in Supabase.",
+    } as Record<string, string>)[code] ?? "Points could not be saved. Check the connection and try again."
+  }
+
+  const callPerformancePoints = async (params: Record<string, unknown>) => {
+    const { data, error } = await supabase.rpc("comptech_performance_points", {
+      p_class_id: String(item.id),
+      ...params,
+    })
+    if (error) throw error
+    if (!data || typeof data !== "object") throw new Error("INVALID_RESPONSE")
+    return data as Record<string, any>
+  }
+
+  // Identifies the student on the card and lists the term's existing
+  // hands-on columns, with the student's current score in each.
+  const loadPerformanceStudent = async (
+    cardUid: string,
+    cardPayload: string,
+    term: "midterm" | "final",
+  ) => {
+    setPerformanceLoading(true)
+    setPerformanceError("")
+    try {
+      const preview = await callPerformancePoints({
+        p_term: term,
+        p_card_uid: cardUid,
+        p_card_payload: cardPayload,
+      })
+      const columns: PerformanceColumn[] = (Array.isArray(preview.columns) ? preview.columns : [])
+        .map((column: any) => ({
+          id: String(column.id),
+          title: String(column.title ?? "Hands-on"),
+          maxScore: Number(column.max_score) > 0 ? Number(column.max_score) : 100,
+          currentScore:
+            column.current_score === null || column.current_score === undefined
+              ? null
+              : Number(column.current_score),
+        }))
+      setPerformanceStudent({
+        id: String(preview.student_id ?? ""),
+        name: String(preview.student_name ?? "Student"),
+        studentNumber: String(preview.student_number ?? ""),
+        cardUid,
+        cardPayload,
+      })
+      setPerformanceColumns(columns)
+      setPerformanceColumnId((current) =>
+        columns.some((column) => column.id === current)
+          ? current
+          : columns[columns.length - 1]?.id ?? "",
+      )
+      return preview
+    } finally {
+      setPerformanceLoading(false)
+    }
+  }
+
+  const savePerformancePoints = async () => {
+    if (!performanceStudent || !performanceColumn || performanceSaving) return
+    if (rubricMax <= 0) {
+      setPerformanceError("Give the rubric at least one criterion with a maximum above 0.")
+      return
+    }
+    setPerformanceSaving(true)
+    setPerformanceError("")
+    setPerformanceMessage("")
+    const breakdown = rubric
+      .map((criterion) =>
+        `${criterion.name || "Criterion"} ${Math.min(criterion.max, rubricScores[criterion.id] ?? 0)}/${criterion.max}`)
+      .join(", ")
+    const note = [
+      `Rubric: ${breakdown} (${rubricTotal}/${rubricMax})`,
+      performanceRemarks.trim(),
+    ].filter(Boolean).join(" · ")
+    try {
+      const result = await callPerformancePoints({
+        p_term: performanceTerm,
+        p_card_uid: performanceStudent.cardUid,
+        p_card_payload: performanceStudent.cardPayload,
+        p_assessment_id: performanceColumn.id,
+        p_points: scaledPoints,
+        p_note: note,
+      })
+      setPerformanceColumns((columns) => columns.map((column) =>
+        column.id === performanceColumn.id
+          ? { ...column, currentScore: Number(result.score) }
+          : column,
+      ))
+      setRubricScores({})
+      setPerformanceRemarks("")
+      setPerformanceMessage(
+        `Saved ${result.student_name}: ${result.score} / ${result.max_score} in ${result.assessment_title}. Tap Scan student card for the next student.`,
+      )
+    } catch (error) {
+      setPerformanceError(performanceErrorText(error))
+    } finally {
+      setPerformanceSaving(false)
+    }
+  }
+
+  const [attendanceSessionId, setAttendanceSessionId] = useState<string | null>(null)
+  const {
+    payload: attendanceQrPayload,
+    countdown: attendanceQrCountdown,
+    message: attendanceQrMessage,
+  } = useAttendanceQr(
+    attendanceSessionId,
+    String(item.id),
+    started && !viewOnly,
+  )
+  const attendanceSessionIdRef = useRef<string | null>(null)
+  const nfcReaderRef = useRef<any>(null)
+  const [nfcSessionState, setNfcSessionState] = useState<
+    "idle" | "opening" | "active" | "closing" | "error"
+  >("idle")
+  const [nfcSessionMessage, setNfcSessionMessage] = useState(
+    "Start the class, then use an NFC-enabled Android phone to scan registered student cards.",
+  )
+  const [nfcScannerStatus, setNfcScannerStatus] = useState<
+    "idle" | "starting" | "scanning" | "verifying" | "success" | "unsupported" | "error"
+  >("idle")
+  const [lastCard, setLastCard] = useState("")
+  // The scanner's own message. nfcSessionMessage is rewritten by the
+  // session sync every 10 seconds, which hid scan results and errors.
+  const [nfcScanMessage, setNfcScanMessage] = useState("")
+  const [liveAttendance, setLiveAttendance] = useState<any[]>([])
+  const [enrolledStudentCount, setEnrolledStudentCount] = useState(0)
+  const [qrExpanded, setQrExpanded] = useState(false)
+
+  useEffect(() => {
+    let active = true
+
+    const loadEnrolledStudentCount = async () => {
+      const { data, error } = await supabase
+        .from("class_students")
+        .select("class_id")
+        .eq("class_id", String(item.id))
+
+      if (!active) return
+      if (error) {
+        console.error("Unable to load enrolled students:", error)
+        setEnrolledStudentCount(0)
+        return
+      }
+
+      setEnrolledStudentCount((data ?? []).length)
+    }
+
+    void loadEnrolledStudentCount()
+
+    const enrollmentChannel = supabase
+      .channel(`active-class-enrollments-${item.id}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "class_students",
+          filter: `class_id=eq.${item.id}`,
+        },
+        () => void loadEnrolledStudentCount(),
+      )
+      .subscribe()
+
+    return () => {
+      active = false
+      void supabase.removeChannel(enrollmentChannel)
+    }
+  }, [item.id])
+
+  useEffect(() => {
+    attendanceSessionIdRef.current = attendanceSessionId
+  }, [attendanceSessionId])
+
+  const waitForAttendanceSession = async () => {
+    const deadline = Date.now() + 12000
+    while (!attendanceSessionIdRef.current && Date.now() < deadline) {
+      await new Promise((resolve) => window.setTimeout(resolve, 150))
+    }
+    return attendanceSessionIdRef.current
+  }
+
+  // Use the same backend and request contract as the CompTech professor scanner.
+  const invokeNfcAttendance = async (
+    action: "scan" | "scan_status",
+    body: Record<string, unknown>,
+  ) => {
+    const { data, error } = await supabase.functions.invoke("nfc-attendance", {
+      body: { ...body, action },
+    })
+    if (error) {
+      const context = (error as any).context
+      let code = context?.status === 401 ? "SIGN_IN_REQUIRED" : "FUNCTION_REQUEST_FAILED"
+      try {
+        const payload = await context?.json?.()
+        if (typeof payload?.error === "string" && /^[A-Z0-9_]{1,80}$/.test(payload.error)) code = payload.error
+      } catch { /* Keep the code above. */ }
+      throw new Error(code)
+    }
+    if (!data || typeof data !== "object") throw new Error("INVALID_RESPONSE")
+    return data as Record<string, any>
+  }
+
+  const nfcExplain = (code: string) =>
+    ({
+      SIGN_IN_REQUIRED: "Sign in again to verify your session.",
+      FACULTY_REQUIRED: "Use an existing faculty/professor account for this scanner.",
+      PROFILE_REQUIRED: "This account has no completed application profile.",
+      STUDENT_REQUIRED: "A completed student account is required.",
+      CLASS_NOT_OWNED: "This session must belong to the signed-in faculty account.",
+      REGISTERED_PHONE_REQUIRED: "Use the phone registered to this student account.",
+      ACTIVE_CARD_REQUIRED: "Assign an active attendance card first.",
+      NOT_ENROLLED: "The student is not enrolled in this class.",
+      STUDENT_NOT_READY: "The student must open NFC Attendance → Use Card, select this class, and enable attendance readiness.",
+      SESSION_NOT_ACTIVE: "This class session has ended or isn't open for NFC. Start the class again.",
+      NFC_TEST_SESSION_REQUIRED: "This class session isn't open for NFC. End the class and start it again.",
+      READY_EXPIRED: "The student's attendance readiness ended. They need to enable it again.",
+      READY_NOT_FOUND: "The student's attendance readiness ended. They need to enable it again.",
+      CHALLENGE_EXPIRED: "The scan expired. The student should enable readiness, then scan the card again.",
+      ATTENDANCE_ALREADY_RECORDED: "Attendance is already recorded for this student and session.",
+      CHALLENGE_ALREADY_USED: "This scan was already processed. Check the roster before retrying.",
+      LATE_REQUIRES_FACULTY_CONFIRMATION: "The check-in period has ended. Mark this student manually.",
+      CARD_UID_MISMATCH: "The token was read, but the card UID does not match the registered card.",
+      SIGNATURE_INVALID: "The registered phone signature could not be verified.",
+      ATTENDANCE_CANCELLED: "The student stopped readiness or the session ended.",
+      RATE_LIMITED: "Too many attempts. Wait one minute.",
+      FUNCTION_REQUEST_FAILED: "Could not reach the attendance server. Check your internet connection and try again.",
+      INVALID_RESPONSE: "The attendance server returned an invalid response.",
+      NOT_CONFIRMED: "The student's phone didn't confirm in time. Ask them to open NFC Attendance → Use Card, select this class, tap Enable Attendance Readiness, then scan again.",
+    } as Record<string, string>)[code] ??
+    (/^[A-Z0-9_]+$/.test(code) ? `Attendance could not be confirmed (${code}).` : code)
+
+  const openMobileNfcSession = async () => {
+    if (!scheduledToday) {
+      showMessage("This class has no meeting scheduled for today. A live attendance session can only be started on an assigned meeting day.", "info", "No class scheduled today")
+      return null
+    }
+    setNfcSessionState("opening")
+
+    try {
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser()
+
+      if (userError || !user) {
+        throw new Error("Your session expired. Please sign in again.")
+      }
+
+      const { data: existingSession, error: existingError } = await supabase
+        .from("attendance_sessions")
+        .select("id, class_id, started_by, started_at, ended_at, status")
+        .eq("class_id", String(item.id))
+        .eq("started_by", user.id)
+        .is("ended_at", null)
+        .order("started_at", { ascending: false })
+        .limit(1)
+        .maybeSingle()
+
+      if (existingError) throw new Error(existingError.message)
+
+      let session = existingSession
+
+      if (!session) {
+        const { data: createdSession, error: createError } = await supabase
+          .from("attendance_sessions")
+          .insert({
+            class_id: String(item.id),
+            started_by: user.id,
+            started_at: new Date().toISOString(),
+            ended_at: null,
+            status: "active",
+          })
+          .select("id, class_id, started_by, started_at, ended_at, status")
+          .single()
+
+        if (createError || !createdSession) {
+          throw new Error(createError?.message ?? "The database did not return an attendance session.")
+        }
+
+        session = createdSession
+      }
+
+      const sessionId = String(session.id)
+      const parsedStartedAt = Date.parse(String(session.started_at ?? ""))
+      const sessionStartedAt = Number.isFinite(parsedStartedAt) ? parsedStartedAt : Date.now()
+
+      attendanceSessionIdRef.current = sessionId
+      setAttendanceSessionId(sessionId)
+      setStartedAt(sessionStartedAt)
+      setSessionNow(Date.now())
+      setStarted(true)
+      setNfcSessionState("active")
+      setNfcSessionMessage(
+        "Attendance is ready. On an NFC-enabled Android phone, select Scan student card.",
+      )
+      return sessionId
+    } catch (error) {
+      console.error("Unable to open attendance session:", error)
+      setNfcSessionState("error")
+      setNfcSessionMessage(
+        error instanceof Error ? error.message : "The attendance session could not be opened.",
+      )
+      return null
+    }
+  }
+
+  const closeMobileNfcSession = async () => {
+    const sessionId = attendanceSessionIdRef.current
+    if (!sessionId) return true
+
+    setNfcSessionState("closing")
+
+    const { error } = await supabase
+      .from("attendance_sessions")
+      .update({
+        status: "ended",
+        ended_at: new Date().toISOString(),
+      })
+      .eq("id", sessionId)
+
+    if (error) {
+      console.error("Unable to close attendance session:", error)
+      setNfcSessionState("error")
+      setNfcSessionMessage(error.message)
+      return false
+    }
+
+    attendanceSessionIdRef.current = null
+    setAttendanceSessionId(null)
+    setNfcSessionState("idle")
+    setNfcScannerStatus("idle")
+    setNfcScanMessage("")
+    return true
+  }
+
+  // Accept only the attendance-card format written by the student app.
+  const readAttendanceCard = (message: any) => {
+    const records = Array.from(message?.records ?? []) as any[]
+    if (records.length !== 1) throw new Error("Use the assigned attendance card.")
+    const record = records[0]
+    const encoding = String(record?.encoding || "utf-8").toLowerCase()
+    if (record?.recordType !== "text" || !record?.data || encoding !== "utf-8") {
+      throw new Error("Unsupported card record.")
+    }
+    const payload = new TextDecoder("utf-8").decode(
+      new Uint8Array(record.data.buffer, record.data.byteOffset, record.data.byteLength),
+    )
+    if (!/^COMPTECH:NFC:CARD:V1:[0-9a-f]{64}$/.test(payload)) {
+      throw new Error("This card has no attendance token. Assign it in the student app first.")
+    }
+    return payload
+  }
+
+  const startNfcScanner = async () => {
+    if (!("NDEFReader" in window)) {
+      setNfcScannerStatus("unsupported")
+      setNfcScanMessage(
+        "NFC scanning is unavailable on this device. Open the faculty dashboard in Chrome on an NFC-enabled Android phone.",
+      )
+      return
+    }
+
+    try {
+      if (nfcReaderRef.current) {
+        setNfcScannerStatus("scanning")
+        setNfcScanMessage("Scanner active. Hold a registered student NFC card near the phone.")
+        return
+      }
+
+      setNfcScannerStatus("starting")
+      setNfcScanMessage("Allow NFC access, then hold a registered student card near the phone.")
+
+      const Reader = (window as any).NDEFReader
+      const reader = new Reader()
+      nfcReaderRef.current = reader
+      await reader.scan()
+
+      setNfcScannerStatus("scanning")
+      setNfcScanMessage("Scanner active. Hold a registered student NFC card near the phone.")
+
+      reader.addEventListener("readingerror", () => {
+        nfcReaderRef.current = null
+        setNfcScannerStatus("error")
+        setNfcScanMessage("The card was detected but could not be read. Try again.")
+      }, { once: true })
+
+      reader.addEventListener("reading", async (event: any) => {
+        const cardUid = String(event.serialNumber ?? "")
+          .replace(/[^0-9a-f]/gi, "")
+          .toLowerCase()
+        if (!/^[0-9a-f]{8,32}$/.test(cardUid) || cardUid.length % 2 !== 0) {
+          setNfcScannerStatus("error")
+          setNfcScanMessage("The NFC card identifier could not be read.")
+          return
+        }
+
+        setLastCard(cardUid)
+
+        let ndefPayload = ""
+        try {
+          ndefPayload = readAttendanceCard(event.message)
+        } catch (error) {
+          nfcReaderRef.current = null
+          setNfcScannerStatus("error")
+          setNfcScanMessage(error instanceof Error ? error.message : "Unsupported card record.")
+          return
+        }
+
+        // Performance mode only identifies the student for hands-on points.
+        // It records no attendance and doesn't need the student's phone.
+        if (scannerModeRef.current === "performance") {
+          setNfcScannerStatus("verifying")
+          setNfcScanMessage("Card detected. Loading the student's hands-on columns...")
+          try {
+            const preview = await loadPerformanceStudent(cardUid, ndefPayload, performanceTermRef.current)
+            setRubricScores({})
+            setPerformanceRemarks("")
+            setPerformanceMessage("")
+            nfcReaderRef.current = null
+            setNfcScannerStatus("success")
+            setNfcScanMessage(`${preview.student_name ?? "Student"} found. Enter the hands-on points below.`)
+          } catch (error) {
+            nfcReaderRef.current = null
+            setNfcScannerStatus("error")
+            setNfcScanMessage(performanceErrorText(error))
+          }
+          return
+        }
+
+        setNfcScannerStatus("verifying")
+        setNfcScanMessage("Card detected. Verifying the student...")
+
+        try {
+          const activeSessionId = await waitForAttendanceSession()
+          if (!activeSessionId) {
+            throw new Error(
+              "The student card was detected, but the shared class session is not ready yet. Keep the class open and scan again.",
+            )
+          }
+
+          const scanned = await invokeNfcAttendance("scan", {
+            card_uid: cardUid,
+            ndef_payload: ndefPayload,
+            session_id: activeSessionId,
+          })
+
+          // "attendance" right away means this student was already recorded.
+          // Otherwise the scan returns a challenge that the student's phone
+          // confirms (Use Card → Enable Attendance Readiness).
+          const alreadyRecorded = Boolean(scanned?.attendance)
+          let data: any = scanned
+
+          if (!alreadyRecorded) {
+            const challengeId = String(scanned?.challenge_id ?? "")
+            if (!challengeId) {
+              throw new Error("The scan didn't return a challenge. Scan the card again.")
+            }
+
+            setNfcScanMessage(
+              "Card read. Waiting for the student's phone. They need NFC Attendance → Use Card open, this class selected and readiness on.",
+            )
+
+            data = null
+            const deadline = Date.now() + 65_000
+            while (Date.now() < deadline) {
+              await new Promise((resolve) => window.setTimeout(resolve, 2000))
+              const status = await invokeNfcAttendance("scan_status", {
+                challenge_id: challengeId,
+              })
+              if (status?.attendance) {
+                data = status
+                break
+              }
+            }
+
+            if (!data) throw new Error("NOT_CONFIRMED")
+          }
+
+          nfcReaderRef.current = null
+          setNfcScannerStatus("success")
+          setNfcScanMessage(
+            alreadyRecorded
+              ? "This student was already recorded for the active class session."
+              : "Attendance recorded successfully.",
+          )
+
+          window.setTimeout(() => {
+            setNfcScannerStatus("idle")
+            setNfcScanMessage("Ready to scan another registered student card.")
+          }, 2500)
+        } catch (error) {
+          nfcReaderRef.current = null
+          setNfcScannerStatus("error")
+          setNfcScanMessage(
+            error instanceof Error
+              ? nfcExplain(error.message)
+              : "The scanned card could not be verified.",
+          )
+        }
+      }, { once: true })
+    } catch (error) {
+      nfcReaderRef.current = null
+      const errorName = error instanceof DOMException ? error.name : ""
+      setNfcScannerStatus(errorName === "NotSupportedError" ? "unsupported" : "error")
+      setNfcScanMessage(
+        errorName === "NotAllowedError"
+          ? "NFC permission was denied. Allow NFC access in Chrome and try again."
+          : errorName === "NotSupportedError"
+            ? "NFC scanning is unavailable on this device. Use Chrome on an NFC-enabled Android phone."
+            : "NFC scanning could not start. Keep Chrome open in the foreground and try again.",
+      )
+    }
+  }
+
+  const syncActiveAttendanceSession = async () => {
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+
+      if (!user) return null
+
+      const { data: activeSession, error } = await supabase
+        .from("attendance_sessions")
+        .select("id, class_id, started_by, started_at, ended_at, status")
+        .eq("class_id", String(item.id))
+        .eq("started_by", user.id)
+        .is("ended_at", null)
+        .order("started_at", { ascending: false })
+        .limit(1)
+        .maybeSingle()
+
+      if (error) {
+        console.error("Unable to synchronize the active attendance session:", error)
+        return null
+      }
+
+      if (!activeSession?.id) return null
+
+      const sessionId = String(activeSession.id)
+      const synchronizedStartedAt = Date.parse(String(activeSession.started_at ?? ""))
+      const timerStart = Number.isFinite(synchronizedStartedAt)
+        ? synchronizedStartedAt
+        : Date.now()
+
+      attendanceSessionIdRef.current = sessionId
+      setAttendanceSessionId(sessionId)
+      setStartedAt(timerStart)
+      setSessionNow(Date.now())
+      setStarted(true)
+      setNfcSessionState("active")
+      setNfcSessionMessage(
+        "This live class session and timer are synchronized across all faculty devices.",
+      )
+      return sessionId
+    } catch (error) {
+      console.error("Unable to synchronize the active attendance session:", error)
+      return null
+    }
+  }
+
+  useEffect(() => {
+    if (viewOnly) return
+    void syncActiveAttendanceSession()
+
+    const refresh = () => {
+      if (document.visibilityState === "visible") {
+        void syncActiveAttendanceSession()
+      }
+    }
+
+    window.addEventListener("focus", refresh)
+    document.addEventListener("visibilitychange", refresh)
+    return () => {
+      window.removeEventListener("focus", refresh)
+      document.removeEventListener("visibilitychange", refresh)
+    }
+  }, [item.id, viewOnly])
+
+  useEffect(() => {
+    if (viewOnly) return
+
+    const applySharedSession = (row: any) => {
+      if (!row || String(row.class_id ?? "") !== String(item.id)) return
+
+      const status = String(row.status ?? "active").toLowerCase()
+      if (status === "ended" || row.ended_at) {
+        attendanceSessionIdRef.current = null
+        setAttendanceSessionId(null)
+        setStarted(false)
+        setStartedAt(undefined)
+        setNfcSessionState("idle")
+        setNfcScannerStatus("idle")
+        setNfcSessionMessage("This class session was ended from another device.")
+        return
+      }
+
+      const synchronizedStartedAt = Date.parse(String(row.started_at ?? ""))
+      const timerStart = Number.isFinite(synchronizedStartedAt)
+        ? synchronizedStartedAt
+        : Date.now()
+
+      attendanceSessionIdRef.current = String(row.id)
+      setAttendanceSessionId(String(row.id))
+      setStartedAt(timerStart)
+      setSessionNow(Date.now())
+      setStarted(true)
+      setNfcSessionState("active")
+      setNfcSessionMessage("This live class session and timer are synchronized across all faculty devices.")
+    }
+
+    const channel = supabase
+      .channel(`class-session-timer-${item.id}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "attendance_sessions",
+          filter: `class_id=eq.${item.id}`,
+        },
+        (payload: any) => {
+          if (payload.eventType === "DELETE") {
+            void syncActiveAttendanceSession()
+            return
+          }
+          applySharedSession(payload.new)
+        },
+      )
+      .subscribe()
+
+    // Fallback for browsers that pause Realtime while they are in the background.
+    const refreshTimer = window.setInterval(() => {
+      void syncActiveAttendanceSession()
+    }, 10_000)
+
+    return () => {
+      window.clearInterval(refreshTimer)
+      void supabase.removeChannel(channel)
+    }
+  }, [item.id, viewOnly])
+
+  useEffect(() => {
+    if (!started || !startedAt) return
+    setSessionNow(Date.now())
+    const timer = window.setInterval(() => setSessionNow(Date.now()), 1000)
+    return () => window.clearInterval(timer)
+  }, [started, startedAt])
+
+  useEffect(() => () => {
+    nfcReaderRef.current = null
+  }, [])
+
+  useEffect(() => {
+    if (!attendanceSessionId) {
+      setLiveAttendance([])
+      return
+    }
+    // Clear the previous session's roster while loading this session.
+    setLiveAttendance([])
+    let active = true
+    let loadVersion = 0
+    const loadAttendance = async () => {
+      const version = ++loadVersion
+      const { data, error } = await supabase.rpc("faculty_get_live_attendance", {
+        p_session_id: attendanceSessionId,
+      })
+      if (!active || version !== loadVersion) return
+      if (error) {
+        console.error("Unable to load live attendance:", error)
+        showToast("Unable to load student names and attendance. Refresh the class to retry.", "error")
+        return
+      }
+      setLiveAttendance(Array.isArray(data) ? data : [])
+    }
+    void loadAttendance()
+    const channel = supabase
+      .channel(`live-attendance-${attendanceSessionId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "attendance",
+          filter: `session_id=eq.${attendanceSessionId}`,
+        },
+        () => void loadAttendance(),
+      )
+      .subscribe()
+    return () => {
+      active = false
+      void supabase.removeChannel(channel)
+    }
+  }, [attendanceSessionId])
+  const [manualAttendanceOpen, setManualAttendanceOpen] = useState(false)
+  const [manualAttendance, setManualAttendance] = useState<Record<string, boolean>>(
+    {},
+  )
+  useEffect(() => {
+    if (!performanceMessage) return
+    const timer = window.setTimeout(() => setPerformanceMessage(""), 8000)
+    return () => window.clearTimeout(timer)
+  }, [performanceMessage])
+
+  const liveRoster: Array<{ name: string; id: string; studentNumber: string; time: string; status: string; method: string }> =
+    liveAttendance.map((row: any) => ({
+      name: String(row.full_name ?? "").trim() || "Student name unavailable",
+      // Keep database identity internal; display only the school's student number.
+      id: String(row.student_id ?? row.id),
+      studentNumber: String(row.student_number ?? "").trim() || "Student ID unavailable",
+      time: (() => {
+        const recordedAt =
+          row.checked_in_at ??
+          row.recorded_at ??
+          row.scanned_at ??
+          row.check_in_time ??
+          row.created_at ??
+          null
+        return recordedAt
+          ? new Date(recordedAt).toLocaleTimeString([], {
+              hour: "numeric",
+              minute: "2-digit",
+            })
+          : "Recorded"
+      })(),
+      status: String(row.status ?? "Present"),
+      method: String(row.method ?? "").trim(),
+    }))
+  return (
+    <div
+      className="modal-backdrop"
+      onMouseDown={(e) =>
+        e.target === e.currentTarget &&
+        (started && startedAt ? onMinimize(startedAt) : onClose())
+      }
+    >
+      <section
+        className="session-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="session-title"
+      >
+        {started && (
+          <button
+            className="session-minimize"
+            onClick={() => startedAt && onMinimize(startedAt)}
+            aria-label="Minimize live session"
+            title="Minimize live session"
+          >
+            <Icon name="minus" size={19} />
+          </button>
+        )}
+        <div className="live-badge">
+          <span />{" "}
+          {viewOnly
+            ? "Class ended"
+            : started
+              ? `Live session · ${startedAt ? formatSessionDuration(startedAt, sessionNow) : "00:00"}`
+              : "Ready to begin"}
+        </div>
+        <p className="eyebrow">Today · {activeOccurrence ? `${formatDatabaseTime(activeOccurrence.startTime)} - ${formatDatabaseTime(activeOccurrence.endTime)}` : item.time}</p>
+        <h2 id="session-title">{item.subject}</h2>
+        <p>
+          {item.code} · {activeOccurrence?.room || item.room}
+        </p>
+        {started && (
+          <div className="session-attendance-stats" aria-label="Session attendance summary">
+            <div>
+              <strong>{liveAttendance.filter((row: any) => String(row.status ?? "present").toLowerCase() === "present").length}</strong>
+              <small>Present</small>
+            </div>
+            <div>
+              <strong>{liveAttendance.filter((row: any) => String(row.status ?? "").toLowerCase() === "late").length}</strong>
+              <small>Late</small>
+            </div>
+            <div>
+              <strong>{Math.max(0, item.attendance - enrolledStudentCount)}</strong>
+              <small>Not enrolled</small>
+            </div>
+            <div>
+              <strong>{enrolledStudentCount}</strong>
+              <small>Enrolled</small>
+            </div>
+          </div>
+        )}
+        {!started ? (
+          <div className="session-setup">
+            <div>
+              <span>
+                <Icon name={viewOnly ? "check" : "clock"} />
+              </span>
+              <strong>{viewOnly ? "Closed" : "15 min"}</strong>
+              <small>{viewOnly ? "Class session" : "Attendance window"}</small>
+            </div>
+            <div>
+              <span>
+                <Icon name={viewOnly ? "users" : "scan"} />
+              </span>
+              <strong>
+                {viewOnly ? `24 of ${item.attendance}` : "60 sec"}
+              </strong>
+              <small>{viewOnly ? "Students joined" : "QR refresh"}</small>
+            </div>
+            <div>
+              <span>
+                <Icon name={viewOnly ? "chart" : "users"} />
+              </span>
+              <strong>{viewOnly ? "Saved" : item.attendance}</strong>
+              <small>{viewOnly ? "Class records" : "Enrolled students"}</small>
+            </div>
+          </div>
+        ) : (
+          <>
+            <div className="session-live-layout">
+              <div className="session-checkin-stack">
+            <section
+              className="nfc-scanner-card"
+              aria-labelledby="nfc-scanner-title"
+            >
+              <div className="nfc-scanner-heading">
+                <span className="nfc-scanner-icon">
+                  <Icon name="scan" size={20} />
+                </span>
+                <div>
+                  <span className="nfc-scanner-label">Mobile NFC attendance</span>
+                  <strong id="nfc-scanner-title">
+                    {nfcSessionState === "opening"
+                      ? "Opening session"
+                      : nfcSessionState === "closing"
+                        ? "Closing session"
+                        : nfcSessionState === "error"
+                          ? "Web scanning unavailable"
+                          : "Attendance session active"} <i aria-hidden="true" />
+                  </strong>
+                  <small>{nfcSessionMessage}</small>
+                </div>
+                <span className="session-online-status">
+                  <i aria-hidden="true" /> Online
+                </span>
+              </div>
+              <div
+                className="nfc-mode-picker"
+                role="group"
+                aria-label="NFC recording mode"
+              >
+                <button
+                  className={scannerMode === "attendance" ? "active" : ""}
+                  onClick={() => setScannerMode("attendance")}
+                  aria-pressed={scannerMode === "attendance"}
+                >
+                  <Icon name="check" size={14} /> Attendance
+                </button>
+                <button
+                  className={scannerMode === "performance" ? "active" : ""}
+                  onClick={() => setScannerMode("performance")}
+                  aria-pressed={scannerMode === "performance"}
+                >
+                  <Icon name="chart" size={14} /> Performance
+                </button>
+              </div>
+              <div className="nfc-tap-prompt">
+                <span>
+                  <Icon name="scan" size={22} />
+                </span>
+                <div>
+                  <strong>
+                    {nfcScannerStatus === "starting"
+                      ? "Starting NFC scanner"
+                      : nfcScannerStatus === "scanning"
+                        ? "Ready for a student card"
+                        : nfcScannerStatus === "verifying"
+                          ? "Verifying student"
+                          : nfcScannerStatus === "success"
+                            ? scannerMode === "performance" ? "Student found" : "Attendance recorded"
+                            : nfcScannerStatus === "unsupported"
+                              ? "NFC scanning unavailable"
+                              : nfcScannerStatus === "error"
+                                ? "Card could not be verified"
+                                : "Scan a registered student card"}
+                  </strong>
+                  <small>{nfcScanMessage || nfcSessionMessage}</small>
+                  {lastCard && <small>Last card: {lastCard}</small>}
+                </div>
+                <button
+                  type="button"
+                  className="secondary-button"
+                  onClick={() => void startNfcScanner()}
+                  disabled={
+                    nfcScannerStatus === "starting" ||
+                    nfcScannerStatus === "scanning" ||
+                    nfcScannerStatus === "verifying"
+                  }
+                >
+                  {nfcScannerStatus === "starting"
+                    ? "Starting..."
+                    : nfcScannerStatus === "scanning"
+                      ? "Waiting for card..."
+                      : nfcScannerStatus === "verifying"
+                        ? "Verifying..."
+                        : "Scan student card"}
+                </button>
+              </div>
+            </section>
+            {scannerMode === "attendance" ? (
+              <section className="qr-card" aria-labelledby="qr-check-in-title">
+                <div className="qr-card-heading">
+                  <div>
+                    <span>Alternative check-in</span>
+                    <strong id="qr-check-in-title">Attendance QR</strong>
+                  </div>
+                  <button type="button" className="qr-expand-button" onClick={() => setQrExpanded(true)} disabled={!attendanceQrPayload} aria-label="Expand attendance QR code for classroom display" title="Show QR on TV or projector"><Icon name="scan" size={18} /><span>Expand</span></button>
+                </div>
+                <div className="qr-pattern" aria-label="Attendance QR code">
+                  {attendanceQrPayload ? (
+                    <QRCodeCanvas
+                      value={attendanceQrPayload}
+                      size={140}
+                      level="H"
+                      includeMargin
+                    />
+                  ) : (
+                    <div className="qr-loading-state" role="status" aria-live="polite">
+                      <Icon name="clock" size={22} />
+                      <span>Preparing secure QR…</span>
+                    </div>
+                  )}
+                </div>
+                <p>{attendanceQrMessage}</p>
+                <small className="qr-refresh-note">
+                  {attendanceQrPayload
+                    ? `QR refreshes in ${attendanceQrCountdown}s`
+                    : "Waiting for a server-issued attendance QR"}
+                </small>
+                <div className="progress-label">
+                  <span>Attendance recorded</span>
+                  <strong>{liveAttendance.length} of {enrolledStudentCount}</strong>
+                </div>
+                <div className="progress">
+                  <span style={{ width: `${Math.min(100, enrolledStudentCount ? (liveAttendance.length / enrolledStudentCount) * 100 : 0)}%` }} />
+                </div>
+              </section>
+            ) : (
+              <section className="performance-mode-card" aria-label="Performance mode">
+                <span><Icon name="chart" size={20} /></span>
+                <div className="performance-mode-content">
+                  <small>Performance mode</small>
+                  <strong>Hands-on points</strong>
+                  <p>Tap Scan student card, then hold the student's card to the phone. This records no attendance.</p>
+
+                  <div className="performance-sync-controls">
+                    <label>
+                      <span>Term</span>
+                      <select
+                        value={performanceTerm}
+                        disabled={performanceLoading || performanceSaving}
+                        onChange={(event) => {
+                          const term = event.target.value as "midterm" | "final"
+                          setPerformanceTerm(term)
+                          if (performanceStudent) {
+                            void loadPerformanceStudent(performanceStudent.cardUid, performanceStudent.cardPayload, term)
+                              .catch((error) => setPerformanceError(performanceErrorText(error)))
+                          }
+                        }}
+                      >
+                        <option value="midterm">Midterm</option>
+                        <option value="final">Finals</option>
+                      </select>
+                    </label>
+                  </div>
+
+                  {!performanceStudent ? (
+                    <p className="performance-awaiting-card">
+                      {performanceLoading ? "Loading the student..." : "No student scanned yet."}
+                    </p>
+                  ) : (
+                    <div className="performance-record">
+                      <div className="performance-student-heading">
+                        <div>
+                          <strong>{performanceStudent.name}</strong>
+                          <small>{performanceStudent.studentNumber || "No student number"}</small>
+                        </div>
+                        <button
+                          type="button"
+                          className="secondary-button compact"
+                          onClick={() => {
+                            setPerformanceStudent(null)
+                            setPerformanceColumns([])
+                            setRubricScores({})
+                            setPerformanceRemarks("")
+                            setPerformanceError("")
+                          }}
+                        >Clear</button>
+                      </div>
+
+                      {performanceColumns.length === 0 ? (
+                        <p className="performance-awaiting-card">
+                          This class has no {performanceTerm === "final" ? "Finals" : "Midterm"} hands-on columns yet.
+                          Add one in Records → {performanceTerm === "final" ? "Final" : "Midterm"} ACTIVITIES/Projects and
+                          save a score in it, then scan again.
+                        </p>
+                      ) : (
+                        <>
+                          <div className="performance-sync-controls">
+                            <label>
+                              <span>Hands-on column</span>
+                              <select
+                                value={performanceColumnId}
+                                disabled={performanceSaving}
+                                onChange={(event) => setPerformanceColumnId(event.target.value)}
+                              >
+                                {performanceColumns.map((column) => (
+                                  <option key={column.id} value={column.id}>{column.title}</option>
+                                ))}
+                              </select>
+                            </label>
+                          </div>
+                          <small>
+                            Current score: {performanceColumn?.currentScore ?? "—"} / {performanceColumn?.maxScore ?? 100}
+                            {performanceColumn?.currentScore != null ? " · saving replaces it" : ""}
+                          </small>
+
+                          <div className="performance-rubric">
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
+                              <h5>Rubric</h5>
+                              <button
+                                type="button"
+                                className="secondary-button compact"
+                                onClick={() => setRubricEditing((editing) => !editing)}
+                              >{rubricEditing ? "Done editing" : "Edit rubric"}</button>
+                            </div>
+                            {rubricEditing ? (
+                              <>
+                                {rubric.map((criterion) => (
+                                  <div key={criterion.id} style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 8 }}>
+                                    <input
+                                      value={criterion.name}
+                                      maxLength={40}
+                                      placeholder="Criterion"
+                                      aria-label="Criterion name"
+                                      style={{ flex: 1, minWidth: 0 }}
+                                      onChange={(event) => setRubric((current) => current.map((c) =>
+                                        c.id === criterion.id ? { ...c, name: event.target.value } : c))}
+                                    />
+                                    <input
+                                      type="number"
+                                      min={1}
+                                      max={100}
+                                      value={criterion.max}
+                                      aria-label={`Maximum score for ${criterion.name || "criterion"}`}
+                                      style={{ width: 64 }}
+                                      onChange={(event) => {
+                                        const max = Math.min(100, Math.max(1, Math.round(Number(event.target.value) || 1)))
+                                        setRubric((current) => current.map((c) =>
+                                          c.id === criterion.id ? { ...c, max } : c))
+                                      }}
+                                    />
+                                    <button
+                                      type="button"
+                                      className="secondary-button compact"
+                                      disabled={rubric.length <= 1}
+                                      aria-label={`Remove ${criterion.name || "criterion"}`}
+                                      onClick={() => setRubric((current) => current.filter((c) => c.id !== criterion.id))}
+                                    >×</button>
+                                  </div>
+                                ))}
+                                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                                  <button
+                                    type="button"
+                                    className="secondary-button compact"
+                                    disabled={rubric.length >= 10}
+                                    onClick={() => setRubric((current) => [
+                                      ...current,
+                                      { id: `criterion-${Date.now()}`, name: `Criterion ${current.length + 1}`, max: 5 },
+                                    ])}
+                                  >+ Add criterion</button>
+                                  <button
+                                    type="button"
+                                    className="secondary-button compact"
+                                    onClick={() => setRubric(defaultRubric)}
+                                  >Reset to default</button>
+                                </div>
+                                <small>Total possible: {rubricMax}. The rubric is kept on this device for this class.</small>
+                              </>
+                            ) : (
+                              rubric.map((criterion) => {
+                                const value = Math.min(criterion.max, rubricScores[criterion.id] ?? 0)
+                                return (
+                                  <label key={criterion.id}>
+                                    <span>{criterion.name || "Criterion"}: {value}</span>
+                                    <output>{value} / {criterion.max}</output>
+                                    <input
+                                      type="range"
+                                      min="0"
+                                      max={criterion.max}
+                                      value={value}
+                                      onChange={(event) => setRubricScores((scores) => ({
+                                        ...scores,
+                                        [criterion.id]: Number(event.target.value),
+                                      }))}
+                                    />
+                                  </label>
+                                )
+                              })
+                            )}
+                            <strong className="performance-total">
+                              Total: {rubricTotal} / {rubricMax} → {scaledPoints} / {performanceColumn?.maxScore ?? 100} in the column
+                            </strong>
+                          </div>
+
+                          <label className="performance-remarks-field">
+                            <span>Notes <small>(optional)</small></span>
+                            <textarea
+                              maxLength={200}
+                              rows={3}
+                              value={performanceRemarks}
+                              onChange={(event) => setPerformanceRemarks(event.target.value)}
+                              placeholder="Add a note for this score..."
+                            />
+                            <small>{performanceRemarks.length}/200</small>
+                          </label>
+
+                          <div className="performance-form-actions">
+                            <button
+                              type="button"
+                              className="primary-button performance-save-button hands-on"
+                              disabled={performanceSaving || performanceLoading || !performanceColumn || rubricEditing}
+                              onClick={() => void savePerformancePoints()}
+                            >{performanceSaving ? "Saving..." : "Save to gradebook"}</button>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  )}
+
+                  {performanceError && <p className="performance-save-message" role="alert">{performanceError}</p>}
+                  {performanceMessage && <p className="performance-save-message" role="status">{performanceMessage}</p>}
+                </div>
+              </section>
+            )}
+              </div>
+              <section className="session-attendance-roster" aria-labelledby="session-roster-title">
+                <div className="session-roster-heading">
+                  <div>
+                    <span>Live attendance</span>
+                    <strong id="session-roster-title">Attendance roster</strong>
+                  </div>
+                  {scannerMode === "attendance" && (
+                    <button
+                      className={manualAttendanceOpen ? "manual-roster-toggle active" : "manual-roster-toggle"}
+                      type="button"
+                      onClick={() => setManualAttendanceOpen((open) => !open)}
+                      aria-pressed={manualAttendanceOpen}
+                    >
+                      <Icon name="check" size={12} /> Manual mark
+                    </button>
+                  )}
+                </div>
+                <div className="session-roster-table" role="table" aria-label="Live attendance roster">
+                  <div className="session-roster-row session-roster-labels" role="row">
+                    <span>Student</span>
+                    <span>Time</span>
+                    <span>Status</span>
+                  </div>
+                  {liveRoster.map((student) => {
+                    const manuallyMarked = manualAttendance[student.id] ?? false
+                    const status = manuallyMarked ? "Present" : student.status
+                    const time =
+                      manuallyMarked && student.status !== "Present"
+                        ? "Manual"
+                        : student.time
+                    const method = manuallyMarked ? "Manual" : student.method
+                    return (
+                    <div className="session-roster-row" role="row" key={student.id}>
+                      <span className="session-roster-student">
+                        {scannerMode === "attendance" && manualAttendanceOpen && (
+                          <input
+                            type="checkbox"
+                            checked={manualAttendance[student.id] ?? false}
+                            onChange={(event) =>
+                              setManualAttendance((current) => ({
+                                ...current,
+                                [student.id]: event.target.checked,
+                              }))
+                            }
+                            aria-label={`Mark ${student.name} present manually`}
+                          />
+                        )}
+                        <span>
+                          <strong>{student.name}</strong>
+                          <small>{student.studentNumber}{method ? " · " + method : ""}</small>
+                        </span>
+                      </span>
+                      <span>{time}</span>
+                      <span className={status.toLowerCase().replace(" ", "-")}>
+                        {status}
+                      </span>
+                    </div>
+                    )
+                  })}
+                </div>
+              </section>
+            </div>
+          </>
+        )}
+        <button
+          className={
+            viewOnly
+              ? "secondary-button session-button"
+              : started
+                ? "danger-button"
+                : "primary-button session-button"
+          }
+          onClick={() => {
+            if (viewOnly) onClose()
+            else if (started) {
+              void closeMobileNfcSession().then((closed) => {
+                if (closed) onEnd(attendanceSessionId)
+              })
+            } else {
+              if (!scheduledToday) {
+                showMessage("This class has no meeting scheduled for today. Choose a class assigned to today before starting attendance.", "info", "No class scheduled today")
+                return
+              }
+              // Start Web NFC from this user gesture. Session creation continues in parallel.
+              void startNfcScanner()
+              void openMobileNfcSession().then((sessionId) => {
+                if (!sessionId) return
+                setSessionNow(Date.now())
+                setScannerMode("attendance")
+                setStarted(true)
+              })
+            }
+          }}
+          disabled={nfcSessionState === "opening" || nfcSessionState === "closing" || (!viewOnly && !started && !scheduledToday)}
+        >
+          {viewOnly ? (
+            "Close overview"
+          ) : nfcSessionState === "opening" ? (
+            "Opening attendance..."
+          ) : nfcSessionState === "closing" ? (
+            "Closing attendance..."
+          ) : started ? (
+            "End class"
+          ) : !scheduledToday ? (
+            "No class scheduled today"
+          ) : (
+            <>
+              <Icon name="play" /> Start class session
+            </>
+          )}
+        </button>
+      </section>
+      {qrExpanded && (
+        <div className="qr-display-backdrop" role="dialog" aria-modal="true" aria-labelledby="qr-display-title" onClick={() => setQrExpanded(false)}>
+          <section className="qr-display-panel" onClick={(event) => event.stopPropagation()}>
+            <button type="button" className="qr-display-close" onClick={() => setQrExpanded(false)} aria-label="Close expanded QR code">×</button>
+            <div className="qr-display-heading">
+              <span>Live attendance</span>
+              <h2 id="qr-display-title">Scan to check in</h2>
+              <p>{item.subject} · {item.code}</p>
+            </div>
+            <div className="qr-display-code">
+              {attendanceQrPayload ? (
+                <QRCodeCanvas value={attendanceQrPayload} size={420} level="H" includeMargin />
+              ) : (
+                <div className="qr-loading-state"><Icon name="clock" size={34}/><span>Preparing secure QR…</span></div>
+              )}
+            </div>
+            <div className="qr-display-footer">
+              <strong>{attendanceQrPayload ? `Refreshes in ${attendanceQrCountdown}s` : "Waiting for QR"}</strong>
+              <span>{liveAttendance.length} of {enrolledStudentCount} attendance recorded</span>
+            </div>
+          </section>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function formatSessionDuration(startedAt: number, now: number) {
+  const seconds = Math.max(0, Math.floor((now - startedAt) / 1000))
+  const hours = Math.floor(seconds / 3600)
+  const minutes = Math.floor((seconds % 3600) / 60)
+  const remainingSeconds = seconds % 60
+  return `${
+    hours ? `${String(hours).padStart(2, "0")}:` : ""
+  }${String(minutes).padStart(2, "0")}:${String(remainingSeconds).padStart(2, "0")}`
+}
+
+function MinimizedSession({
+  item,
+  startedAt,
+  onRestore,
+  className = "",
+  position,
+  onPositionChange,
+}: {
+  item: ClassItem
+  startedAt: number
+  onRestore: () => void
+  className?: string
+  position: { x: number; y: number }
+  onPositionChange: (position: { x: number; y: number }) => void
+}) {
+  const [now, setNow] = useState(() => Date.now())
+  const trayRef = useRef<HTMLElement>(null)
+  const dragState = useRef<{
+    pointerId: number
+    startX: number
+    startY: number
+    position: { x: number; y: number }
+    minX: number
+    maxX: number
+    minY: number
+    maxY: number
+  } | null>(null)
+
+  useEffect(() => {
+    const interval = window.setInterval(() => setNow(Date.now()), 1000)
+    return () => window.clearInterval(interval)
+  }, [])
+
+  const startDragging = (event: React.PointerEvent<HTMLButtonElement>) => {
+    const rect = trayRef.current?.getBoundingClientRect()
+    if (!rect) return
+    event.currentTarget.setPointerCapture(event.pointerId)
+    dragState.current = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      position,
+      minX: -(rect.left - position.x),
+      maxX: window.innerWidth - (rect.right - position.x),
+      minY: -(rect.top - position.y),
+      maxY: window.innerHeight - (rect.bottom - position.y),
+    }
+  }
+  const drag = (event: React.PointerEvent<HTMLButtonElement>) => {
+    const activeDrag = dragState.current
+    if (!activeDrag || event.pointerId !== activeDrag.pointerId) return
+    onPositionChange({
+      x: Math.min(
+        activeDrag.maxX,
+        Math.max(
+          activeDrag.minX,
+          activeDrag.position.x + event.clientX - activeDrag.startX,
+        ),
+      ),
+      y: Math.min(
+        activeDrag.maxY,
+        Math.max(
+          activeDrag.minY,
+          activeDrag.position.y + event.clientY - activeDrag.startY,
+        ),
+      ),
+    })
+  }
+  const stopDragging = (event: React.PointerEvent<HTMLButtonElement>) => {
+    if (dragState.current?.pointerId !== event.pointerId) return
+    dragState.current = null
+  }
+
+  return (
+    <aside
+      ref={trayRef}
+      className={`live-session-tray live-session-tray-larger ${className}`}
+      style={{ transform: `translate(${position.x}px, ${position.y}px)` }}
+      aria-label={`Live class: ${item.subject}`}
+      onPointerDown={startDragging}
+      onPointerMove={drag}
+      onPointerUp={stopDragging}
+      onPointerCancel={stopDragging}
+    >
+      <button className="live-tray-resume" type="button" onClick={onRestore} onPointerDown={(event) => event.stopPropagation()}>
+        <span className="live-tray-status live-tray-status-custom">
+          <i /> Live class
+        </span>
+        <span className="live-tray-details">
+          <strong className="live-tray-subject-custom">{item.subject}</strong>
+          <small className="live-tray-duration-custom">
+            <Icon name="clock" size={13} />{" "}
+            {formatSessionDuration(startedAt, now)} elapsed
+          </small>
+        </span>
+        <span className="live-tray-expand live-tray-expand-custom">
+          Resume <Icon name="arrow" size={15} />
+        </span>
+      </button>
+      <button
+        className="live-tray-drag-handle"
+        type="button"
+        aria-label="Drag live class"
+        title="Drag to move"
+      >
+        <Icon name="more" size={16} />
+      </button>
+    </aside>
+  )
+}
+
+function LandingPage({
+  onSignIn,
+  onRegistrationComplete,
+  forcePasswordRecovery = false,
+}: {
+  onSignIn: () => void
+  onRegistrationComplete: () => void
+  forcePasswordRecovery?: boolean
+}) {
+  const [authMode, setAuthMode] = useState<"signIn" | "signUp">("signIn")
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmation, setShowConfirmation] = useState(false)
+  const [authFormErrors, setAuthFormErrors] = useState<string[]>([])
+  const [recoveryView, setRecoveryView] = useState<"closed" | "request" | "update">("closed")
+  const [recoveryEmail, setRecoveryEmail] = useState("")
+  const [recoveryPassword, setRecoveryPassword] = useState("")
+  const [recoveryConfirmation, setRecoveryConfirmation] = useState("")
+  const [recoveryBusy, setRecoveryBusy] = useState(false)
+  const [recoveryNotice, setRecoveryNotice] = useState("")
+  const isSignUp = authMode === "signUp"
+
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "PASSWORD_RECOVERY") {
+        setRecoveryNotice("")
+        setRecoveryView("update")
+      }
+    })
+    return () => subscription.unsubscribe()
+  }, [])
+
+  useEffect(() => {
+    if (forcePasswordRecovery) {
+      setRecoveryNotice("")
+      setRecoveryView("update")
+    }
+  }, [forcePasswordRecovery])
+
+  const requestPasswordReset = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    const email = recoveryEmail.trim().toLowerCase()
+    if (!/^[^\s@]+@ms\.bulsu\.edu\.ph$/i.test(email)) {
+      setRecoveryNotice("Enter your @ms.bulsu.edu.ph university email address.")
+      return
+    }
+    setRecoveryBusy(true)
+    setRecoveryNotice("")
+    const redirectTo = `${window.location.origin}${window.location.pathname}`
+    const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo })
+    setRecoveryBusy(false)
+    if (error) {
+      setRecoveryNotice(error.message)
+      return
+    }
+    setRecoveryNotice("If an account exists for this email, a password-reset link has been sent. Check the inbox and spam folder.")
+  }
+
+  const updateRecoveredPassword = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    const validPassword = recoveryPassword.length >= 8 && /[A-Z]/.test(recoveryPassword) &&
+      /[a-z]/.test(recoveryPassword) && /[0-9]/.test(recoveryPassword) && /[^A-Za-z0-9]/.test(recoveryPassword)
+    if (!validPassword) {
+      setRecoveryNotice("Use at least 8 characters with uppercase, lowercase, number, and special character.")
+      return
+    }
+    if (recoveryPassword !== recoveryConfirmation) {
+      setRecoveryNotice("Passwords do not match.")
+      return
+    }
+    setRecoveryBusy(true)
+    setRecoveryNotice("")
+    const { error } = await supabase.auth.updateUser({ password: recoveryPassword })
+    if (error) {
+      setRecoveryBusy(false)
+      setRecoveryNotice(error.message)
+      return
+    }
+    await supabase.auth.signOut({ scope: "local" })
+    setRecoveryBusy(false)
+    setRecoveryPassword("")
+    setRecoveryConfirmation("")
+    setRecoveryView("closed")
+    showMessage("Password updated successfully. Sign in with the new password.", "success", "Password changed")
+    window.history.replaceState({}, document.title, window.location.pathname)
+  }
+
+  return (
+    <main className="landing-page">
+      <MessageDialogHost />
+      {/* Left Intro Panel with Background Image & Bleeding Vignette Effect */}
+      <section className="landing-intro">
+        <img
+          src={citBuilding}
+          alt=""
+          aria-hidden="true"
+          className="landing-building-image"
+          referrerPolicy="no-referrer"
+          onError={(event) => {
+            event.currentTarget.style.display = "none"
+          }}
+        />
+        <div className="landing-background-overlay" aria-hidden="true" />
+          {/* The CIT branding is already embedded in the hosted background image. */}
+          <div className="landing-copy">
+          <h1>Make every class hour count.</h1>
+          <p>
+            Plan your sessions, record attendance, and keep every student moving
+            forward from one focused workspace.
+          </p>
+        </div>
+      </section>
+
+      {/* Right Authentication Panel with Dynamic Header */}
+{/* Right Authentication Panel */}
+<section
+  className="landing-auth-container"
+  style={{
+    padding: "30px",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+  }}
+>
+  {/* 1. Header Placed At The Top */}
+  <div className="auth-header" style={{ marginBottom: "5px" }}>
+    <h2 style={{ fontSize: "28px", fontWeight: 700, color: "#072c52", marginBottom: "6px" }}>
+      {isSignUp ? "Create account" : "Welcome back"}
+    </h2>
+    <p style={{ fontSize: "14px", color: "#667587" }}>
+      {isSignUp
+        ? "Set up your faculty credentials to get started."
+        : "Sign in to continue to your teaching workspace."}
+    </p>
+  </div>
+
+  {/* 2. Tab Switcher Below Header */}
+  <div
+    className="auth-mode-switch"
+    role="tablist"
+    aria-label="Account access"
+    style={{ marginBottom: "5px" }}
+  >
+    <button
+      className={!isSignUp ? "active" : ""}
+      role="tab"
+      aria-selected={!isSignUp}
+      onClick={() => { setAuthMode("signIn"); setAuthFormErrors([]) }}
+    >
+      Sign in
+    </button>
+    <button
+      className={isSignUp ? "active" : ""}
+      role="tab"
+      aria-selected={isSignUp}
+      onClick={() => { setAuthMode("signUp"); setAuthFormErrors([]) }}
+    >
+      Create account
+    </button>
+  </div>
+
+  {/* 3. Form Fields */}
+  <form
+    className="sign-in-form"
+    onInput={() => authFormErrors.length > 0 && setAuthFormErrors([])}
+    onSubmit={async (event) => {
+  event.preventDefault()
+
+  const form = event.currentTarget
+  const formData = new FormData(form)
+
+  const email = String(formData.get("email") ?? "")
+  const password = String(formData.get("password") ?? "")
+  const passwordConfirmation = String(formData.get("passwordConfirmation") ?? "")
+
+  setAuthFormErrors([])
+
+  try {
+    if (isSignUp) {
+      const fullName = String(formData.get("fullName") ?? "")
+      const facultyNumber = String(
+        formData.get("facultyNumber") ?? ""
+      )
+      const department = String(
+        formData.get("department") ?? ""
+      )
+      const normalizedEmail = email.trim().toLowerCase()
+
+      const validationErrors: string[] = []
+      if (!/^[^\s@]+@ms\.bulsu\.edu\.ph$/i.test(normalizedEmail)) {
+        validationErrors.push("Use your @ms.bulsu.edu.ph email address.")
+      }
+
+      const passwordsDoNotMatch = passwordConfirmation !== password
+      const passwordMeetsRequirements =
+        password.length >= 8 &&
+        /[A-Z]/.test(password) &&
+        /[a-z]/.test(password) &&
+        /[0-9]/.test(password) &&
+        /[^A-Za-z0-9]/.test(password)
+
+      // When confirmation does not match, show only the mismatch message for
+      // the password fields. This prevents two password errors appearing together.
+      if (passwordsDoNotMatch) {
+        validationErrors.push("Passwords do not match.")
+      } else if (!passwordMeetsRequirements) {
+        validationErrors.push(
+          "Password must contain at least 8 characters, one uppercase letter, one lowercase letter, one number, and one special character.",
+        )
+      }
+      if (validationErrors.length > 0) {
+        setAuthFormErrors(validationErrors)
+        return
+      }
+
+      await registerFaculty({
+        email: normalizedEmail,
+        password,
+        fullName,
+        facultyNumber,
+        department,
+      })
+
+      // Supabase may create a session immediately when email confirmation is disabled.
+      // Registration must not grant dashboard access, so always end that session first.
+      const { error: signOutError } = await supabase.auth.signOut({ scope: "local" })
+      if (signOutError) throw signOutError
+
+      form.reset()
+      setAuthMode("signIn")
+      setShowPassword(false)
+      setShowConfirmation(false)
+      onRegistrationComplete()
+
+      showMessage(
+  "Faculty account created. Please sign in using the account you just created.",
+  "success",
+  "Account Created"
+)
+    } else {
+      await loginFaculty(email, password)
+      onSignIn()
+    }
+  } catch (error) {
+    const rawMessage =
+      error instanceof Error
+        ? error.message
+        : "Authentication failed."
+
+    const message = /password/i.test(rawMessage)
+      ? "Use 6+ characters with 1 uppercase letter and 1 number."
+      : rawMessage
+
+    console.error("Faculty authentication error:", error)
+    if (isSignUp) {
+      setAuthFormErrors([message])
+    } else {
+      showMessage(message)
+    }
+  }
+}}
+  >
+    {isSignUp && (
+      <label>
+        Full name
+        <input
+          type="text"
+          name="fullName"
+          placeholder="Enter your full name"
+          autoComplete="name"
+          required
+        />
+      </label>
+    )}
+    <label>
+      University email
+      <input
+        type="email"
+        name="email"
+        placeholder="name@university.edu"
+        autoComplete="email"
+        required
+      />
+    </label>
+    <label>
+      Password
+      <span className="password-field">
+        <input
+          type={showPassword ? "text" : "password"}
+          name="password"
+          placeholder="Enter your password"
+          autoComplete={isSignUp ? "new-password" : "current-password"}
+          required
+        />
+        <button
+          type="button"
+          onClick={() => setShowPassword((visible) => !visible)}
+          aria-label={showPassword ? "Hide password" : "Show password"}
+        >
+          <Icon name={showPassword ? "eyeOff" : "eye"} size={17} />
+        </button>
+      </span>
+    </label>
+    {isSignUp ? (
+      <>
+        <label>
+          Confirm password
+          <span className="password-field">
+            <input
+              type={showConfirmation ? "text" : "password"}
+              name="passwordConfirmation"
+              placeholder="Confirm your password"
+              autoComplete="new-password"
+              required
+            />
+            <button
+              type="button"
+              onClick={() => setShowConfirmation((visible) => !visible)}
+              aria-label={
+                showConfirmation
+                  ? "Hide password confirmation"
+                  : "Show password confirmation"
+              }
+            >
+              <Icon
+                name={showConfirmation ? "eyeOff" : "eye"}
+                size={17}
+              />
+            </button>
+          </span>
+        </label>
+        {authFormErrors.length > 0 && (
+          <div className="auth-validation-errors" role="alert" aria-live="polite" style={{ display: "grid", gap: 8, width: "100%", marginTop: 10, marginBottom: 8 }}>
+            {authFormErrors.map((errorMessage) => (
+              <div className="auth-inline-error" key={errorMessage} style={{ display: "flex", alignItems: "flex-start", gap: 10, width: "100%", boxSizing: "border-box", padding: "10px 12px", border: "1px solid #f1b7b7", borderRadius: 10, background: "#fff5f5", color: "#a32929", fontSize: 13, lineHeight: 1.45 }}>
+                <span aria-hidden="true" style={{ display: "grid", placeItems: "center", flex: "0 0 20px", width: 20, height: 20, borderRadius: "50%", background: "#d74747", color: "white", fontWeight: 700 }}>!</span>
+                <span>{errorMessage}</span>
+              </div>
+            ))}
+          </div>
+        )}
+        <label className="terms-agreement">
+          <input type="checkbox" required />
+          <span>
+            I agree to the <button type="button">terms of use</button> and{" "}
+            <button type="button">privacy policy</button>.
+          </span>
+        </label>
+      </>
+    ) : (
+      <button
+        className="landing-forgot-password"
+        type="button"
+        onClick={() => {
+          setRecoveryNotice("")
+          setRecoveryEmail("")
+          setRecoveryView("request")
+        }}
+      >
+        Forgot password?
+      </button>
+    )}
+    <button className="primary-button landing-sign-in" type="submit">
+      {isSignUp ? "Create account" : "Sign in"}{" "}
+      <Icon name="arrow" size={17} />
+    </button>
+  </form>
+
+  <div className="sign-in-help">
+    <span>
+      <Icon name="user" size={17} />
+    </span>
+    <p>
+      <strong>
+        {isSignUp ? "Joining a faculty team?" : "Need access?"}
+      </strong>
+      <small>
+        {isSignUp
+          ? "Your institution administrator will confirm your faculty access."
+          : "Your institution administrator can add you to ClassTrack."}
+      </small>
+    </p>
+  </div>
+</section>
+      {recoveryView !== "closed" && (
+        <div className="modal-backdrop" role="presentation">
+          <section className="modal-card profile-edit-modal" role="dialog" aria-modal="true" aria-labelledby="password-recovery-title">
+            <button type="button" className="modal-close" aria-label="Close password recovery" onClick={() => setRecoveryView("closed")}>×</button>
+            <p className="eyebrow">Account recovery</p>
+            <h2 id="password-recovery-title">{recoveryView === "request" ? "Forgot password" : "Create a new password"}</h2>
+            {recoveryView === "request" ? (
+              <form className="profile-form-fields" onSubmit={requestPasswordReset}>
+                <p>Enter the university email connected to the faculty account. A secure recovery link will be sent by Supabase.</p>
+                <label><span className="profile-field-heading">University email <em>Required</em></span><input type="email" value={recoveryEmail} onChange={(event) => setRecoveryEmail(event.target.value)} placeholder="name@ms.bulsu.edu.ph" autoComplete="email" required /></label>
+                {recoveryNotice && <p role="status" className="performance-save-message">{recoveryNotice}</p>}
+                <div className="profile-form-actions"><button type="button" className="secondary-button" onClick={() => setRecoveryView("closed")}>Cancel</button><button type="submit" className="primary-button" disabled={recoveryBusy}>{recoveryBusy ? "Sending..." : "Send reset link"}</button></div>
+              </form>
+            ) : (
+              <form className="profile-form-fields" onSubmit={updateRecoveredPassword}>
+                <p>Use at least 8 characters with uppercase, lowercase, number, and special character.</p>
+                <label><span className="profile-field-heading">New password <em>Required</em></span><input type="password" value={recoveryPassword} onChange={(event) => setRecoveryPassword(event.target.value)} autoComplete="new-password" required /></label>
+                <label><span className="profile-field-heading">Confirm new password <em>Required</em></span><input type="password" value={recoveryConfirmation} onChange={(event) => setRecoveryConfirmation(event.target.value)} autoComplete="new-password" required /></label>
+                {recoveryNotice && <p role="alert" className="performance-save-message">{recoveryNotice}</p>}
+                <div className="profile-form-actions"><button type="submit" className="primary-button" disabled={recoveryBusy}>{recoveryBusy ? "Updating..." : "Update password"}</button></div>
+              </form>
+            )}
+          </section>
+        </div>
+      )}
+    </main>
+  )
+}
+
+export default function App() {
+  const [page, setPage] = useState("home")
+  const [signedIn, setSignedIn] = useState(false)
+  const recoveryLinkOnLoad = () =>
+    window.location.hash.includes("type=recovery") ||
+    new URLSearchParams(window.location.search).get("type") === "recovery"
+  const [passwordRecoveryActive, setPasswordRecoveryActive] = useState(recoveryLinkOnLoad)
+  const [authChecking, setAuthChecking] = useState(true)
+  const registrationLogoutInProgress = useRef(false)
+  const [activities, setActivities] =
+    useState<ActivityItem[]>(initialActivities)
+  const [activeClass, setActiveClass] = useState<ClassItem | null>(null)
+  const [activeOccurrence, setActiveOccurrence] = useState<ClassSchedule | null>(null)
+  const [activeSessionStartedAt, setActiveSessionStartedAt] =
+    useState<number | null>(null)
+  const [minimizedSession, setMinimizedSession] = useState<{
+    item: ClassItem
+    startedAt: number
+  } | null>(null)
+  const [liveSessionPosition, setLiveSessionPosition] = useState({
+    x: 0,
+    y: 0,
+  })
+  const [omrDraftScores, setOmrDraftScores] = useState<Record<string, number>>(
+    {},
+  )
+  const localDateKey = () => {
+    const date = new Date()
+    return [
+      date.getFullYear(),
+      String(date.getMonth() + 1).padStart(2, "0"),
+      String(date.getDate()).padStart(2, "0"),
+    ].join("-")
+  }
+  const [endedClassIds, setEndedClassIds] = useState<string[]>([])
+  const [online, setOnline] = useState(true)
+
+  useEffect(() => {
+    let active = true
+
+    const loadEndedClasses = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        if (active) setEndedClassIds([])
+        return
+      }
+      const { data, error } = await supabase
+        .from("class_session_status")
+        .select("class_id, occurrence_key")
+        .eq("faculty_id", user.id)
+        .eq("session_date", localDateKey())
+        .eq("status", "ended")
+      if (!active) return
+      if (error) {
+        console.error("Unable to synchronize ended classes:", error)
+        return
+      }
+      setEndedClassIds([...(new Set((data ?? []).map((row: any) => `${String(row.class_id)}:${String(row.occurrence_key ?? "legacy")}`)))])
+    }
+
+    void loadEndedClasses()
+    const channel = supabase
+      .channel("class-session-status-cross-device")
+      .on("postgres_changes", { event: "*", schema: "public", table: "class_session_status" }, () => void loadEndedClasses())
+      .subscribe()
+
+    const refreshSessionState = () => void loadEndedClasses()
+    window.addEventListener("focus", refreshSessionState)
+    document.addEventListener("visibilitychange", refreshSessionState)
+    return () => {
+      active = false
+      window.removeEventListener("focus", refreshSessionState)
+      document.removeEventListener("visibilitychange", refreshSessionState)
+      void supabase.removeChannel(channel)
+    }
+  }, [signedIn])
+
+  const endClassAcrossDevices = async (
+    displayedClassId: string,
+    attendanceSessionId: string | null,
+    occurrenceKey: string,
+  ) => {
+    const { data: { user }, error: userError } = await supabase.auth.getUser()
+    if (userError || !user) {
+      showMessage(
+        "Your session expired. Please sign in again.",
+        "error",
+        "Class could not be ended",
+      )
+      return false
+    }
+
+    // The attendance-session UUID and class UUID are different values.
+    // When a mobile NFC attendance session exists, use its class_id as the
+    // authoritative class UUID before writing class_session_status.
+    let realClassId = displayedClassId
+
+    if (attendanceSessionId) {
+      const { data: sessionRow, error: sessionLookupError } = await supabase
+        .from("attendance_sessions")
+        .select("id, class_id")
+        .eq("id", attendanceSessionId)
+        .maybeSingle()
+
+      if (sessionLookupError || !sessionRow?.class_id) {
+        showMessage(
+          sessionLookupError?.message ??
+            "The active attendance session could not be found.",
+          "error",
+          "Class could not be ended",
+        )
+        return false
+      }
+
+      realClassId = String(sessionRow.class_id)
+    }
+
+    // Guard against stale UI data or an accidental attendance-session UUID.
+    const { data: classRow, error: classLookupError } = await supabase
+      .from("classes")
+      .select("id")
+      .eq("id", realClassId)
+      .eq("faculty_id", user.id)
+      .maybeSingle()
+
+    if (classLookupError || !classRow) {
+      showMessage(
+        classLookupError?.message ??
+          "The selected class no longer exists. Refresh the page and open the class again.",
+        "error",
+        "Class could not be ended",
+      )
+      return false
+    }
+
+    const timestamp = new Date().toISOString()
+    const { error } = await supabase
+      .from("class_session_status")
+      .upsert(
+        {
+          class_id: realClassId,
+          faculty_id: user.id,
+          session_date: localDateKey(),
+          occurrence_key: occurrenceKey,
+          status: "ended",
+          ended_at: timestamp,
+          updated_at: timestamp,
+        },
+        { onConflict: "class_id,session_date,occurrence_key" },
+      )
+
+    if (error) {
+      showMessage(
+        `Unable to end class: ${error.message}`,
+        "error",
+        "Class could not be ended",
+      )
+      return false
+    }
+
+    const endedKey = `${realClassId}:${occurrenceKey}`
+    setEndedClassIds((ids) => ids.includes(endedKey) ? ids : [...ids, endedKey])
+    return true
+  }
+
+  const resetSignedInState = () => {
+    setSignedIn(false)
+    setPage("home")
+    setActiveClass(null)
+    setActiveSessionStartedAt(null)
+    setMinimizedSession(null)
+    setOmrDraftScores({})
+  }
+
+  const validateAuthenticatedAccount = async () => {
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser()
+
+    if (error || !user) {
+      await supabase.auth.signOut({ scope: "local" })
+      resetSignedInState()
+      return false
+    }
+
+    const { data: facultyProfile, error: profileError } = await supabase
+      .from("faculty_profiles")
+      .select("id, role")
+      .eq("id", user.id)
+      .maybeSingle()
+
+    if (
+      profileError ||
+      !facultyProfile ||
+      String(facultyProfile.role).toLowerCase() !== "faculty"
+    ) {
+      await supabase.auth.signOut({ scope: "local" })
+      resetSignedInState()
+      return false
+    }
+
+    setSignedIn(true)
+    return true
+  }
+
+  useEffect(() => {
+    let mounted = true
+
+    const checkAccount = async () => {
+      if (recoveryLinkOnLoad()) {
+        setPasswordRecoveryActive(true)
+        setSignedIn(false)
+      } else {
+        await validateAuthenticatedAccount()
+      }
+      if (mounted) setAuthChecking(false)
+    }
+
+    void checkAccount()
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "PASSWORD_RECOVERY") {
+        setPasswordRecoveryActive(true)
+        setSignedIn(false)
+        setAuthChecking(false)
+        return
+      }
+
+      if (registrationLogoutInProgress.current) {
+        if (event === "SIGNED_OUT" || !session?.user) {
+          registrationLogoutInProgress.current = false
+          resetSignedInState()
+          setAuthChecking(false)
+        }
+        return
+      }
+
+      if (event === "SIGNED_OUT" || !session?.user) {
+        resetSignedInState()
+        setAuthChecking(false)
+        return
+      }
+
+      // SIGNED_IN is also emitted by signUp when email confirmation is disabled.
+      // Dashboard access is granted only by the explicit Sign in form callback.
+      if (event === "TOKEN_REFRESHED" || event === "USER_UPDATED") {
+        void validateAuthenticatedAccount()
+      }
+    })
+
+    const handleVisibilityOrFocus = () => {
+      if (document.visibilityState === "visible" && !recoveryLinkOnLoad()) {
+        void validateAuthenticatedAccount()
+      }
+    }
+
+    window.addEventListener("focus", handleVisibilityOrFocus)
+    document.addEventListener("visibilitychange", handleVisibilityOrFocus)
+    const validationTimer = window.setInterval(
+      () => void validateAuthenticatedAccount(),
+      60_000,
+    )
+
+    return () => {
+      mounted = false
+      subscription.unsubscribe()
+      window.removeEventListener("focus", handleVisibilityOrFocus)
+      document.removeEventListener("visibilitychange", handleVisibilityOrFocus)
+      window.clearInterval(validationTimer)
+    }
+  }, [])
+
+  const logout = async () => {
+    await supabase.auth.signOut({ scope: "local" })
+    resetSignedInState()
+  }
+
+  const openClass = (item: ClassItem) => {
+    const isOpeningMinimizedClass =
+      minimizedSession && String(minimizedSession.item.id) === String(item.id)
+
+    if (isOpeningMinimizedClass) {
+      setActiveClass(minimizedSession.item)
+      setActiveOccurrence(currentOccurrenceForClass(minimizedSession.item, new Date()))
+      setActiveSessionStartedAt(minimizedSession.startedAt)
+      setMinimizedSession(null)
+      return
+    }
+
+    const occurrence = currentOccurrenceForClass(item, new Date())
+    if (!occurrence) {
+      showMessage("This class does not have an active schedule at the current time.", "info", "Class is outside its scheduled time")
+      return
+    }
+    setActiveOccurrence(occurrence)
+    setActiveSessionStartedAt(null)
+    setActiveClass(item)
+  }
+
+  const restoreMinimizedSession = () => {
+    if (!minimizedSession) return
+    setActiveClass(minimizedSession.item)
+    setMinimizedSession(null)
+  }
+  const renderPage = () => {
+    if (page === "classes")
+      return (
+        <ClassesPage
+          onStart={openClass}
+  setPage={setPage}
+  endedClassIds={endedClassIds}
+/>
+      )
+    if (page === "records")
+      return <RecordsPage setPage={setPage} omrDraftScores={omrDraftScores} />
+    if (page === "activities")
+      return (
+        <ActivitiesPage
+          setPage={setPage}
+          reminders={activities}
+          setReminders={setActivities}
+        />
+      )
+    if (page === "scanner")
+      return <OmrScanner onClose={() => setPage("home")} />
+    if (page === "profile")
+      return <ProfilePage setPage={setPage} onLogout={logout} />
+    if (page === "notifications") return <NotificationsPage setPage={setPage} />
+    return (
+<Dashboard
+        onStart={openClass}
+  setPage={setPage}
+  endedClassIds={endedClassIds}
+  activities={activities}
+/>
+    )
+  }
+
+  if (authChecking) {
+    return (
+      <div className="auth-checking-screen" role="status" aria-live="polite">
+        <span className="auth-checking-spinner" aria-hidden="true" />
+        <p>Checking your account...</p>
+      </div>
+    )
+  }
+
+  if (passwordRecoveryActive || !signedIn) {
+    return (
+      <LandingPage
+        forcePasswordRecovery={passwordRecoveryActive}
+        onSignIn={() => {
+          setPasswordRecoveryActive(false)
+          setAuthChecking(true)
+          void validateAuthenticatedAccount().finally(() => setAuthChecking(false))
+        }}
+        onRegistrationComplete={() => {
+          registrationLogoutInProgress.current = true
+          resetSignedInState()
+          setAuthChecking(false)
+        }}
+      />
+    )
+  }
+
+  return (
+    <div className="app-shell">
+      <MessageDialogHost />
+      <ToastHost />
+      <Sidebar page={page} setPage={setPage} onLogout={logout} />
+      <main className="main-content">
+        <ConnectionNotice
+          online={online}
+          onToggle={() => setOnline((state) => !state)}
+        />
+        {renderPage()}
+      </main>
+      <BottomNav page={page} setPage={setPage} />
+      {minimizedSession && !activeClass && (
+        <MinimizedSession
+          {...minimizedSession}
+          className="live-session-tray-global"
+          onRestore={restoreMinimizedSession}
+          position={liveSessionPosition}
+          onPositionChange={setLiveSessionPosition}
+        />
+      )}
+      {activeClass && (
+        <ActiveClass
+          item={activeClass}
+          activeOccurrence={activeOccurrence}
+          scheduledToday={Boolean(activeOccurrence)}
+          viewOnly={
+            isCurrentOccurrenceEnded(activeClass, endedClassIds) ||
+            hasSemesterEnded(activeClass)
+          }
+          initialStarted={activeSessionStartedAt !== null}
+          initialStartedAt={activeSessionStartedAt ?? undefined}
+          onClose={() => {
+            setActiveClass(null)
+            setActiveOccurrence(null)
+            setActiveSessionStartedAt(null)
+          }}
+          onEnd={(attendanceSessionId) => {
+            const displayedClassId = String(activeClass.id)
+            const occurrenceNow = new Date()
+            const occurrenceKey = activeOccurrence
+              ? occurrenceKeyForSchedule(activeOccurrence, occurrenceNow)
+              : `${localDateKey()}:manual`
+            void endClassAcrossDevices(
+              displayedClassId,
+              attendanceSessionId,
+              occurrenceKey,
+            ).then((saved) => {
+              if (!saved) return
+              setActiveClass(null)
+              setActiveSessionStartedAt(null)
+              setMinimizedSession(null)
+              showToast("Class ended and synchronized across devices.")
+            })
+          }}
+          onMinimize={(startedAt) => {
+            setMinimizedSession({ item: activeClass, startedAt })
+            setLiveSessionPosition({ x: 0, y: 0 })
+            setActiveSessionStartedAt(startedAt)
+            setActiveClass(null)
+          }}
+        />
+      )}
+    </div>
+  )
+}

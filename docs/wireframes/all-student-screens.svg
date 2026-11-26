@@ -1,0 +1,1480 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="5040" height="7012" viewBox="0 0 5040 7012">
+<g id="home-login" transform="translate(0,0)">
+<rect width="1224" height="1364" rx="8" fill="#868686"/>
+<text x="16" y="26" font-family="Inter, Roboto, Arial, sans-serif" font-size="16" font-weight="600" fill="#FFFFFF">/home-login</text>
+<text x="16" y="52" font-family="Inter, Roboto, Arial, sans-serif" font-size="12" fill="#EDEDED">Tablet · 800 +</text>
+<text x="848" y="52" font-family="Inter, Roboto, Arial, sans-serif" font-size="12" fill="#EDEDED">Mobile · Primary · 1 - 799</text>
+<g id="home-login-tablet" transform="translate(16,64)">
+<clipPath id="clip-home-login-1"><rect width="800" height="1280"/></clipPath>
+<g clip-path="url(#clip-home-login-1)"><rect x="0.0" y="0.0" width="800.0" height="1280.0" fill="#FFFFFF"/>
+<rect x="140.0" y="422.0" width="520.0" height="442.0" fill="#E0E0E0" rx="16"/>
+<rect x="370.0" y="452.0" width="60.0" height="60.0" fill="#FFFFFF" stroke="#9E9E9E" stroke-width="1"/>
+<path d="M370.0 452.0L430.0 512.0 M430.0 452.0L370.0 512.0" fill="none" stroke="#BDBDBD" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="393.0" y="476.0" width="14.0" height="12.0" fill="#FFFFFF" rx="1" stroke="#9E9E9E" stroke-width="1.2"/>
+<circle cx="398.0" cy="480.0" r="1.5" fill="#9E9E9E"/>
+<rect x="326.1" y="526.3" width="147.8" height="15.3" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="292.5" y="556.3" width="215.0" height="8.3" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="170.0" y="586.1" width="80.1" height="7.6" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="170.0" y="602.0" width="460.0" height="46.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="184.0" y="629.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.4" font-weight="400" fill="#9E9E9E" text-anchor="start">Text field</text>
+<rect x="170.0" y="666.1" width="49.3" height="7.6" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="170.0" y="682.0" width="460.0" height="46.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="184.0" y="709.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.4" font-weight="400" fill="#9E9E9E" text-anchor="start">Text field</text>
+<rect x="522.5" y="738.3" width="107.5" height="8.3" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="170.0" y="762.0" width="460.0" height="46.0" fill="#555555"/>
+<text x="400.0" y="790.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="14.6" font-weight="600" fill="#FFFFFF" text-anchor="middle">Button</text>
+<rect x="292.5" y="824.3" width="215.0" height="8.3" fill="#5F5F5F" rx="2" fill-opacity="0.28"/></g></g>
+<g id="home-login-mobile" transform="translate(848,64)">
+<clipPath id="clip-home-login-0"><rect width="360" height="800"/></clipPath>
+<g clip-path="url(#clip-home-login-0)"><rect x="0.0" y="0.0" width="360.0" height="800.0" fill="#FFFFFF"/>
+<rect x="16.0" y="214.0" width="328.0" height="372.0" fill="#E0E0E0" rx="16"/>
+<rect x="154.0" y="232.0" width="52.0" height="52.0" fill="#FFFFFF" stroke="#9E9E9E" stroke-width="1"/>
+<path d="M154.0 232.0L206.0 284.0 M206.0 232.0L154.0 284.0" fill="none" stroke="#BDBDBD" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="173.0" y="252.0" width="14.0" height="12.0" fill="#FFFFFF" rx="1" stroke="#9E9E9E" stroke-width="1.2"/>
+<circle cx="178.0" cy="256.0" r="1.5" fill="#9E9E9E"/>
+<rect x="114.0" y="300.2" width="132.0" height="13.6" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="84.0" y="329.4" width="192.0" height="7.4" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="34.0" y="359.1" width="71.5" height="6.8" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="34.0" y="374.0" width="292.0" height="34.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="48.0" y="395.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="12.0" font-weight="400" fill="#9E9E9E" text-anchor="start">Text field</text>
+<rect x="34.0" y="423.1" width="44.0" height="6.8" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="34.0" y="438.0" width="292.0" height="34.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="48.0" y="459.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="12.0" font-weight="400" fill="#9E9E9E" text-anchor="start">Text field</text>
+<rect x="230.0" y="483.4" width="96.0" height="7.4" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="34.0" y="506.0" width="292.0" height="36.0" fill="#555555"/>
+<text x="180.0" y="529.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.0" font-weight="600" fill="#FFFFFF" text-anchor="middle">Button</text>
+<rect x="84.0" y="559.4" width="192.0" height="7.4" fill="#5F5F5F" rx="2" fill-opacity="0.28"/></g></g>
+</g>
+<g id="studentregister" transform="translate(1272,0)">
+<rect width="1224" height="1364" rx="8" fill="#868686"/>
+<text x="16" y="26" font-family="Inter, Roboto, Arial, sans-serif" font-size="16" font-weight="600" fill="#FFFFFF">/studentregister</text>
+<text x="16" y="52" font-family="Inter, Roboto, Arial, sans-serif" font-size="12" fill="#EDEDED">Tablet · 800 +</text>
+<text x="848" y="52" font-family="Inter, Roboto, Arial, sans-serif" font-size="12" fill="#EDEDED">Mobile · Primary · 1 - 799</text>
+<g id="studentregister-tablet" transform="translate(16,64)">
+<clipPath id="clip-studentregister-1"><rect width="800" height="1280"/></clipPath>
+<g clip-path="url(#clip-studentregister-1)"><rect x="0.0" y="0.0" width="800.0" height="1280.0" fill="#FFFFFF"/>
+<rect x="120.0" y="38.0" width="560.0" height="783.2" fill="#E0E0E0" rx="16"/>
+<rect x="374.0" y="68.0" width="52.0" height="52.0" fill="#FFFFFF" stroke="#9E9E9E" stroke-width="1"/>
+<path d="M374.0 68.0L426.0 120.0 M426.0 68.0L374.0 120.0" fill="none" stroke="#BDBDBD" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="393.0" y="88.0" width="14.0" height="12.0" fill="#FFFFFF" rx="1" stroke="#9E9E9E" stroke-width="1.2"/>
+<circle cx="398.0" cy="92.0" r="1.5" fill="#9E9E9E"/>
+<rect x="317.7" y="127.1" width="164.6" height="14.6" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="265.6" y="154.3" width="268.8" height="8.3" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="150.0" y="176.1" width="30.8" height="7.6" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="150.0" y="192.0" width="500.0" height="46.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="164.0" y="219.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.4" font-weight="400" fill="#9E9E9E" text-anchor="start">Text field</text>
+<rect x="150.0" y="252.9" width="55.4" height="7.6" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="150.0" y="268.8" width="500.0" height="46.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="164.0" y="295.8" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.4" font-weight="400" fill="#9E9E9E" text-anchor="start">Text field</text>
+<rect x="150.0" y="329.7" width="61.6" height="7.6" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="150.0" y="345.6" width="500.0" height="46.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="164.0" y="372.6" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.4" font-weight="400" fill="#9E9E9E" text-anchor="start">Text field</text>
+<rect x="150.0" y="406.5" width="43.1" height="7.6" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="150.0" y="422.4" width="500.0" height="46.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="164.0" y="449.4" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.4" font-weight="400" fill="#9E9E9E" text-anchor="start">Text field</text>
+<rect x="150.0" y="483.3" width="37.0" height="7.6" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="150.0" y="499.2" width="500.0" height="46.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="164.0" y="526.2" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.4" font-weight="400" fill="#9E9E9E" text-anchor="start">Dropdown</text>
+<text x="632.0" y="526.2" font-family="Inter, Roboto, Arial, sans-serif" font-size="10.0" font-weight="400" fill="#1A1A1A" text-anchor="middle">v</text>
+<rect x="150.0" y="560.1" width="49.3" height="7.6" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="150.0" y="576.0" width="500.0" height="46.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="164.0" y="603.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.4" font-weight="400" fill="#9E9E9E" text-anchor="start">Text field</text>
+<rect x="150.0" y="636.9" width="98.6" height="7.6" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="150.0" y="652.8" width="500.0" height="46.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="164.0" y="679.8" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.4" font-weight="400" fill="#9E9E9E" text-anchor="start">Text field</text>
+<rect x="150.0" y="721.2" width="500.0" height="46.0" fill="#555555"/>
+<text x="400.0" y="749.2" font-family="Inter, Roboto, Arial, sans-serif" font-size="14.6" font-weight="600" fill="#FFFFFF" text-anchor="middle">Button</text>
+<rect x="292.5" y="781.5" width="215.0" height="8.3" fill="#5F5F5F" rx="2" fill-opacity="0.28"/></g></g>
+<g id="studentregister-mobile" transform="translate(848,64)">
+<clipPath id="clip-studentregister-0"><rect width="360" height="800"/></clipPath>
+<g clip-path="url(#clip-studentregister-0)"><rect x="0.0" y="0.0" width="360.0" height="800.0" fill="#FFFFFF"/>
+<rect x="12.0" y="26.0" width="336.0" height="591.6" fill="#E0E0E0" rx="16"/>
+<rect x="154.0" y="42.0" width="52.0" height="52.0" fill="#FFFFFF" stroke="#9E9E9E" stroke-width="1"/>
+<path d="M154.0 42.0L206.0 94.0 M206.0 42.0L154.0 94.0" fill="none" stroke="#BDBDBD" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="173.0" y="62.0" width="14.0" height="12.0" fill="#FFFFFF" rx="1" stroke="#9E9E9E" stroke-width="1.2"/>
+<circle cx="178.0" cy="66.0" r="1.5" fill="#9E9E9E"/>
+<rect x="106.5" y="102.9" width="147.0" height="13.0" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="60.0" y="129.4" width="240.0" height="7.4" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="28.0" y="151.1" width="27.5" height="6.8" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="28.0" y="166.0" width="304.0" height="30.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="42.0" y="185.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="12.0" font-weight="400" fill="#9E9E9E" text-anchor="start">Text field</text>
+<rect x="28.0" y="206.3" width="49.5" height="6.8" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="28.0" y="221.2" width="304.0" height="30.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="42.0" y="240.2" font-family="Inter, Roboto, Arial, sans-serif" font-size="12.0" font-weight="400" fill="#9E9E9E" text-anchor="start">Text field</text>
+<rect x="28.0" y="261.5" width="55.0" height="6.8" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="28.0" y="276.4" width="304.0" height="30.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="42.0" y="295.4" font-family="Inter, Roboto, Arial, sans-serif" font-size="12.0" font-weight="400" fill="#9E9E9E" text-anchor="start">Text field</text>
+<rect x="28.0" y="316.7" width="38.5" height="6.8" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="28.0" y="331.6" width="304.0" height="30.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="42.0" y="350.6" font-family="Inter, Roboto, Arial, sans-serif" font-size="12.0" font-weight="400" fill="#9E9E9E" text-anchor="start">Text field</text>
+<rect x="28.0" y="371.9" width="33.0" height="6.8" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="28.0" y="386.8" width="304.0" height="30.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="42.0" y="405.8" font-family="Inter, Roboto, Arial, sans-serif" font-size="12.0" font-weight="400" fill="#9E9E9E" text-anchor="start">Dropdown</text>
+<text x="314.0" y="405.8" font-family="Inter, Roboto, Arial, sans-serif" font-size="10.0" font-weight="400" fill="#1A1A1A" text-anchor="middle">v</text>
+<rect x="28.0" y="427.1" width="44.0" height="6.8" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="28.0" y="442.0" width="304.0" height="30.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="42.0" y="461.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="12.0" font-weight="400" fill="#9E9E9E" text-anchor="start">Text field</text>
+<rect x="28.0" y="482.3" width="88.0" height="6.8" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="28.0" y="497.2" width="304.0" height="30.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="42.0" y="516.2" font-family="Inter, Roboto, Arial, sans-serif" font-size="12.0" font-weight="400" fill="#9E9E9E" text-anchor="start">Text field</text>
+<rect x="28.0" y="541.6" width="304.0" height="36.0" fill="#555555"/>
+<text x="180.0" y="564.6" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.0" font-weight="600" fill="#FFFFFF" text-anchor="middle">Button</text>
+<rect x="84.0" y="593.0" width="192.0" height="7.4" fill="#5F5F5F" rx="2" fill-opacity="0.28"/></g></g>
+</g>
+<g id="studentprofiles" transform="translate(2544,0)">
+<rect width="1224" height="1364" rx="8" fill="#868686"/>
+<text x="16" y="26" font-family="Inter, Roboto, Arial, sans-serif" font-size="16" font-weight="600" fill="#FFFFFF">/studentprofiles</text>
+<text x="16" y="52" font-family="Inter, Roboto, Arial, sans-serif" font-size="12" fill="#EDEDED">Tablet · 800 +</text>
+<text x="848" y="52" font-family="Inter, Roboto, Arial, sans-serif" font-size="12" fill="#EDEDED">Mobile · Primary · 1 - 799</text>
+<g id="studentprofiles-tablet" transform="translate(16,64)">
+<clipPath id="clip-studentprofiles-1"><rect width="800" height="1280"/></clipPath>
+<g clip-path="url(#clip-studentprofiles-1)"><rect x="0.0" y="0.0" width="800.0" height="1280.0" fill="#FFFFFF"/>
+<text x="35.0" y="50.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="24.6" font-weight="700" fill="#1A1A1A" text-anchor="start">Title</text>
+<rect x="35.0" y="62.3" width="235.2" height="8.3" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="35.0" y="90.0" width="730.0" height="170.0" fill="#E0E0E0" rx="14"/>
+<circle cx="400.0" cy="150.0" r="40.0" fill="#FFFFFF" stroke="#9E9E9E" stroke-width="1.2"/>
+<rect x="378.0" y="128.0" width="44.0" height="44.0" fill="#FFFFFF" stroke="#9E9E9E" stroke-width="1"/>
+<path d="M378.0 128.0L422.0 172.0 M422.0 128.0L378.0 172.0" fill="none" stroke="#BDBDBD" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="393.0" y="144.0" width="14.0" height="12.0" fill="#FFFFFF" rx="1" stroke="#9E9E9E" stroke-width="1.2"/>
+<circle cx="398.0" cy="148.0" r="1.5" fill="#9E9E9E"/>
+<circle cx="428.8" cy="178.8" r="11.0" fill="#555555"/>
+<rect x="422.8" y="174.8" width="12.0" height="8.0" fill="none" rx="2" stroke="#FFFFFF" stroke-width="1.4"/>
+<rect x="341.2" y="201.9" width="117.6" height="10.4" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="323.6" y="221.5" width="152.9" height="7.3" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="35.0" y="274.0" width="730.0" height="587.8" fill="#E0E0E0" rx="14"/>
+<rect x="55.0" y="295.9" width="159.6" height="10.4" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="55.0" y="320.1" width="30.8" height="7.6" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="55.0" y="336.0" width="690.0" height="46.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="69.0" y="363.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.4" font-weight="400" fill="#9E9E9E" text-anchor="start">Text field</text>
+<rect x="55.0" y="396.9" width="24.6" height="7.6" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="55.0" y="412.8" width="690.0" height="46.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="69.0" y="439.8" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.4" font-weight="400" fill="#9E9E9E" text-anchor="start">Text field</text>
+<rect x="55.0" y="473.7" width="61.6" height="7.6" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="55.0" y="489.6" width="690.0" height="46.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="69.0" y="516.6" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.4" font-weight="400" fill="#9E9E9E" text-anchor="start">Text field</text>
+<rect x="55.0" y="550.5" width="43.1" height="7.6" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="55.0" y="566.4" width="690.0" height="46.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="69.0" y="593.4" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.4" font-weight="400" fill="#9E9E9E" text-anchor="start">Text field</text>
+<rect x="55.0" y="627.3" width="37.0" height="7.6" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="55.0" y="643.2" width="690.0" height="46.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="69.0" y="670.2" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.4" font-weight="400" fill="#9E9E9E" text-anchor="start">Dropdown</text>
+<text x="727.0" y="670.2" font-family="Inter, Roboto, Arial, sans-serif" font-size="10.0" font-weight="400" fill="#1A1A1A" text-anchor="middle">v</text>
+<rect x="55.0" y="707.5" width="67.2" height="8.3" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="55.0" y="723.2" width="345.0" height="44.0" fill="#555555"/>
+<text x="227.5" y="750.2" font-family="Inter, Roboto, Arial, sans-serif" font-size="14.6" font-weight="600" fill="#FFFFFF" text-anchor="middle">Tab</text>
+<rect x="400.0" y="723.2" width="345.0" height="44.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="572.5" y="750.2" font-family="Inter, Roboto, Arial, sans-serif" font-size="14.6" font-weight="500" fill="#1A1A1A" text-anchor="middle">Tab</text>
+<rect x="55.0" y="776.1" width="649.6" height="6.9" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="55.0" y="795.8" width="340.0" height="46.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="225.0" y="823.8" font-family="Inter, Roboto, Arial, sans-serif" font-size="14.6" font-weight="600" fill="#1A1A1A" text-anchor="middle">Button</text>
+<rect x="405.0" y="795.8" width="340.0" height="46.0" fill="#555555"/>
+<text x="575.0" y="823.8" font-family="Inter, Roboto, Arial, sans-serif" font-size="14.6" font-weight="600" fill="#FFFFFF" text-anchor="middle">Button</text></g></g>
+<g id="studentprofiles-mobile" transform="translate(848,64)">
+<clipPath id="clip-studentprofiles-0"><rect width="360" height="800"/></clipPath>
+<g clip-path="url(#clip-studentprofiles-0)"><rect x="0.0" y="0.0" width="360.0" height="800.0" fill="#FFFFFF"/>
+<text x="16.0" y="46.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="22.0" font-weight="700" fill="#1A1A1A" text-anchor="start">Title</text>
+<rect x="16.0" y="59.4" width="210.0" height="7.4" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="16.0" y="82.0" width="328.0" height="132.0" fill="#E0E0E0" rx="14"/>
+<circle cx="180.0" cy="126.0" r="32.0" fill="#FFFFFF" stroke="#9E9E9E" stroke-width="1.2"/>
+<rect x="162.4" y="108.4" width="35.2" height="35.2" fill="#FFFFFF" stroke="#9E9E9E" stroke-width="1"/>
+<path d="M162.4 108.4L197.6 143.6 M197.6 108.4L162.4 143.6" fill="none" stroke="#BDBDBD" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="173.0" y="120.0" width="14.0" height="12.0" fill="#FFFFFF" rx="1" stroke="#9E9E9E" stroke-width="1.2"/>
+<circle cx="178.0" cy="124.0" r="1.5" fill="#9E9E9E"/>
+<circle cx="203.0" cy="149.0" r="11.0" fill="#555555"/>
+<rect x="197.0" y="145.0" width="12.0" height="8.0" fill="none" rx="2" stroke="#FFFFFF" stroke-width="1.4"/>
+<rect x="127.5" y="171.2" width="105.0" height="9.3" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="111.8" y="190.4" width="136.5" height="6.5" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="16.0" y="224.0" width="328.0" height="446.3" fill="#E0E0E0" rx="14"/>
+<rect x="28.0" y="239.2" width="142.5" height="9.3" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="28.0" y="263.1" width="27.5" height="6.8" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="28.0" y="278.0" width="304.0" height="28.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="42.0" y="296.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="12.0" font-weight="400" fill="#9E9E9E" text-anchor="start">Text field</text>
+<rect x="28.0" y="313.3" width="22.0" height="6.8" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="28.0" y="328.2" width="304.0" height="28.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="42.0" y="346.2" font-family="Inter, Roboto, Arial, sans-serif" font-size="12.0" font-weight="400" fill="#9E9E9E" text-anchor="start">Text field</text>
+<rect x="28.0" y="363.5" width="55.0" height="6.8" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="28.0" y="378.4" width="304.0" height="28.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="42.0" y="396.4" font-family="Inter, Roboto, Arial, sans-serif" font-size="12.0" font-weight="400" fill="#9E9E9E" text-anchor="start">Text field</text>
+<rect x="28.0" y="413.7" width="38.5" height="6.8" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="28.0" y="428.6" width="304.0" height="28.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="42.0" y="446.6" font-family="Inter, Roboto, Arial, sans-serif" font-size="12.0" font-weight="400" fill="#9E9E9E" text-anchor="start">Text field</text>
+<rect x="28.0" y="463.9" width="33.0" height="6.8" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="28.0" y="478.8" width="304.0" height="28.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="42.0" y="496.8" font-family="Inter, Roboto, Arial, sans-serif" font-size="12.0" font-weight="400" fill="#9E9E9E" text-anchor="start">Dropdown</text>
+<text x="314.0" y="496.8" font-family="Inter, Roboto, Arial, sans-serif" font-size="10.0" font-weight="400" fill="#1A1A1A" text-anchor="middle">v</text>
+<rect x="28.0" y="517.4" width="60.0" height="7.4" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="28.0" y="532.0" width="152.0" height="36.0" fill="#555555"/>
+<text x="104.0" y="555.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.0" font-weight="600" fill="#FFFFFF" text-anchor="middle">Tab</text>
+<rect x="180.0" y="532.0" width="152.0" height="36.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="256.0" y="555.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.0" font-weight="500" fill="#1A1A1A" text-anchor="middle">Tab</text>
+<rect x="28.0" y="577.8" width="280.0" height="6.2" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="28.0" y="592.3" width="265.0" height="6.2" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="28.0" y="606.8" width="25.0" height="6.2" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="28.0" y="622.3" width="147.0" height="36.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="101.5" y="645.3" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.0" font-weight="600" fill="#1A1A1A" text-anchor="middle">Button</text>
+<rect x="185.0" y="622.3" width="147.0" height="36.0" fill="#555555"/>
+<text x="258.5" y="645.3" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.0" font-weight="600" fill="#FFFFFF" text-anchor="middle">Button</text></g></g>
+</g>
+<g id="student-homeoverview" transform="translate(3816,0)">
+<rect width="1224" height="1364" rx="8" fill="#868686"/>
+<text x="16" y="26" font-family="Inter, Roboto, Arial, sans-serif" font-size="16" font-weight="600" fill="#FFFFFF">/student-homeoverview</text>
+<text x="16" y="52" font-family="Inter, Roboto, Arial, sans-serif" font-size="12" fill="#EDEDED">Tablet · 800 +</text>
+<text x="848" y="52" font-family="Inter, Roboto, Arial, sans-serif" font-size="12" fill="#EDEDED">Mobile · Primary · 1 - 799</text>
+<g id="student-homeoverview-tablet" transform="translate(16,64)">
+<clipPath id="clip-student-homeoverview-1"><rect width="800" height="1280"/></clipPath>
+<g clip-path="url(#clip-student-homeoverview-1)"><rect x="0.0" y="0.0" width="800.0" height="1280.0" fill="#FFFFFF"/>
+<text x="35.0" y="44.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="14.0" font-weight="600" fill="#1A1A1A" text-anchor="start">Title</text>
+<rect x="35.0" y="72.1" width="43.1" height="7.6" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="35.0" y="88.0" width="730.0" height="46.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="49.0" y="115.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.4" font-weight="400" fill="#9E9E9E" text-anchor="start">Dropdown</text>
+<text x="747.0" y="115.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="10.0" font-weight="400" fill="#1A1A1A" text-anchor="middle">v</text>
+<rect x="35.0" y="150.0" width="356.0" height="190.0" fill="#E0E0E0"/>
+<text x="49.0" y="178.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="12.0" font-weight="600" fill="#1A1A1A" text-anchor="start">Card</text>
+<rect x="49.0" y="244.4" width="44.0" height="13.6" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="49.0" y="316.8" width="60.0" height="6.2" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="409.0" y="150.0" width="356.0" height="190.0" fill="#E0E0E0"/>
+<text x="423.0" y="178.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="12.0" font-weight="600" fill="#1A1A1A" text-anchor="start">Card</text>
+<rect x="423.0" y="244.4" width="44.0" height="13.6" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="423.0" y="316.8" width="100.0" height="6.2" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="35.0" y="356.0" width="730.0" height="34.0" fill="#BDBDBD"/>
+<text x="47.0" y="377.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.4" font-weight="700" fill="#1A1A1A" text-anchor="start">Section header</text>
+<rect x="744.2" y="368.2" width="9.6" height="9.6" fill="none" rx="3" stroke="#9E9E9E" stroke-width="1.2"/>
+<rect x="35.0" y="394.0" width="730.0" height="74.0" fill="#E0E0E0"/>
+<rect x="49.0" y="405.5" width="43.7" height="9.0" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="49.0" y="425.1" width="98.6" height="7.6" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="49.0" y="441.1" width="92.4" height="7.6" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="35.0" y="472.0" width="730.0" height="74.0" fill="#E0E0E0"/>
+<rect x="49.0" y="483.5" width="72.8" height="9.0" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="49.0" y="503.1" width="98.6" height="7.6" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="49.0" y="519.1" width="117.0" height="7.6" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="35.0" y="569.2" width="360.0" height="46.0" fill="#555555"/>
+<text x="215.0" y="597.2" font-family="Inter, Roboto, Arial, sans-serif" font-size="14.6" font-weight="600" fill="#FFFFFF" text-anchor="middle">Button</text>
+<rect x="405.0" y="569.2" width="360.0" height="46.0" fill="#555555"/>
+<text x="585.0" y="597.2" font-family="Inter, Roboto, Arial, sans-serif" font-size="14.6" font-weight="600" fill="#FFFFFF" text-anchor="middle">Button</text>
+<rect x="35.0" y="628.0" width="730.0" height="46.0" fill="#555555"/>
+<text x="400.0" y="656.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="14.6" font-weight="600" fill="#FFFFFF" text-anchor="middle">Button</text></g></g>
+<g id="student-homeoverview-mobile" transform="translate(848,64)">
+<clipPath id="clip-student-homeoverview-0"><rect width="360" height="800"/></clipPath>
+<g clip-path="url(#clip-student-homeoverview-0)"><rect x="0.0" y="0.0" width="360.0" height="800.0" fill="#FFFFFF"/>
+<text x="16.0" y="38.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="14.0" font-weight="600" fill="#1A1A1A" text-anchor="start">Title</text>
+<rect x="16.0" y="57.1" width="38.5" height="6.8" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="16.0" y="72.0" width="328.0" height="34.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="30.0" y="93.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="12.0" font-weight="400" fill="#9E9E9E" text-anchor="start">Dropdown</text>
+<text x="326.0" y="93.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="10.0" font-weight="400" fill="#1A1A1A" text-anchor="middle">v</text>
+<rect x="16.0" y="118.0" width="160.0" height="112.0" fill="#E0E0E0"/>
+<text x="30.0" y="146.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="12.0" font-weight="600" fill="#1A1A1A" text-anchor="start">Card</text>
+<rect x="30.0" y="167.1" width="44.0" height="13.6" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="30.0" y="206.8" width="60.0" height="6.2" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="184.0" y="118.0" width="160.0" height="112.0" fill="#E0E0E0"/>
+<text x="198.0" y="146.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="12.0" font-weight="600" fill="#1A1A1A" text-anchor="start">Card</text>
+<rect x="198.0" y="167.1" width="44.0" height="13.6" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="198.0" y="206.8" width="100.0" height="6.2" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="16.0" y="246.0" width="328.0" height="26.0" fill="#BDBDBD"/>
+<text x="28.0" y="263.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="12.0" font-weight="700" fill="#1A1A1A" text-anchor="start">Section header</text>
+<rect x="323.2" y="254.2" width="9.6" height="9.6" fill="none" rx="3" stroke="#9E9E9E" stroke-width="1.2"/>
+<rect x="16.0" y="276.0" width="328.0" height="60.0" fill="#E0E0E0"/>
+<rect x="30.0" y="288.6" width="39.0" height="8.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="30.0" y="308.1" width="88.0" height="6.8" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="30.0" y="324.1" width="82.5" height="6.8" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="16.0" y="340.0" width="328.0" height="60.0" fill="#E0E0E0"/>
+<rect x="30.0" y="352.6" width="65.0" height="8.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="30.0" y="372.1" width="88.0" height="6.8" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="30.0" y="388.1" width="104.5" height="6.8" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="16.0" y="418.4" width="159.0" height="36.0" fill="#555555"/>
+<text x="95.5" y="441.4" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.0" font-weight="600" fill="#FFFFFF" text-anchor="middle">Button</text>
+<rect x="185.0" y="418.4" width="159.0" height="36.0" fill="#555555"/>
+<text x="264.5" y="441.4" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.0" font-weight="600" fill="#FFFFFF" text-anchor="middle">Button</text>
+<rect x="16.0" y="464.0" width="328.0" height="36.0" fill="#555555"/>
+<text x="180.0" y="487.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.0" font-weight="600" fill="#FFFFFF" text-anchor="middle">Button</text></g></g>
+</g>
+<g id="student-attendance" transform="translate(0,1412)">
+<rect width="1224" height="1364" rx="8" fill="#868686"/>
+<text x="16" y="26" font-family="Inter, Roboto, Arial, sans-serif" font-size="16" font-weight="600" fill="#FFFFFF">/student-attendance</text>
+<text x="16" y="52" font-family="Inter, Roboto, Arial, sans-serif" font-size="12" fill="#EDEDED">Tablet · 800 +</text>
+<text x="848" y="52" font-family="Inter, Roboto, Arial, sans-serif" font-size="12" fill="#EDEDED">Mobile · Primary · 1 - 799</text>
+<g id="student-attendance-tablet" transform="translate(16,64)">
+<clipPath id="clip-student-attendance-1"><rect width="800" height="1280"/></clipPath>
+<g clip-path="url(#clip-student-attendance-1)"><rect x="0.0" y="0.0" width="800.0" height="1280.0" fill="#FFFFFF"/>
+<text x="35.0" y="50.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="24.6" font-weight="700" fill="#1A1A1A" text-anchor="start">Title</text>
+<rect x="35.0" y="62.3" width="235.2" height="8.3" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="35.0" y="90.0" width="730.0" height="34.0" fill="#BDBDBD"/>
+<text x="47.0" y="111.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.4" font-weight="700" fill="#1A1A1A" text-anchor="start">Section header</text>
+<rect x="35.0" y="128.0" width="730.0" height="40.0" fill="#BDBDBD"/>
+<text x="45.0" y="152.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="12.3" font-weight="700" fill="#1A1A1A" text-anchor="start">Table</text>
+<rect x="35.0" y="169.0" width="730.0" height="40.0" fill="#E0E0E0"/>
+<rect x="35.0" y="210.0" width="730.0" height="40.0" fill="#E0E0E0"/>
+<rect x="35.0" y="251.0" width="730.0" height="40.0" fill="#E0E0E0"/>
+<path d="M295.7142857142857 128V291" fill="none" stroke="#FFFFFF" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M556.4285714285714 128V291" fill="none" stroke="#FFFFFF" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="35.0" y="312.3" width="43.1" height="7.6" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="35.0" y="328.2" width="730.0" height="46.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="49.0" y="355.2" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.4" font-weight="400" fill="#9E9E9E" text-anchor="start">Dropdown</text>
+<text x="747.0" y="355.2" font-family="Inter, Roboto, Arial, sans-serif" font-size="10.0" font-weight="400" fill="#1A1A1A" text-anchor="middle">v</text>
+<rect x="35.0" y="393.4" width="730.0" height="34.0" fill="#BDBDBD"/>
+<text x="47.0" y="414.4" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.4" font-weight="700" fill="#1A1A1A" text-anchor="start">Section header</text>
+<rect x="35.0" y="431.4" width="730.0" height="40.0" fill="#BDBDBD"/>
+<text x="45.0" y="455.4" font-family="Inter, Roboto, Arial, sans-serif" font-size="12.3" font-weight="700" fill="#1A1A1A" text-anchor="start">Table</text>
+<rect x="35.0" y="472.4" width="730.0" height="40.0" fill="#E0E0E0"/>
+<rect x="35.0" y="513.4" width="730.0" height="40.0" fill="#E0E0E0"/>
+<rect x="35.0" y="554.4" width="730.0" height="40.0" fill="#E0E0E0"/>
+<path d="M400.0 431.4V594.4" fill="none" stroke="#FFFFFF" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="35.0" y="613.6" width="360.0" height="46.0" fill="#555555"/>
+<text x="215.0" y="641.6" font-family="Inter, Roboto, Arial, sans-serif" font-size="14.6" font-weight="600" fill="#FFFFFF" text-anchor="middle">Button</text>
+<rect x="405.0" y="613.6" width="360.0" height="46.0" fill="#555555"/>
+<text x="585.0" y="641.6" font-family="Inter, Roboto, Arial, sans-serif" font-size="14.6" font-weight="600" fill="#FFFFFF" text-anchor="middle">Button</text>
+<rect x="35.0" y="672.4" width="730.0" height="46.0" fill="#555555"/>
+<text x="400.0" y="700.4" font-family="Inter, Roboto, Arial, sans-serif" font-size="14.6" font-weight="600" fill="#FFFFFF" text-anchor="middle">Button</text></g></g>
+<g id="student-attendance-mobile" transform="translate(848,64)">
+<clipPath id="clip-student-attendance-0"><rect width="360" height="800"/></clipPath>
+<g clip-path="url(#clip-student-attendance-0)"><rect x="0.0" y="0.0" width="360.0" height="800.0" fill="#FFFFFF"/>
+<text x="16.0" y="46.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="22.0" font-weight="700" fill="#1A1A1A" text-anchor="start">Title</text>
+<rect x="16.0" y="59.4" width="210.0" height="7.4" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="16.0" y="82.0" width="328.0" height="26.0" fill="#BDBDBD"/>
+<text x="28.0" y="99.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="12.0" font-weight="700" fill="#1A1A1A" text-anchor="start">Section header</text>
+<rect x="16.0" y="112.0" width="328.0" height="30.0" fill="#BDBDBD"/>
+<text x="26.0" y="131.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="11.0" font-weight="700" fill="#1A1A1A" text-anchor="start">Table</text>
+<rect x="16.0" y="143.0" width="328.0" height="30.0" fill="#E0E0E0"/>
+<rect x="16.0" y="174.0" width="328.0" height="30.0" fill="#E0E0E0"/>
+<rect x="16.0" y="205.0" width="328.0" height="30.0" fill="#E0E0E0"/>
+<path d="M133.14285714285717 112V235" fill="none" stroke="#FFFFFF" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M250.28571428571433 112V235" fill="none" stroke="#FFFFFF" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="16.0" y="252.5" width="38.5" height="6.8" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="16.0" y="267.4" width="328.0" height="34.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="30.0" y="288.4" font-family="Inter, Roboto, Arial, sans-serif" font-size="12.0" font-weight="400" fill="#9E9E9E" text-anchor="start">Dropdown</text>
+<text x="326.0" y="288.4" font-family="Inter, Roboto, Arial, sans-serif" font-size="10.0" font-weight="400" fill="#1A1A1A" text-anchor="middle">v</text>
+<rect x="16.0" y="315.8" width="328.0" height="26.0" fill="#BDBDBD"/>
+<text x="28.0" y="332.8" font-family="Inter, Roboto, Arial, sans-serif" font-size="12.0" font-weight="700" fill="#1A1A1A" text-anchor="start">Section header</text>
+<rect x="16.0" y="345.8" width="328.0" height="30.0" fill="#BDBDBD"/>
+<text x="26.0" y="364.8" font-family="Inter, Roboto, Arial, sans-serif" font-size="11.0" font-weight="700" fill="#1A1A1A" text-anchor="start">Table</text>
+<rect x="16.0" y="376.8" width="328.0" height="30.0" fill="#E0E0E0"/>
+<rect x="16.0" y="407.8" width="328.0" height="30.0" fill="#E0E0E0"/>
+<rect x="16.0" y="438.8" width="328.0" height="30.0" fill="#E0E0E0"/>
+<path d="M180.0 345.79999999999995V468.79999999999995" fill="none" stroke="#FFFFFF" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="16.0" y="483.2" width="159.0" height="36.0" fill="#555555"/>
+<text x="95.5" y="506.2" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.0" font-weight="600" fill="#FFFFFF" text-anchor="middle">Button</text>
+<rect x="185.0" y="483.2" width="159.0" height="36.0" fill="#555555"/>
+<text x="264.5" y="506.2" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.0" font-weight="600" fill="#FFFFFF" text-anchor="middle">Button</text>
+<rect x="16.0" y="528.8" width="328.0" height="36.0" fill="#555555"/>
+<text x="180.0" y="551.8" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.0" font-weight="600" fill="#FFFFFF" text-anchor="middle">Button</text></g></g>
+</g>
+<g id="student-scoresgrades" transform="translate(1272,1412)">
+<rect width="1224" height="1364" rx="8" fill="#868686"/>
+<text x="16" y="26" font-family="Inter, Roboto, Arial, sans-serif" font-size="16" font-weight="600" fill="#FFFFFF">/student-scoresgrades</text>
+<text x="16" y="52" font-family="Inter, Roboto, Arial, sans-serif" font-size="12" fill="#EDEDED">Tablet · 800 +</text>
+<text x="848" y="52" font-family="Inter, Roboto, Arial, sans-serif" font-size="12" fill="#EDEDED">Mobile · Primary · 1 - 799</text>
+<g id="student-scoresgrades-tablet" transform="translate(16,64)">
+<clipPath id="clip-student-scoresgrades-1"><rect width="800" height="1280"/></clipPath>
+<g clip-path="url(#clip-student-scoresgrades-1)"><rect x="0.0" y="0.0" width="800.0" height="1280.0" fill="#FFFFFF"/>
+<text x="35.0" y="50.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="24.6" font-weight="700" fill="#1A1A1A" text-anchor="start">Title</text>
+<rect x="35.0" y="62.3" width="241.9" height="8.3" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="35.0" y="92.1" width="43.1" height="7.6" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="35.0" y="108.0" width="730.0" height="46.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="49.0" y="135.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.4" font-weight="400" fill="#9E9E9E" text-anchor="start">Dropdown</text>
+<text x="747.0" y="135.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="10.0" font-weight="400" fill="#1A1A1A" text-anchor="middle">v</text>
+<rect x="35.0" y="163.1" width="283.4" height="7.6" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="35.0" y="184.0" width="730.0" height="300.0" fill="#E0E0E0" rx="14"/>
+<rect x="57.0" y="207.9" width="128.8" height="6.9" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="732.2" y="207.2" width="9.6" height="9.6" fill="none" rx="3" stroke="#9E9E9E" stroke-width="1.2"/>
+<rect x="57.0" y="232.6" width="57.1" height="23.6" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="57.0" y="276.0" width="686.0" height="32.0" fill="#FFFFFF" stroke="#9E9E9E" stroke-width="1"/>
+<rect x="235.4" y="287.5" width="329.3" height="7.3" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<path d="M57 322H743" fill="none" stroke="#9E9E9E" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="57.0" y="336.3" width="53.2" height="6.6" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="57.0" y="354.3" width="67.2" height="8.3" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="400.0" y="336.3" width="101.1" height="6.6" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="400.0" y="354.3" width="107.5" height="8.3" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<path d="M35 448H765" fill="none" stroke="#9E9E9E" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="57.0" y="461.1" width="301.8" height="7.6" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="35.0" y="500.0" width="730.0" height="52.0" fill="#555555" rx="12"/>
+<text x="51.0" y="531.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="16.8" font-weight="700" fill="#FFFFFF" text-anchor="start">Expandable section</text>
+<rect x="695.8" y="518.9" width="25.2" height="10.4" fill="#FFFFFF" rx="2" fill-opacity="0.28"/>
+<path d="M735 523.0L741 529.0L747 523.0" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="35.0" y="568.0" width="730.0" height="52.0" fill="#555555" rx="12"/>
+<text x="51.0" y="599.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="16.8" font-weight="700" fill="#FFFFFF" text-anchor="start">Expandable section</text>
+<rect x="695.8" y="586.9" width="25.2" height="10.4" fill="#FFFFFF" rx="2" fill-opacity="0.28"/>
+<path d="M735 591.0L741 597.0L747 591.0" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="224.4" y="641.5" width="351.1" height="7.6" fill="#5F5F5F" rx="2" fill-opacity="0.28"/></g></g>
+<g id="student-scoresgrades-mobile" transform="translate(848,64)">
+<clipPath id="clip-student-scoresgrades-0"><rect width="360" height="800"/></clipPath>
+<g clip-path="url(#clip-student-scoresgrades-0)"><rect x="0.0" y="0.0" width="360.0" height="800.0" fill="#FFFFFF"/>
+<text x="16.0" y="46.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="22.0" font-weight="700" fill="#1A1A1A" text-anchor="start">Title</text>
+<rect x="16.0" y="59.4" width="216.0" height="7.4" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="16.0" y="85.1" width="38.5" height="6.8" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="16.0" y="100.0" width="328.0" height="34.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="30.0" y="121.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="12.0" font-weight="400" fill="#9E9E9E" text-anchor="start">Dropdown</text>
+<text x="326.0" y="121.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="10.0" font-weight="400" fill="#1A1A1A" text-anchor="middle">v</text>
+<rect x="16.0" y="144.1" width="253.0" height="6.8" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="16.0" y="164.0" width="328.0" height="250.0" fill="#E0E0E0" rx="14"/>
+<rect x="30.0" y="180.8" width="115.0" height="6.2" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="319.2" y="179.2" width="9.6" height="9.6" fill="none" rx="3" stroke="#9E9E9E" stroke-width="1.2"/>
+<rect x="30.0" y="207.5" width="51.0" height="21.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="30.0" y="248.0" width="300.0" height="32.0" fill="#FFFFFF" stroke="#9E9E9E" stroke-width="1"/>
+<rect x="33.0" y="260.4" width="294.0" height="6.5" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<path d="M30 294H330" fill="none" stroke="#9E9E9E" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="30.0" y="309.2" width="47.5" height="5.9" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="30.0" y="327.4" width="60.0" height="7.4" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="180.0" y="309.2" width="90.2" height="5.9" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="180.0" y="327.4" width="96.0" height="7.4" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<path d="M16 378H344" fill="none" stroke="#9E9E9E" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="30.0" y="392.1" width="269.5" height="6.8" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="16.0" y="430.0" width="328.0" height="46.0" fill="#555555" rx="12"/>
+<text x="32.0" y="458.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="15.0" font-weight="700" fill="#FFFFFF" text-anchor="start">Expandable section</text>
+<rect x="277.5" y="447.2" width="22.5" height="9.3" fill="#FFFFFF" rx="2" fill-opacity="0.28"/>
+<path d="M314 450.0L320 456.0L326 450.0" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="16.0" y="488.0" width="328.0" height="46.0" fill="#555555" rx="12"/>
+<text x="32.0" y="516.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="15.0" font-weight="700" fill="#FFFFFF" text-anchor="start">Expandable section</text>
+<rect x="277.5" y="505.2" width="22.5" height="9.3" fill="#FFFFFF" rx="2" fill-opacity="0.28"/>
+<path d="M314 508.0L320 514.0L326 508.0" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="23.2" y="550.9" width="313.5" height="6.8" fill="#5F5F5F" rx="2" fill-opacity="0.28"/></g></g>
+</g>
+<g id="student-scoresgrades-expanded" transform="translate(2544,1412)">
+<rect width="1224" height="1364" rx="8" fill="#868686"/>
+<text x="16" y="26" font-family="Inter, Roboto, Arial, sans-serif" font-size="16" font-weight="600" fill="#FFFFFF">/student-scoresgrades-expanded</text>
+<text x="16" y="52" font-family="Inter, Roboto, Arial, sans-serif" font-size="12" fill="#EDEDED">Tablet · 800 +</text>
+<text x="848" y="52" font-family="Inter, Roboto, Arial, sans-serif" font-size="12" fill="#EDEDED">Mobile · Primary · 1 - 799</text>
+<g id="student-scoresgrades-expanded-tablet" transform="translate(16,64)">
+<clipPath id="clip-student-scoresgrades-expanded-1"><rect width="800" height="1280"/></clipPath>
+<g clip-path="url(#clip-student-scoresgrades-expanded-1)"><rect x="0.0" y="0.0" width="800.0" height="1280.0" fill="#FFFFFF"/>
+<text x="35.0" y="50.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="24.6" font-weight="700" fill="#1A1A1A" text-anchor="start">Title</text>
+<rect x="35.0" y="62.3" width="241.9" height="8.3" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="35.0" y="92.1" width="43.1" height="7.6" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="35.0" y="108.0" width="730.0" height="46.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="49.0" y="135.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.4" font-weight="400" fill="#9E9E9E" text-anchor="start">Dropdown</text>
+<text x="747.0" y="135.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="10.0" font-weight="400" fill="#1A1A1A" text-anchor="middle">v</text>
+<rect x="35.0" y="163.1" width="283.4" height="7.6" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="35.0" y="184.0" width="730.0" height="52.0" fill="#555555" rx="12"/>
+<rect x="35.0" y="224.0" width="730.0" height="12.0" fill="#555555"/>
+<text x="51.0" y="215.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="16.8" font-weight="700" fill="#FFFFFF" text-anchor="start">Expandable section</text>
+<rect x="670.6" y="202.9" width="50.4" height="10.4" fill="#FFFFFF" rx="2" fill-opacity="0.28"/>
+<path d="M735 213.0L741 207.0L747 213.0" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="35.0" y="236.0" width="730.0" height="430.0" fill="#E0E0E0"/>
+<rect x="47.0" y="249.5" width="282.2" height="7.3" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<clipPath id="exp7"><rect x="35" y="270" width="730" height="396"/></clipPath>
+<g clip-path="url(#exp7)">
+<rect x="35.0" y="270.0" width="730.0" height="36.0" fill="#BDBDBD"/>
+<rect x="45.0" y="283.9" width="44.8" height="6.9" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="261.3" y="283.9" width="95.2" height="6.9" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="405.5" y="283.9" width="56.0" height="6.9" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="531.7" y="283.9" width="33.6" height="6.9" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="630.8" y="283.9" width="84.0" height="6.9" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<path d="M35 306H765.0" fill="none" stroke="#FFFFFF" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="45.0" y="318.7" width="109.5" height="8.0" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="45.0" y="339.5" width="111.7" height="7.3" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="261.3" y="324.7" width="51.5" height="8.0" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="405.5" y="324.7" width="38.6" height="8.0" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="531.7" y="324.7" width="19.3" height="8.0" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="630.8" y="324.7" width="19.3" height="8.0" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="35.0" y="364.0" width="730.0" height="30.0" fill="#EDEDED"/>
+<rect x="61.0" y="374.5" width="129.4" height="7.3" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="261.3" y="374.5" width="41.2" height="7.3" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="35.0" y="394.0" width="730.0" height="30.0" fill="#EDEDED"/>
+<rect x="61.0" y="404.5" width="123.5" height="7.3" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="261.3" y="404.5" width="41.2" height="7.3" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<path d="M35 424H765.0" fill="none" stroke="#FFFFFF" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="45.0" y="436.7" width="167.4" height="8.0" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="45.0" y="457.5" width="111.7" height="7.3" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="261.3" y="442.7" width="32.2" height="8.0" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="405.5" y="442.7" width="19.3" height="8.0" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="531.7" y="442.7" width="19.3" height="8.0" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="630.8" y="442.7" width="19.3" height="8.0" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<path d="M35 482H765.0" fill="none" stroke="#FFFFFF" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="45.0" y="494.7" width="45.1" height="8.0" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="45.0" y="515.5" width="111.7" height="7.3" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="261.3" y="500.7" width="45.1" height="8.0" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="405.5" y="500.7" width="38.6" height="8.0" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="531.7" y="500.7" width="19.3" height="8.0" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="630.8" y="500.7" width="19.3" height="8.0" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<path d="M35 540H765.0" fill="none" stroke="#FFFFFF" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="45.0" y="552.7" width="135.2" height="8.0" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="45.0" y="573.5" width="111.7" height="7.3" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="261.3" y="558.7" width="51.5" height="8.0" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="405.5" y="558.7" width="38.6" height="8.0" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="531.7" y="558.7" width="19.3" height="8.0" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="630.8" y="558.7" width="19.3" height="8.0" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<path d="M35 598H765.0" fill="none" stroke="#FFFFFF" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="45.0" y="610.7" width="64.4" height="8.0" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="45.0" y="631.5" width="111.7" height="7.3" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="261.3" y="616.7" width="32.2" height="8.0" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="405.5" y="616.7" width="19.3" height="8.0" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="531.7" y="616.7" width="19.3" height="8.0" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="630.8" y="616.7" width="19.3" height="8.0" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+</g>
+<rect x="35.0" y="682.0" width="730.0" height="52.0" fill="#555555" rx="12"/>
+<text x="51.0" y="713.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="16.8" font-weight="700" fill="#FFFFFF" text-anchor="start">Expandable section</text>
+<rect x="695.8" y="700.9" width="25.2" height="10.4" fill="#FFFFFF" rx="2" fill-opacity="0.28"/>
+<path d="M735 705.0L741 711.0L747 705.0" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g></g>
+<g id="student-scoresgrades-expanded-mobile" transform="translate(848,64)">
+<clipPath id="clip-student-scoresgrades-expanded-0"><rect width="360" height="800"/></clipPath>
+<g clip-path="url(#clip-student-scoresgrades-expanded-0)"><rect x="0.0" y="0.0" width="360.0" height="800.0" fill="#FFFFFF"/>
+<text x="16.0" y="46.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="22.0" font-weight="700" fill="#1A1A1A" text-anchor="start">Title</text>
+<rect x="16.0" y="59.4" width="216.0" height="7.4" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="16.0" y="85.1" width="38.5" height="6.8" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="16.0" y="100.0" width="328.0" height="34.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="30.0" y="121.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="12.0" font-weight="400" fill="#9E9E9E" text-anchor="start">Dropdown</text>
+<text x="326.0" y="121.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="10.0" font-weight="400" fill="#1A1A1A" text-anchor="middle">v</text>
+<rect x="16.0" y="144.1" width="253.0" height="6.8" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="16.0" y="164.0" width="328.0" height="46.0" fill="#555555" rx="12"/>
+<rect x="16.0" y="198.0" width="328.0" height="12.0" fill="#555555"/>
+<text x="32.0" y="192.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="15.0" font-weight="700" fill="#FFFFFF" text-anchor="start">Expandable section</text>
+<rect x="255.0" y="181.2" width="45.0" height="9.3" fill="#FFFFFF" rx="2" fill-opacity="0.28"/>
+<path d="M314 190.0L320 184.0L326 190.0" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="16.0" y="210.0" width="328.0" height="396.0" fill="#E0E0E0"/>
+<rect x="28.0" y="224.4" width="252.0" height="6.5" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<clipPath id="exp8"><rect x="16" y="244" width="328" height="362"/></clipPath>
+<g clip-path="url(#exp8)">
+<rect x="16.0" y="244.0" width="810.0" height="32.0" fill="#BDBDBD"/>
+<rect x="26.0" y="256.8" width="40.0" height="6.2" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="266.0" y="256.8" width="85.0" height="6.2" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="426.0" y="256.8" width="50.0" height="6.2" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="566.0" y="256.8" width="30.0" height="6.2" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="676.0" y="256.8" width="75.0" height="6.2" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<path d="M16 276H826.0" fill="none" stroke="#FFFFFF" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="26.0" y="289.7" width="97.8" height="7.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="26.0" y="310.4" width="99.8" height="6.5" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="266.0" y="295.7" width="46.0" height="7.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="426.0" y="295.7" width="34.5" height="7.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="566.0" y="295.7" width="17.2" height="7.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="676.0" y="295.7" width="17.2" height="7.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="16.0" y="328.0" width="810.0" height="30.0" fill="#EDEDED"/>
+<rect x="42.0" y="339.4" width="115.5" height="6.5" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="266.0" y="339.4" width="36.8" height="6.5" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="16.0" y="358.0" width="810.0" height="30.0" fill="#EDEDED"/>
+<rect x="42.0" y="369.4" width="110.2" height="6.5" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="266.0" y="369.4" width="36.8" height="6.5" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<path d="M16 388H826.0" fill="none" stroke="#FFFFFF" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="26.0" y="401.7" width="149.5" height="7.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="26.0" y="422.4" width="99.8" height="6.5" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="266.0" y="407.7" width="28.8" height="7.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="426.0" y="407.7" width="17.2" height="7.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="566.0" y="407.7" width="17.2" height="7.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="676.0" y="407.7" width="17.2" height="7.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<path d="M16 440H826.0" fill="none" stroke="#FFFFFF" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="26.0" y="453.7" width="40.2" height="7.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="26.0" y="474.4" width="99.8" height="6.5" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="266.0" y="459.7" width="40.2" height="7.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="426.0" y="459.7" width="34.5" height="7.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="566.0" y="459.7" width="17.2" height="7.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="676.0" y="459.7" width="17.2" height="7.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<path d="M16 492H826.0" fill="none" stroke="#FFFFFF" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="26.0" y="505.7" width="120.8" height="7.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="26.0" y="526.4" width="99.8" height="6.5" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="266.0" y="511.7" width="46.0" height="7.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="426.0" y="511.7" width="34.5" height="7.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="566.0" y="511.7" width="17.2" height="7.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="676.0" y="511.7" width="17.2" height="7.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<path d="M16 544H826.0" fill="none" stroke="#FFFFFF" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="26.0" y="557.7" width="57.5" height="7.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="26.0" y="578.4" width="99.8" height="6.5" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="266.0" y="563.7" width="28.8" height="7.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="426.0" y="563.7" width="17.2" height="7.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="566.0" y="563.7" width="17.2" height="7.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="676.0" y="563.7" width="17.2" height="7.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+</g>
+<rect x="16.0" y="618.0" width="328.0" height="46.0" fill="#555555" rx="12"/>
+<text x="32.0" y="646.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="15.0" font-weight="700" fill="#FFFFFF" text-anchor="start">Expandable section</text>
+<rect x="277.5" y="635.2" width="22.5" height="9.3" fill="#FFFFFF" rx="2" fill-opacity="0.28"/>
+<path d="M314 638.0L320 644.0L326 638.0" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g></g>
+</g>
+<g id="scanner-for-omr" transform="translate(3816,1412)">
+<rect width="1224" height="1364" rx="8" fill="#868686"/>
+<text x="16" y="26" font-family="Inter, Roboto, Arial, sans-serif" font-size="16" font-weight="600" fill="#FFFFFF">/scanner-for-omr</text>
+<text x="16" y="52" font-family="Inter, Roboto, Arial, sans-serif" font-size="12" fill="#EDEDED">Tablet · 800 +</text>
+<text x="848" y="52" font-family="Inter, Roboto, Arial, sans-serif" font-size="12" fill="#EDEDED">Mobile · Primary · 1 - 799</text>
+<g id="scanner-for-omr-tablet" transform="translate(16,64)">
+<clipPath id="clip-scanner-for-omr-1"><rect width="800" height="1280"/></clipPath>
+<g clip-path="url(#clip-scanner-for-omr-1)"><rect x="0.0" y="0.0" width="800.0" height="1280.0" fill="#FFFFFF"/>
+<path d="M41 48.0H27 M33 42.0L27 48.0L33 54.0" fill="none" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="69.0" y="54.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="19.0" font-weight="500" fill="#1A1A1A" text-anchor="start">Title</text>
+<rect x="35.0" y="97.1" width="224.0" height="11.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="35.0" y="124.1" width="61.6" height="7.6" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="35.0" y="140.0" width="730.0" height="46.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="49.0" y="167.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.4" font-weight="400" fill="#9E9E9E" text-anchor="start">Dropdown</text>
+<text x="747.0" y="167.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="10.0" font-weight="400" fill="#1A1A1A" text-anchor="middle">v</text>
+<rect x="653.3" y="193.5" width="111.7" height="7.3" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="35.0" y="210.0" width="730.0" height="300.0" fill="#E0E0E0" rx="12"/>
+<rect x="372.0" y="324.0" width="56.0" height="56.0" fill="#FFFFFF" stroke="#9E9E9E" stroke-width="1"/>
+<path d="M372.0 324.0L428.0 380.0 M428.0 324.0L372.0 380.0" fill="none" stroke="#BDBDBD" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="393.0" y="346.0" width="14.0" height="12.0" fill="#FFFFFF" rx="1" stroke="#9E9E9E" stroke-width="1.2"/>
+<circle cx="398.0" cy="350.0" r="1.5" fill="#9E9E9E"/>
+<rect x="319.9" y="485.1" width="160.2" height="7.6" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="35.0" y="520.0" width="360.0" height="46.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="215.0" y="548.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="14.6" font-weight="600" fill="#1A1A1A" text-anchor="middle">Button</text>
+<rect x="405.0" y="520.0" width="360.0" height="46.0" fill="#555555"/>
+<text x="585.0" y="548.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="14.6" font-weight="600" fill="#FFFFFF" text-anchor="middle">Button</text>
+<rect x="35.0" y="582.0" width="730.0" height="96.0" fill="#FFFFFF" rx="10" stroke="#9E9E9E" stroke-width="1"/>
+<rect x="49.0" y="593.5" width="94.6" height="9.0" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="52.2" y="621.2" width="9.6" height="9.6" fill="none" rx="3" stroke="#9E9E9E" stroke-width="1.2"/>
+<rect x="71.0" y="621.1" width="221.8" height="7.6" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="49.0" y="652.0" width="30.0" height="18.0" fill="#E0E0E0" rx="4"/>
+<rect x="56.0" y="657.3" width="16.0" height="6.6" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="85.0" y="652.0" width="30.0" height="18.0" fill="#E0E0E0" rx="4"/>
+<rect x="92.0" y="657.3" width="16.0" height="6.6" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="121.0" y="652.0" width="30.0" height="18.0" fill="#E0E0E0" rx="4"/>
+<rect x="128.0" y="657.3" width="16.0" height="6.6" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="157.0" y="652.0" width="30.0" height="18.0" fill="#E0E0E0" rx="4"/>
+<rect x="164.0" y="657.3" width="16.0" height="6.6" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="193.0" y="652.0" width="30.0" height="18.0" fill="#E0E0E0" rx="4"/>
+<rect x="200.0" y="657.3" width="16.0" height="6.6" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="229.0" y="652.0" width="30.0" height="18.0" fill="#E0E0E0" rx="4"/>
+<rect x="236.0" y="657.3" width="16.0" height="6.6" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="265.0" y="652.0" width="30.0" height="18.0" fill="#E0E0E0" rx="4"/>
+<rect x="272.0" y="657.3" width="16.0" height="6.6" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="301.0" y="652.0" width="30.0" height="18.0" fill="#E0E0E0" rx="4"/>
+<rect x="308.0" y="657.3" width="16.0" height="6.6" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="35.0" y="697.2" width="730.0" height="34.0" fill="#BDBDBD"/>
+<text x="47.0" y="718.2" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.4" font-weight="700" fill="#1A1A1A" text-anchor="start">Section header</text>
+<rect x="744.2" y="709.4" width="9.6" height="9.6" fill="none" rx="3" stroke="#9E9E9E" stroke-width="1.2"/>
+<rect x="35.0" y="735.2" width="730.0" height="40.0" fill="#BDBDBD"/>
+<text x="45.0" y="759.2" font-family="Inter, Roboto, Arial, sans-serif" font-size="12.3" font-weight="700" fill="#1A1A1A" text-anchor="start">Table</text>
+<rect x="35.0" y="776.2" width="730.0" height="40.0" fill="#E0E0E0"/>
+<rect x="35.0" y="817.2" width="730.0" height="40.0" fill="#E0E0E0"/>
+<path d="M260.6363636363636 735.2V857.2" fill="none" stroke="#FFFFFF" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M446.4545454545455 735.2V857.2" fill="none" stroke="#FFFFFF" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M632.2727272727274 735.2V857.2" fill="none" stroke="#FFFFFF" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="35.0" y="865.1" width="190.4" height="6.9" fill="#5F5F5F" rx="2" fill-opacity="0.28"/></g></g>
+<g id="scanner-for-omr-mobile" transform="translate(848,64)">
+<clipPath id="clip-scanner-for-omr-0"><rect width="360" height="800"/></clipPath>
+<g clip-path="url(#clip-scanner-for-omr-0)"><rect x="0.0" y="0.0" width="360.0" height="800.0" fill="#FFFFFF"/>
+<path d="M26 38.0H12 M18 32.0L12 38.0L18 44.0" fill="none" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="44.0" y="44.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="17.0" font-weight="500" fill="#1A1A1A" text-anchor="start">Title</text>
+<rect x="16.0" y="74.5" width="200.0" height="9.9" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="16.0" y="101.1" width="55.0" height="6.8" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="16.0" y="116.0" width="328.0" height="34.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="30.0" y="137.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="12.0" font-weight="400" fill="#9E9E9E" text-anchor="start">Dropdown</text>
+<text x="326.0" y="137.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="10.0" font-weight="400" fill="#1A1A1A" text-anchor="middle">v</text>
+<rect x="244.2" y="158.4" width="99.8" height="6.5" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="16.0" y="174.0" width="328.0" height="150.0" fill="#E0E0E0" rx="12"/>
+<rect x="158.0" y="219.0" width="44.0" height="44.0" fill="#FFFFFF" stroke="#9E9E9E" stroke-width="1"/>
+<path d="M158.0 219.0L202.0 263.0 M202.0 219.0L158.0 263.0" fill="none" stroke="#BDBDBD" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="173.0" y="235.0" width="14.0" height="12.0" fill="#FFFFFF" rx="1" stroke="#9E9E9E" stroke-width="1.2"/>
+<circle cx="178.0" cy="239.0" r="1.5" fill="#9E9E9E"/>
+<rect x="108.5" y="300.1" width="143.0" height="6.8" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="16.0" y="334.0" width="159.0" height="36.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="95.5" y="357.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.0" font-weight="600" fill="#1A1A1A" text-anchor="middle">Button</text>
+<rect x="185.0" y="334.0" width="159.0" height="36.0" fill="#555555"/>
+<text x="264.5" y="357.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.0" font-weight="600" fill="#FFFFFF" text-anchor="middle">Button</text>
+<rect x="16.0" y="382.0" width="328.0" height="84.0" fill="#FFFFFF" rx="10" stroke="#9E9E9E" stroke-width="1"/>
+<rect x="30.0" y="394.6" width="84.5" height="8.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="33.2" y="421.2" width="9.6" height="9.6" fill="none" rx="3" stroke="#9E9E9E" stroke-width="1.2"/>
+<rect x="52.0" y="422.1" width="198.0" height="6.8" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="30.0" y="440.0" width="30.0" height="18.0" fill="#E0E0E0" rx="4"/>
+<rect x="37.9" y="446.2" width="14.2" height="5.9" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="66.0" y="440.0" width="30.0" height="18.0" fill="#E0E0E0" rx="4"/>
+<rect x="73.9" y="446.2" width="14.2" height="5.9" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="102.0" y="440.0" width="30.0" height="18.0" fill="#E0E0E0" rx="4"/>
+<rect x="109.9" y="446.2" width="14.2" height="5.9" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="138.0" y="440.0" width="30.0" height="18.0" fill="#E0E0E0" rx="4"/>
+<rect x="145.9" y="446.2" width="14.2" height="5.9" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="174.0" y="440.0" width="30.0" height="18.0" fill="#E0E0E0" rx="4"/>
+<rect x="181.9" y="446.2" width="14.2" height="5.9" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="210.0" y="440.0" width="30.0" height="18.0" fill="#E0E0E0" rx="4"/>
+<rect x="217.9" y="446.2" width="14.2" height="5.9" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="16.0" y="480.4" width="328.0" height="26.0" fill="#BDBDBD"/>
+<text x="28.0" y="497.4" font-family="Inter, Roboto, Arial, sans-serif" font-size="12.0" font-weight="700" fill="#1A1A1A" text-anchor="start">Section header</text>
+<rect x="323.2" y="488.6" width="9.6" height="9.6" fill="none" rx="3" stroke="#9E9E9E" stroke-width="1.2"/>
+<clipPath id="tbl9"><rect x="16" y="510.4" width="328" height="92"/></clipPath>
+<g clip-path="url(#tbl9)">
+<rect x="16.0" y="510.4" width="550.0" height="30.0" fill="#BDBDBD"/>
+<text x="26.0" y="529.4" font-family="Inter, Roboto, Arial, sans-serif" font-size="11.0" font-weight="700" fill="#1A1A1A" text-anchor="start">Table</text>
+<rect x="16.0" y="541.4" width="550.0" height="30.0" fill="#E0E0E0"/>
+<rect x="16.0" y="572.4" width="550.0" height="30.0" fill="#E0E0E0"/>
+<path d="M186.0 510.4V602.4" fill="none" stroke="#FFFFFF" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M326.0 510.4V602.4" fill="none" stroke="#FFFFFF" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M466.0 510.4V602.4" fill="none" stroke="#FFFFFF" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<rect x="16.0" y="611.2" width="170.0" height="6.2" fill="#5F5F5F" rx="2" fill-opacity="0.28"/></g></g>
+</g>
+<g id="password-recovery" transform="translate(0,2824)">
+<rect width="1224" height="1364" rx="8" fill="#868686"/>
+<text x="16" y="26" font-family="Inter, Roboto, Arial, sans-serif" font-size="16" font-weight="600" fill="#FFFFFF">/password-recovery</text>
+<text x="16" y="52" font-family="Inter, Roboto, Arial, sans-serif" font-size="12" fill="#EDEDED">Tablet · 800 +</text>
+<text x="848" y="52" font-family="Inter, Roboto, Arial, sans-serif" font-size="12" fill="#EDEDED">Mobile · Primary · 1 - 799</text>
+<g id="password-recovery-tablet" transform="translate(16,64)">
+<clipPath id="clip-password-recovery-1"><rect width="800" height="1280"/></clipPath>
+<g clip-path="url(#clip-password-recovery-1)"><rect x="0.0" y="0.0" width="800.0" height="1280.0" fill="#FFFFFF"/>
+<path d="M41 48.0H27 M33 42.0L27 48.0L33 54.0" fill="none" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="69.0" y="54.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="19.0" font-weight="500" fill="#1A1A1A" text-anchor="start">Title</text>
+<rect x="367.0" y="107.0" width="66.0" height="66.0" fill="#FFFFFF" stroke="#9E9E9E" stroke-width="1"/>
+<path d="M367.0 107.0L433.0 173.0 M433.0 107.0L367.0 173.0" fill="none" stroke="#BDBDBD" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="393.0" y="134.0" width="14.0" height="12.0" fill="#FFFFFF" rx="1" stroke="#9E9E9E" stroke-width="1.2"/>
+<circle cx="398.0" cy="138.0" r="1.5" fill="#9E9E9E"/>
+<text x="400.0" y="202.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="23.5" font-weight="700" fill="#1A1A1A" text-anchor="middle">Title</text>
+<rect x="171.5" y="214.3" width="457.0" height="8.3" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="35.0" y="261.2" width="80.1" height="7.6" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="35.0" y="277.1" width="730.0" height="46.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="49.0" y="304.1" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.4" font-weight="400" fill="#9E9E9E" text-anchor="start">Text field</text>
+<rect x="35.0" y="341.2" width="73.9" height="7.6" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="35.0" y="357.1" width="730.0" height="46.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="49.0" y="384.1" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.4" font-weight="400" fill="#9E9E9E" text-anchor="start">Text field</text>
+<rect x="35.0" y="412.2" width="437.4" height="7.6" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="35.0" y="438.7" width="123.2" height="7.6" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="35.0" y="454.6" width="730.0" height="46.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="49.0" y="481.6" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.4" font-weight="400" fill="#9E9E9E" text-anchor="start">Text field</text>
+<rect x="35.0" y="526.2" width="730.0" height="46.0" fill="#555555"/>
+<text x="400.0" y="554.2" font-family="Inter, Roboto, Arial, sans-serif" font-size="14.6" font-weight="600" fill="#FFFFFF" text-anchor="middle">Button</text>
+<rect x="356.3" y="588.5" width="87.4" height="8.3" fill="#1A1A1A" rx="2" fill-opacity="0.28"/></g></g>
+<g id="password-recovery-mobile" transform="translate(848,64)">
+<clipPath id="clip-password-recovery-0"><rect width="360" height="800"/></clipPath>
+<g clip-path="url(#clip-password-recovery-0)"><rect x="0.0" y="0.0" width="360.0" height="800.0" fill="#FFFFFF"/>
+<path d="M26 38.0H12 M18 32.0L12 38.0L18 44.0" fill="none" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="44.0" y="44.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="17.0" font-weight="500" fill="#1A1A1A" text-anchor="start">Title</text>
+<rect x="154.7" y="83.7" width="50.6" height="50.6" fill="#FFFFFF" stroke="#9E9E9E" stroke-width="1"/>
+<path d="M154.7 83.7L205.3 134.3 M205.3 83.7L154.7 134.3" fill="none" stroke="#BDBDBD" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="173.0" y="103.0" width="14.0" height="12.0" fill="#FFFFFF" rx="1" stroke="#9E9E9E" stroke-width="1.2"/>
+<circle cx="178.0" cy="107.0" r="1.5" fill="#9E9E9E"/>
+<text x="180.0" y="160.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="21.0" font-weight="700" fill="#1A1A1A" text-anchor="middle">Title</text>
+<rect x="57.0" y="173.4" width="246.0" height="7.4" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="102.0" y="190.8" width="156.0" height="7.4" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="16.0" y="229.1" width="71.5" height="6.8" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="16.0" y="244.0" width="328.0" height="34.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="30.0" y="265.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="12.0" font-weight="400" fill="#9E9E9E" text-anchor="start">Text field</text>
+<rect x="16.0" y="293.1" width="66.0" height="6.8" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="16.0" y="308.0" width="328.0" height="34.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="30.0" y="329.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="12.0" font-weight="400" fill="#9E9E9E" text-anchor="start">Text field</text>
+<rect x="16.0" y="352.1" width="258.5" height="6.8" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="16.0" y="368.0" width="126.5" height="6.8" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="16.0" y="390.2" width="110.0" height="6.8" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="16.0" y="405.1" width="328.0" height="34.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="30.0" y="426.1" font-family="Inter, Roboto, Arial, sans-serif" font-size="12.0" font-weight="400" fill="#9E9E9E" text-anchor="start">Text field</text>
+<rect x="16.0" y="458.3" width="328.0" height="36.0" fill="#555555"/>
+<text x="180.0" y="481.3" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.0" font-weight="600" fill="#FFFFFF" text-anchor="middle">Button</text>
+<rect x="141.0" y="507.7" width="78.0" height="7.4" fill="#1A1A1A" rx="2" fill-opacity="0.28"/></g></g>
+</g>
+<g id="join-class-scan-qr-sheet" transform="translate(1272,2824)">
+<rect width="1224" height="1364" rx="8" fill="#868686"/>
+<text x="16" y="26" font-family="Inter, Roboto, Arial, sans-serif" font-size="16" font-weight="600" fill="#FFFFFF">/join-class-scan-qr-sheet</text>
+<text x="16" y="52" font-family="Inter, Roboto, Arial, sans-serif" font-size="12" fill="#EDEDED">Tablet · 800 +</text>
+<text x="848" y="52" font-family="Inter, Roboto, Arial, sans-serif" font-size="12" fill="#EDEDED">Mobile · Primary · 1 - 799</text>
+<g id="join-class-scan-qr-sheet-tablet" transform="translate(16,64)">
+<clipPath id="clip-join-class-scan-qr-sheet-1"><rect width="800" height="1280"/></clipPath>
+<g clip-path="url(#clip-join-class-scan-qr-sheet-1)"><rect x="0.0" y="0.0" width="800.0" height="1280.0" fill="#FFFFFF"/>
+<text x="35.0" y="44.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="14.0" font-weight="600" fill="#1A1A1A" text-anchor="start">Title</text>
+<rect x="35.0" y="72.1" width="43.1" height="7.6" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="35.0" y="88.0" width="730.0" height="46.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="49.0" y="115.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.4" font-weight="400" fill="#9E9E9E" text-anchor="start">Dropdown</text>
+<text x="747.0" y="115.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="10.0" font-weight="400" fill="#1A1A1A" text-anchor="middle">v</text>
+<rect x="35.0" y="150.0" width="356.0" height="190.0" fill="#E0E0E0"/>
+<text x="49.0" y="178.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="12.0" font-weight="600" fill="#1A1A1A" text-anchor="start">Card</text>
+<rect x="49.0" y="244.4" width="44.0" height="13.6" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="49.0" y="316.8" width="60.0" height="6.2" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="409.0" y="150.0" width="356.0" height="190.0" fill="#E0E0E0"/>
+<text x="423.0" y="178.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="12.0" font-weight="600" fill="#1A1A1A" text-anchor="start">Card</text>
+<rect x="423.0" y="244.4" width="44.0" height="13.6" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="423.0" y="316.8" width="100.0" height="6.2" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="35.0" y="356.0" width="730.0" height="34.0" fill="#BDBDBD"/>
+<text x="47.0" y="377.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.4" font-weight="700" fill="#1A1A1A" text-anchor="start">Section header</text>
+<rect x="744.2" y="368.2" width="9.6" height="9.6" fill="none" rx="3" stroke="#9E9E9E" stroke-width="1.2"/>
+<rect x="35.0" y="394.0" width="730.0" height="74.0" fill="#E0E0E0"/>
+<rect x="49.0" y="405.5" width="43.7" height="9.0" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="49.0" y="425.1" width="98.6" height="7.6" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="49.0" y="441.1" width="92.4" height="7.6" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="35.0" y="472.0" width="730.0" height="74.0" fill="#E0E0E0"/>
+<rect x="49.0" y="483.5" width="72.8" height="9.0" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="49.0" y="503.1" width="98.6" height="7.6" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="49.0" y="519.1" width="117.0" height="7.6" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="35.0" y="569.2" width="360.0" height="46.0" fill="#555555"/>
+<text x="215.0" y="597.2" font-family="Inter, Roboto, Arial, sans-serif" font-size="14.6" font-weight="600" fill="#FFFFFF" text-anchor="middle">Button</text>
+<rect x="405.0" y="569.2" width="360.0" height="46.0" fill="#555555"/>
+<text x="585.0" y="597.2" font-family="Inter, Roboto, Arial, sans-serif" font-size="14.6" font-weight="600" fill="#FFFFFF" text-anchor="middle">Button</text>
+<rect x="35.0" y="628.0" width="730.0" height="46.0" fill="#555555"/>
+<text x="400.0" y="656.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="14.6" font-weight="600" fill="#FFFFFF" text-anchor="middle">Button</text>
+<rect x="0.0" y="0.0" width="800.0" height="1280.0" fill="#000000" fill-opacity="0.42"/>
+<path d="M0 1078A18 18 0 0 1 18 1060H782A18 18 0 0 1 800 1078V1280H0Z" fill="#FFFFFF" stroke="none" stroke-width="0" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="380.0" y="1070.0" width="40.0" height="4.0" fill="#BDBDBD" rx="2"/>
+<text x="400.0" y="1106.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="19.0" font-weight="700" fill="#1A1A1A" text-anchor="middle">Title</text>
+<circle cx="57.0" cy="1158.0" r="20.0" fill="#E0E0E0"/>
+<rect x="49.0" y="1150.0" width="16.0" height="16.0" fill="none" rx="3" stroke="#9E9E9E" stroke-width="1.2"/>
+<text x="89.0" y="1155.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="15.7" font-weight="600" fill="#1A1A1A" text-anchor="start">List item</text>
+<rect x="89.0" y="1164.1" width="184.8" height="7.6" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<path d="M751 1153.0L756 1158.0L751 1163.0" fill="none" stroke="#5F5F5F" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="57.0" cy="1228.0" r="20.0" fill="#E0E0E0"/>
+<rect x="49.8" y="1220.8" width="14.4" height="14.4" fill="none" rx="3" stroke="#9E9E9E" stroke-width="1.2"/>
+<text x="89.0" y="1225.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="15.7" font-weight="600" fill="#1A1A1A" text-anchor="start">List item</text>
+<rect x="89.0" y="1234.1" width="234.1" height="7.6" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<path d="M751 1223.0L756 1228.0L751 1233.0" fill="none" stroke="#5F5F5F" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></g></g>
+<g id="join-class-scan-qr-sheet-mobile" transform="translate(848,64)">
+<clipPath id="clip-join-class-scan-qr-sheet-0"><rect width="360" height="800"/></clipPath>
+<g clip-path="url(#clip-join-class-scan-qr-sheet-0)"><rect x="0.0" y="0.0" width="360.0" height="800.0" fill="#FFFFFF"/>
+<text x="16.0" y="38.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="14.0" font-weight="600" fill="#1A1A1A" text-anchor="start">Title</text>
+<rect x="16.0" y="57.1" width="38.5" height="6.8" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="16.0" y="72.0" width="328.0" height="34.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="30.0" y="93.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="12.0" font-weight="400" fill="#9E9E9E" text-anchor="start">Dropdown</text>
+<text x="326.0" y="93.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="10.0" font-weight="400" fill="#1A1A1A" text-anchor="middle">v</text>
+<rect x="16.0" y="118.0" width="160.0" height="112.0" fill="#E0E0E0"/>
+<text x="30.0" y="146.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="12.0" font-weight="600" fill="#1A1A1A" text-anchor="start">Card</text>
+<rect x="30.0" y="167.1" width="44.0" height="13.6" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="30.0" y="206.8" width="60.0" height="6.2" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="184.0" y="118.0" width="160.0" height="112.0" fill="#E0E0E0"/>
+<text x="198.0" y="146.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="12.0" font-weight="600" fill="#1A1A1A" text-anchor="start">Card</text>
+<rect x="198.0" y="167.1" width="44.0" height="13.6" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="198.0" y="206.8" width="100.0" height="6.2" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="16.0" y="246.0" width="328.0" height="26.0" fill="#BDBDBD"/>
+<text x="28.0" y="263.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="12.0" font-weight="700" fill="#1A1A1A" text-anchor="start">Section header</text>
+<rect x="323.2" y="254.2" width="9.6" height="9.6" fill="none" rx="3" stroke="#9E9E9E" stroke-width="1.2"/>
+<rect x="16.0" y="276.0" width="328.0" height="60.0" fill="#E0E0E0"/>
+<rect x="30.0" y="288.6" width="39.0" height="8.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="30.0" y="308.1" width="88.0" height="6.8" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="30.0" y="324.1" width="82.5" height="6.8" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="16.0" y="340.0" width="328.0" height="60.0" fill="#E0E0E0"/>
+<rect x="30.0" y="352.6" width="65.0" height="8.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="30.0" y="372.1" width="88.0" height="6.8" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="30.0" y="388.1" width="104.5" height="6.8" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="16.0" y="418.4" width="159.0" height="36.0" fill="#555555"/>
+<text x="95.5" y="441.4" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.0" font-weight="600" fill="#FFFFFF" text-anchor="middle">Button</text>
+<rect x="185.0" y="418.4" width="159.0" height="36.0" fill="#555555"/>
+<text x="264.5" y="441.4" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.0" font-weight="600" fill="#FFFFFF" text-anchor="middle">Button</text>
+<rect x="16.0" y="464.0" width="328.0" height="36.0" fill="#555555"/>
+<text x="180.0" y="487.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.0" font-weight="600" fill="#FFFFFF" text-anchor="middle">Button</text>
+<rect x="0.0" y="0.0" width="360.0" height="800.0" fill="#000000" fill-opacity="0.42"/>
+<path d="M0 618A18 18 0 0 1 18 600H342A18 18 0 0 1 360 618V800H0Z" fill="#FFFFFF" stroke="none" stroke-width="0" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="160.0" y="610.0" width="40.0" height="4.0" fill="#BDBDBD" rx="2"/>
+<text x="180.0" y="646.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="17.0" font-weight="700" fill="#1A1A1A" text-anchor="middle">Title</text>
+<circle cx="38.0" cy="695.0" r="20.0" fill="#E0E0E0"/>
+<rect x="30.0" y="687.0" width="16.0" height="16.0" fill="none" rx="3" stroke="#9E9E9E" stroke-width="1.2"/>
+<text x="70.0" y="692.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="14.0" font-weight="600" fill="#1A1A1A" text-anchor="start">List item</text>
+<rect x="70.0" y="702.1" width="165.0" height="6.8" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<path d="M330 690.0L335 695.0L330 700.0" fill="none" stroke="#5F5F5F" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="38.0" cy="759.0" r="20.0" fill="#E0E0E0"/>
+<rect x="30.8" y="751.8" width="14.4" height="14.4" fill="none" rx="3" stroke="#9E9E9E" stroke-width="1.2"/>
+<text x="70.0" y="756.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="14.0" font-weight="600" fill="#1A1A1A" text-anchor="start">List item</text>
+<rect x="70.0" y="766.1" width="209.0" height="6.8" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<path d="M330 754.0L335 759.0L330 764.0" fill="none" stroke="#5F5F5F" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></g></g>
+</g>
+<g id="join-class" transform="translate(2544,2824)">
+<rect width="1224" height="1364" rx="8" fill="#868686"/>
+<text x="16" y="26" font-family="Inter, Roboto, Arial, sans-serif" font-size="16" font-weight="600" fill="#FFFFFF">/join-class</text>
+<text x="16" y="52" font-family="Inter, Roboto, Arial, sans-serif" font-size="12" fill="#EDEDED">Tablet · 800 +</text>
+<text x="848" y="52" font-family="Inter, Roboto, Arial, sans-serif" font-size="12" fill="#EDEDED">Mobile · Primary · 1 - 799</text>
+<g id="join-class-tablet" transform="translate(16,64)">
+<clipPath id="clip-join-class-1"><rect width="800" height="1280"/></clipPath>
+<g clip-path="url(#clip-join-class-1)"><rect x="0.0" y="0.0" width="800.0" height="1280.0" fill="#FFFFFF"/>
+<path d="M41 48.0H27 M33 42.0L27 48.0L33 54.0" fill="none" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="69.0" y="54.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="19.0" font-weight="500" fill="#1A1A1A" text-anchor="start">Title</text>
+<rect x="367.0" y="107.0" width="66.0" height="66.0" fill="#FFFFFF" stroke="#9E9E9E" stroke-width="1"/>
+<path d="M367.0 107.0L433.0 173.0 M433.0 107.0L367.0 173.0" fill="none" stroke="#BDBDBD" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="393.0" y="134.0" width="14.0" height="12.0" fill="#FFFFFF" rx="1" stroke="#9E9E9E" stroke-width="1.2"/>
+<circle cx="398.0" cy="138.0" r="1.5" fill="#9E9E9E"/>
+<text x="400.0" y="202.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="23.5" font-weight="700" fill="#1A1A1A" text-anchor="middle">Title</text>
+<rect x="238.7" y="214.3" width="322.6" height="8.3" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="35.0" y="261.2" width="104.7" height="7.6" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="35.0" y="277.1" width="730.0" height="46.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="49.0" y="304.1" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.4" font-weight="400" fill="#9E9E9E" text-anchor="start">Text field</text>
+<rect x="35.0" y="342.3" width="730.0" height="46.0" fill="#555555"/>
+<text x="400.0" y="370.3" font-family="Inter, Roboto, Arial, sans-serif" font-size="14.6" font-weight="600" fill="#FFFFFF" text-anchor="middle">Button</text>
+<rect x="35.0" y="413.9" width="730.0" height="135.5" fill="#E0E0E0"/>
+<rect x="394.0" y="446.9" width="12.0" height="12.0" fill="none" rx="3" stroke="#9E9E9E" stroke-width="1.2"/>
+<text x="400.0" y="491.9" font-family="Inter, Roboto, Arial, sans-serif" font-size="16.8" font-weight="600" fill="#1A1A1A" text-anchor="middle">Card</text>
+<rect x="191.7" y="504.2" width="416.6" height="8.3" fill="#5F5F5F" rx="2" fill-opacity="0.28"/></g></g>
+<g id="join-class-mobile" transform="translate(848,64)">
+<clipPath id="clip-join-class-0"><rect width="360" height="800"/></clipPath>
+<g clip-path="url(#clip-join-class-0)"><rect x="0.0" y="0.0" width="360.0" height="800.0" fill="#FFFFFF"/>
+<path d="M26 38.0H12 M18 32.0L12 38.0L18 44.0" fill="none" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="44.0" y="44.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="17.0" font-weight="500" fill="#1A1A1A" text-anchor="start">Title</text>
+<rect x="154.7" y="83.7" width="50.6" height="50.6" fill="#FFFFFF" stroke="#9E9E9E" stroke-width="1"/>
+<path d="M154.7 83.7L205.3 134.3 M205.3 83.7L154.7 134.3" fill="none" stroke="#BDBDBD" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="173.0" y="103.0" width="14.0" height="12.0" fill="#FFFFFF" rx="1" stroke="#9E9E9E" stroke-width="1.2"/>
+<circle cx="178.0" cy="107.0" r="1.5" fill="#9E9E9E"/>
+<text x="180.0" y="160.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="21.0" font-weight="700" fill="#1A1A1A" text-anchor="middle">Title</text>
+<rect x="36.0" y="173.4" width="288.0" height="7.4" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="16.0" y="211.7" width="93.5" height="6.8" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="16.0" y="226.6" width="328.0" height="34.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="30.0" y="247.6" font-family="Inter, Roboto, Arial, sans-serif" font-size="12.0" font-weight="400" fill="#9E9E9E" text-anchor="start">Text field</text>
+<rect x="16.0" y="275.0" width="328.0" height="36.0" fill="#555555"/>
+<text x="180.0" y="298.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.0" font-weight="600" fill="#FFFFFF" text-anchor="middle">Button</text>
+<rect x="16.0" y="330.2" width="328.0" height="138.8" fill="#E0E0E0"/>
+<rect x="174.0" y="357.2" width="12.0" height="12.0" fill="none" rx="3" stroke="#9E9E9E" stroke-width="1.2"/>
+<text x="180.0" y="402.2" font-family="Inter, Roboto, Arial, sans-serif" font-size="15.0" font-weight="600" fill="#1A1A1A" text-anchor="middle">Card</text>
+<rect x="60.0" y="415.6" width="240.0" height="7.4" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="117.0" y="433.0" width="126.0" height="7.4" fill="#5F5F5F" rx="2" fill-opacity="0.28"/></g></g>
+</g>
+<g id="qr-attendance-recorded" transform="translate(3816,2824)">
+<rect width="1224" height="1364" rx="8" fill="#868686"/>
+<text x="16" y="26" font-family="Inter, Roboto, Arial, sans-serif" font-size="16" font-weight="600" fill="#FFFFFF">/qr-attendance-recorded</text>
+<text x="16" y="52" font-family="Inter, Roboto, Arial, sans-serif" font-size="12" fill="#EDEDED">Tablet · 800 +</text>
+<text x="848" y="52" font-family="Inter, Roboto, Arial, sans-serif" font-size="12" fill="#EDEDED">Mobile · Primary · 1 - 799</text>
+<g id="qr-attendance-recorded-tablet" transform="translate(16,64)">
+<clipPath id="clip-qr-attendance-recorded-1"><rect width="800" height="1280"/></clipPath>
+<g clip-path="url(#clip-qr-attendance-recorded-1)"><rect x="0.0" y="0.0" width="800.0" height="1280.0" fill="#FFFFFF"/>
+<path d="M41 48.0H27 M33 42.0L27 48.0L33 54.0" fill="none" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="69.0" y="54.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="19.0" font-weight="500" fill="#1A1A1A" text-anchor="start">Title</text>
+<rect x="35.0" y="100.0" width="730.0" height="560.0" fill="#E0E0E0" rx="12"/>
+<rect x="55.0" y="120.0" width="690.0" height="420.0" fill="#D3D3D3" rx="10"/>
+<path d="M89 200V154H135" fill="none" stroke="#1A1A1A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M711 200V154H665" fill="none" stroke="#1A1A1A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M89 460V506H135" fill="none" stroke="#1A1A1A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M711 460V506H665" fill="none" stroke="#1A1A1A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="382.4" y="312.4" width="35.2" height="35.2" fill="none" rx="3" stroke="#9E9E9E" stroke-width="1.2"/>
+<rect x="316.0" y="556.3" width="168.0" height="8.3" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="55.0" y="584.0" width="690.0" height="46.0" fill="#555555"/>
+<text x="400.0" y="612.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="14.6" font-weight="600" fill="#FFFFFF" text-anchor="middle">Button</text>
+<rect x="35.0" y="672.4" width="730.0" height="250.0" fill="#E0E0E0" rx="12"/>
+<rect x="394.0" y="704.4" width="12.0" height="12.0" fill="none" rx="3" stroke="#9E9E9E" stroke-width="1.2"/>
+<rect x="314.9" y="743.5" width="170.2" height="11.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="329.4" y="774.7" width="141.1" height="8.3" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="374.5" y="799.9" width="51.0" height="9.0" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="57.0" y="830.4" width="686.0" height="46.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="400.0" y="858.4" font-family="Inter, Roboto, Arial, sans-serif" font-size="14.6" font-weight="600" fill="#1A1A1A" text-anchor="middle">Button</text></g></g>
+<g id="qr-attendance-recorded-mobile" transform="translate(848,64)">
+<clipPath id="clip-qr-attendance-recorded-0"><rect width="360" height="800"/></clipPath>
+<g clip-path="url(#clip-qr-attendance-recorded-0)"><rect x="0.0" y="0.0" width="360.0" height="800.0" fill="#FFFFFF"/>
+<path d="M26 38.0H12 M18 32.0L12 38.0L18 44.0" fill="none" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="44.0" y="44.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="17.0" font-weight="500" fill="#1A1A1A" text-anchor="start">Title</text>
+<rect x="16.0" y="76.0" width="328.0" height="348.0" fill="#E0E0E0" rx="12"/>
+<rect x="30.0" y="90.0" width="300.0" height="230.0" fill="#D3D3D3" rx="10"/>
+<path d="M52 142V112H82" fill="none" stroke="#1A1A1A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M308 142V112H278" fill="none" stroke="#1A1A1A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M52 268V298H82" fill="none" stroke="#1A1A1A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M308 268V298H278" fill="none" stroke="#1A1A1A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="166.4" y="191.4" width="27.2" height="27.2" fill="none" rx="3" stroke="#9E9E9E" stroke-width="1.2"/>
+<rect x="105.0" y="337.4" width="150.0" height="7.4" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="30.0" y="364.0" width="300.0" height="36.0" fill="#555555"/>
+<text x="180.0" y="387.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.0" font-weight="600" fill="#FFFFFF" text-anchor="middle">Button</text>
+<rect x="16.0" y="430.8" width="328.0" height="216.0" fill="#E0E0E0" rx="12"/>
+<rect x="174.0" y="456.8" width="12.0" height="12.0" fill="none" rx="3" stroke="#9E9E9E" stroke-width="1.2"/>
+<rect x="104.0" y="497.3" width="152.0" height="9.9" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="117.0" y="528.2" width="126.0" height="7.4" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="157.2" y="553.4" width="45.5" height="8.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="32.0" y="582.8" width="296.0" height="36.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="180.0" y="605.8" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.0" font-weight="600" fill="#1A1A1A" text-anchor="middle">Button</text></g></g>
+</g>
+<g id="qr-attendance-history" transform="translate(0,4236)">
+<rect width="1224" height="1364" rx="8" fill="#868686"/>
+<text x="16" y="26" font-family="Inter, Roboto, Arial, sans-serif" font-size="16" font-weight="600" fill="#FFFFFF">/qr-attendance-history</text>
+<text x="16" y="52" font-family="Inter, Roboto, Arial, sans-serif" font-size="12" fill="#EDEDED">Tablet · 800 +</text>
+<text x="848" y="52" font-family="Inter, Roboto, Arial, sans-serif" font-size="12" fill="#EDEDED">Mobile · Primary · 1 - 799</text>
+<g id="qr-attendance-history-tablet" transform="translate(16,64)">
+<clipPath id="clip-qr-attendance-history-1"><rect width="800" height="1280"/></clipPath>
+<g clip-path="url(#clip-qr-attendance-history-1)"><rect x="0.0" y="0.0" width="800.0" height="1280.0" fill="#FFFFFF"/>
+<path d="M41 48.0H27 M33 42.0L27 48.0L33 54.0" fill="none" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="69.0" y="54.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="19.0" font-weight="500" fill="#1A1A1A" text-anchor="start">Title</text>
+<rect x="35.0" y="101.9" width="176.4" height="10.4" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="35.0" y="134.0" width="730.0" height="64.0" fill="#E0E0E0" rx="8"/>
+<rect x="53.8" y="158.8" width="14.4" height="14.4" fill="none" rx="3" stroke="#9E9E9E" stroke-width="1.2"/>
+<rect x="91.0" y="151.7" width="54.9" height="9.7" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="91.0" y="172.1" width="135.5" height="7.6" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="35.0" y="208.0" width="730.0" height="64.0" fill="#E0E0E0" rx="8"/>
+<rect x="53.8" y="232.8" width="14.4" height="14.4" fill="none" rx="3" stroke="#9E9E9E" stroke-width="1.2"/>
+<rect x="91.0" y="225.7" width="54.9" height="9.7" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="91.0" y="246.1" width="135.5" height="7.6" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="35.0" y="282.0" width="730.0" height="64.0" fill="#E0E0E0" rx="8"/>
+<rect x="53.8" y="306.8" width="14.4" height="14.4" fill="none" rx="3" stroke="#9E9E9E" stroke-width="1.2"/>
+<rect x="91.0" y="299.7" width="31.4" height="9.7" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="91.0" y="320.1" width="135.5" height="7.6" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="35.0" y="356.0" width="730.0" height="64.0" fill="#E0E0E0" rx="8"/>
+<rect x="53.8" y="380.8" width="14.4" height="14.4" fill="none" rx="3" stroke="#9E9E9E" stroke-width="1.2"/>
+<rect x="91.0" y="373.7" width="54.9" height="9.7" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="91.0" y="394.1" width="135.5" height="7.6" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="35.0" y="430.0" width="730.0" height="64.0" fill="#E0E0E0" rx="8"/>
+<rect x="53.8" y="454.8" width="14.4" height="14.4" fill="none" rx="3" stroke="#9E9E9E" stroke-width="1.2"/>
+<rect x="91.0" y="447.7" width="47.0" height="9.7" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="91.0" y="468.1" width="98.6" height="7.6" fill="#5F5F5F" rx="2" fill-opacity="0.28"/></g></g>
+<g id="qr-attendance-history-mobile" transform="translate(848,64)">
+<clipPath id="clip-qr-attendance-history-0"><rect width="360" height="800"/></clipPath>
+<g clip-path="url(#clip-qr-attendance-history-0)"><rect x="0.0" y="0.0" width="360.0" height="800.0" fill="#FFFFFF"/>
+<path d="M26 38.0H12 M18 32.0L12 38.0L18 44.0" fill="none" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="44.0" y="44.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="17.0" font-weight="500" fill="#1A1A1A" text-anchor="start">Title</text>
+<rect x="16.0" y="79.2" width="157.5" height="9.3" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="16.0" y="110.0" width="328.0" height="58.0" fill="#E0E0E0" rx="8"/>
+<rect x="34.8" y="131.8" width="14.4" height="14.4" fill="none" rx="3" stroke="#9E9E9E" stroke-width="1.2"/>
+<rect x="72.0" y="125.9" width="49.0" height="8.7" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="72.0" y="146.1" width="121.0" height="6.8" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="16.0" y="178.0" width="328.0" height="58.0" fill="#E0E0E0" rx="8"/>
+<rect x="34.8" y="199.8" width="14.4" height="14.4" fill="none" rx="3" stroke="#9E9E9E" stroke-width="1.2"/>
+<rect x="72.0" y="193.9" width="49.0" height="8.7" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="72.0" y="214.1" width="121.0" height="6.8" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="16.0" y="246.0" width="328.0" height="58.0" fill="#E0E0E0" rx="8"/>
+<rect x="34.8" y="267.8" width="14.4" height="14.4" fill="none" rx="3" stroke="#9E9E9E" stroke-width="1.2"/>
+<rect x="72.0" y="261.9" width="28.0" height="8.7" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="72.0" y="282.1" width="121.0" height="6.8" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="16.0" y="314.0" width="328.0" height="58.0" fill="#E0E0E0" rx="8"/>
+<rect x="34.8" y="335.8" width="14.4" height="14.4" fill="none" rx="3" stroke="#9E9E9E" stroke-width="1.2"/>
+<rect x="72.0" y="329.9" width="49.0" height="8.7" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="72.0" y="350.1" width="121.0" height="6.8" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="16.0" y="382.0" width="328.0" height="58.0" fill="#E0E0E0" rx="8"/>
+<rect x="34.8" y="403.8" width="14.4" height="14.4" fill="none" rx="3" stroke="#9E9E9E" stroke-width="1.2"/>
+<rect x="72.0" y="397.9" width="42.0" height="8.7" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="72.0" y="418.1" width="88.0" height="6.8" fill="#5F5F5F" rx="2" fill-opacity="0.28"/></g></g>
+</g>
+<g id="nfc-actions-sheet" transform="translate(1272,4236)">
+<rect width="1224" height="1364" rx="8" fill="#868686"/>
+<text x="16" y="26" font-family="Inter, Roboto, Arial, sans-serif" font-size="16" font-weight="600" fill="#FFFFFF">/nfc-actions-sheet</text>
+<text x="16" y="52" font-family="Inter, Roboto, Arial, sans-serif" font-size="12" fill="#EDEDED">Tablet · 800 +</text>
+<text x="848" y="52" font-family="Inter, Roboto, Arial, sans-serif" font-size="12" fill="#EDEDED">Mobile · Primary · 1 - 799</text>
+<g id="nfc-actions-sheet-tablet" transform="translate(16,64)">
+<clipPath id="clip-nfc-actions-sheet-1"><rect width="800" height="1280"/></clipPath>
+<g clip-path="url(#clip-nfc-actions-sheet-1)"><rect x="0.0" y="0.0" width="800.0" height="1280.0" fill="#FFFFFF"/>
+<text x="35.0" y="44.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="14.0" font-weight="600" fill="#1A1A1A" text-anchor="start">Title</text>
+<rect x="35.0" y="72.1" width="43.1" height="7.6" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="35.0" y="88.0" width="730.0" height="46.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="49.0" y="115.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.4" font-weight="400" fill="#9E9E9E" text-anchor="start">Dropdown</text>
+<text x="747.0" y="115.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="10.0" font-weight="400" fill="#1A1A1A" text-anchor="middle">v</text>
+<rect x="35.0" y="150.0" width="356.0" height="190.0" fill="#E0E0E0"/>
+<text x="49.0" y="178.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="12.0" font-weight="600" fill="#1A1A1A" text-anchor="start">Card</text>
+<rect x="49.0" y="244.4" width="44.0" height="13.6" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="49.0" y="316.8" width="60.0" height="6.2" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="409.0" y="150.0" width="356.0" height="190.0" fill="#E0E0E0"/>
+<text x="423.0" y="178.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="12.0" font-weight="600" fill="#1A1A1A" text-anchor="start">Card</text>
+<rect x="423.0" y="244.4" width="44.0" height="13.6" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="423.0" y="316.8" width="100.0" height="6.2" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="35.0" y="356.0" width="730.0" height="34.0" fill="#BDBDBD"/>
+<text x="47.0" y="377.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.4" font-weight="700" fill="#1A1A1A" text-anchor="start">Section header</text>
+<rect x="744.2" y="368.2" width="9.6" height="9.6" fill="none" rx="3" stroke="#9E9E9E" stroke-width="1.2"/>
+<rect x="35.0" y="394.0" width="730.0" height="74.0" fill="#E0E0E0"/>
+<rect x="49.0" y="405.5" width="43.7" height="9.0" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="49.0" y="425.1" width="98.6" height="7.6" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="49.0" y="441.1" width="92.4" height="7.6" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="35.0" y="472.0" width="730.0" height="74.0" fill="#E0E0E0"/>
+<rect x="49.0" y="483.5" width="72.8" height="9.0" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="49.0" y="503.1" width="98.6" height="7.6" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="49.0" y="519.1" width="117.0" height="7.6" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="35.0" y="569.2" width="360.0" height="46.0" fill="#555555"/>
+<text x="215.0" y="597.2" font-family="Inter, Roboto, Arial, sans-serif" font-size="14.6" font-weight="600" fill="#FFFFFF" text-anchor="middle">Button</text>
+<rect x="405.0" y="569.2" width="360.0" height="46.0" fill="#555555"/>
+<text x="585.0" y="597.2" font-family="Inter, Roboto, Arial, sans-serif" font-size="14.6" font-weight="600" fill="#FFFFFF" text-anchor="middle">Button</text>
+<rect x="35.0" y="628.0" width="730.0" height="46.0" fill="#555555"/>
+<text x="400.0" y="656.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="14.6" font-weight="600" fill="#FFFFFF" text-anchor="middle">Button</text>
+<rect x="0.0" y="0.0" width="800.0" height="1280.0" fill="#000000" fill-opacity="0.42"/>
+<path d="M0 1078A18 18 0 0 1 18 1060H782A18 18 0 0 1 800 1078V1280H0Z" fill="#FFFFFF" stroke="none" stroke-width="0" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="380.0" y="1070.0" width="40.0" height="4.0" fill="#BDBDBD" rx="2"/>
+<text x="400.0" y="1106.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="19.0" font-weight="700" fill="#1A1A1A" text-anchor="middle">Title</text>
+<circle cx="57.0" cy="1158.0" r="20.0" fill="#E0E0E0"/>
+<rect x="49.8" y="1150.8" width="14.4" height="14.4" fill="none" rx="3" stroke="#9E9E9E" stroke-width="1.2"/>
+<text x="89.0" y="1155.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="15.7" font-weight="600" fill="#1A1A1A" text-anchor="start">List item</text>
+<rect x="89.0" y="1164.1" width="172.5" height="7.6" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<path d="M751 1153.0L756 1158.0L751 1163.0" fill="none" stroke="#5F5F5F" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="57.0" cy="1228.0" r="20.0" fill="#E0E0E0"/>
+<rect x="49.0" y="1220.0" width="16.0" height="16.0" fill="none" rx="3" stroke="#9E9E9E" stroke-width="1.2"/>
+<text x="89.0" y="1225.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="15.7" font-weight="600" fill="#1A1A1A" text-anchor="start">List item</text>
+<rect x="89.0" y="1234.1" width="252.6" height="7.6" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<path d="M751 1223.0L756 1228.0L751 1233.0" fill="none" stroke="#5F5F5F" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></g></g>
+<g id="nfc-actions-sheet-mobile" transform="translate(848,64)">
+<clipPath id="clip-nfc-actions-sheet-0"><rect width="360" height="800"/></clipPath>
+<g clip-path="url(#clip-nfc-actions-sheet-0)"><rect x="0.0" y="0.0" width="360.0" height="800.0" fill="#FFFFFF"/>
+<text x="16.0" y="38.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="14.0" font-weight="600" fill="#1A1A1A" text-anchor="start">Title</text>
+<rect x="16.0" y="57.1" width="38.5" height="6.8" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="16.0" y="72.0" width="328.0" height="34.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="30.0" y="93.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="12.0" font-weight="400" fill="#9E9E9E" text-anchor="start">Dropdown</text>
+<text x="326.0" y="93.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="10.0" font-weight="400" fill="#1A1A1A" text-anchor="middle">v</text>
+<rect x="16.0" y="118.0" width="160.0" height="112.0" fill="#E0E0E0"/>
+<text x="30.0" y="146.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="12.0" font-weight="600" fill="#1A1A1A" text-anchor="start">Card</text>
+<rect x="30.0" y="167.1" width="44.0" height="13.6" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="30.0" y="206.8" width="60.0" height="6.2" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="184.0" y="118.0" width="160.0" height="112.0" fill="#E0E0E0"/>
+<text x="198.0" y="146.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="12.0" font-weight="600" fill="#1A1A1A" text-anchor="start">Card</text>
+<rect x="198.0" y="167.1" width="44.0" height="13.6" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="198.0" y="206.8" width="100.0" height="6.2" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="16.0" y="246.0" width="328.0" height="26.0" fill="#BDBDBD"/>
+<text x="28.0" y="263.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="12.0" font-weight="700" fill="#1A1A1A" text-anchor="start">Section header</text>
+<rect x="323.2" y="254.2" width="9.6" height="9.6" fill="none" rx="3" stroke="#9E9E9E" stroke-width="1.2"/>
+<rect x="16.0" y="276.0" width="328.0" height="60.0" fill="#E0E0E0"/>
+<rect x="30.0" y="288.6" width="39.0" height="8.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="30.0" y="308.1" width="88.0" height="6.8" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="30.0" y="324.1" width="82.5" height="6.8" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="16.0" y="340.0" width="328.0" height="60.0" fill="#E0E0E0"/>
+<rect x="30.0" y="352.6" width="65.0" height="8.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="30.0" y="372.1" width="88.0" height="6.8" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="30.0" y="388.1" width="104.5" height="6.8" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="16.0" y="418.4" width="159.0" height="36.0" fill="#555555"/>
+<text x="95.5" y="441.4" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.0" font-weight="600" fill="#FFFFFF" text-anchor="middle">Button</text>
+<rect x="185.0" y="418.4" width="159.0" height="36.0" fill="#555555"/>
+<text x="264.5" y="441.4" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.0" font-weight="600" fill="#FFFFFF" text-anchor="middle">Button</text>
+<rect x="16.0" y="464.0" width="328.0" height="36.0" fill="#555555"/>
+<text x="180.0" y="487.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.0" font-weight="600" fill="#FFFFFF" text-anchor="middle">Button</text>
+<rect x="0.0" y="0.0" width="360.0" height="800.0" fill="#000000" fill-opacity="0.42"/>
+<path d="M0 618A18 18 0 0 1 18 600H342A18 18 0 0 1 360 618V800H0Z" fill="#FFFFFF" stroke="none" stroke-width="0" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="160.0" y="610.0" width="40.0" height="4.0" fill="#BDBDBD" rx="2"/>
+<text x="180.0" y="646.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="17.0" font-weight="700" fill="#1A1A1A" text-anchor="middle">Title</text>
+<circle cx="38.0" cy="695.0" r="20.0" fill="#E0E0E0"/>
+<rect x="30.8" y="687.8" width="14.4" height="14.4" fill="none" rx="3" stroke="#9E9E9E" stroke-width="1.2"/>
+<text x="70.0" y="692.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="14.0" font-weight="600" fill="#1A1A1A" text-anchor="start">List item</text>
+<rect x="70.0" y="702.1" width="154.0" height="6.8" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<path d="M330 690.0L335 695.0L330 700.0" fill="none" stroke="#5F5F5F" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="38.0" cy="759.0" r="20.0" fill="#E0E0E0"/>
+<rect x="30.0" y="751.0" width="16.0" height="16.0" fill="none" rx="3" stroke="#9E9E9E" stroke-width="1.2"/>
+<text x="70.0" y="756.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="14.0" font-weight="600" fill="#1A1A1A" text-anchor="start">List item</text>
+<rect x="70.0" y="766.1" width="225.5" height="6.8" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<path d="M330 754.0L335 759.0L330 764.0" fill="none" stroke="#5F5F5F" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></g></g>
+</g>
+<g id="nfc-attendance" transform="translate(2544,4236)">
+<rect width="1224" height="1364" rx="8" fill="#868686"/>
+<text x="16" y="26" font-family="Inter, Roboto, Arial, sans-serif" font-size="16" font-weight="600" fill="#FFFFFF">/nfc-attendance</text>
+<text x="16" y="52" font-family="Inter, Roboto, Arial, sans-serif" font-size="12" fill="#EDEDED">Tablet · 800 +</text>
+<text x="848" y="52" font-family="Inter, Roboto, Arial, sans-serif" font-size="12" fill="#EDEDED">Mobile · Primary · 1 - 799</text>
+<g id="nfc-attendance-tablet" transform="translate(16,64)">
+<clipPath id="clip-nfc-attendance-1"><rect width="800" height="1280"/></clipPath>
+<g clip-path="url(#clip-nfc-attendance-1)"><rect x="0.0" y="0.0" width="800.0" height="1280.0" fill="#FFFFFF"/>
+<path d="M41 48.0H27 M33 42.0L27 48.0L33 54.0" fill="none" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="69.0" y="54.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="19.0" font-weight="500" fill="#1A1A1A" text-anchor="start">Title</text>
+<rect x="35.0" y="100.0" width="365.0" height="44.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="217.5" y="127.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="14.6" font-weight="500" fill="#1A1A1A" text-anchor="middle">Tab</text>
+<rect x="400.0" y="100.0" width="365.0" height="44.0" fill="#555555"/>
+<text x="582.5" y="127.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="14.6" font-weight="600" fill="#FFFFFF" text-anchor="middle">Tab</text>
+<rect x="35.0" y="166.9" width="30.8" height="7.6" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="35.0" y="182.8" width="730.0" height="46.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="49.0" y="209.8" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.4" font-weight="400" fill="#9E9E9E" text-anchor="start">Dropdown</text>
+<text x="747.0" y="209.8" font-family="Inter, Roboto, Arial, sans-serif" font-size="10.0" font-weight="400" fill="#1A1A1A" text-anchor="middle">v</text>
+<rect x="35.0" y="249.6" width="730.0" height="171.5" fill="#E0E0E0" rx="12"/>
+<rect x="382.4" y="281.0" width="35.2" height="35.2" fill="none" rx="3" stroke="#9E9E9E" stroke-width="1.2"/>
+<rect x="316.0" y="343.5" width="168.0" height="10.4" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="127.8" y="369.9" width="544.3" height="8.3" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="35.0" y="441.9" width="730.0" height="46.0" fill="#555555"/>
+<text x="400.0" y="469.9" font-family="Inter, Roboto, Arial, sans-serif" font-size="14.6" font-weight="600" fill="#FFFFFF" text-anchor="middle">Button</text>
+<rect x="35.0" y="500.7" width="360.0" height="46.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="215.0" y="528.7" font-family="Inter, Roboto, Arial, sans-serif" font-size="14.6" font-weight="600" fill="#1A1A1A" text-anchor="middle">Button</text>
+<rect x="405.0" y="500.7" width="360.0" height="46.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="585.0" y="528.7" font-family="Inter, Roboto, Arial, sans-serif" font-size="14.6" font-weight="600" fill="#1A1A1A" text-anchor="middle">Button</text>
+<rect x="360.0" y="563.4" width="80.1" height="9.0" fill="#1A1A1A" rx="2" fill-opacity="0.28"/></g></g>
+<g id="nfc-attendance-mobile" transform="translate(848,64)">
+<clipPath id="clip-nfc-attendance-0"><rect width="360" height="800"/></clipPath>
+<g clip-path="url(#clip-nfc-attendance-0)"><rect x="0.0" y="0.0" width="360.0" height="800.0" fill="#FFFFFF"/>
+<path d="M26 38.0H12 M18 32.0L12 38.0L18 44.0" fill="none" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="44.0" y="44.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="17.0" font-weight="500" fill="#1A1A1A" text-anchor="start">Title</text>
+<rect x="16.0" y="76.0" width="164.0" height="36.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="98.0" y="99.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.0" font-weight="500" fill="#1A1A1A" text-anchor="middle">Tab</text>
+<rect x="180.0" y="76.0" width="164.0" height="36.0" fill="#555555"/>
+<text x="262.0" y="99.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.0" font-weight="600" fill="#FFFFFF" text-anchor="middle">Tab</text>
+<rect x="16.0" y="130.7" width="27.5" height="6.8" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="16.0" y="145.6" width="328.0" height="34.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="30.0" y="166.6" font-family="Inter, Roboto, Arial, sans-serif" font-size="12.0" font-weight="400" fill="#9E9E9E" text-anchor="start">Dropdown</text>
+<text x="326.0" y="166.6" font-family="Inter, Roboto, Arial, sans-serif" font-size="10.0" font-weight="400" fill="#1A1A1A" text-anchor="middle">v</text>
+<rect x="16.0" y="195.2" width="328.0" height="162.8" fill="#E0E0E0" rx="12"/>
+<rect x="163.2" y="215.4" width="33.6" height="33.6" fill="none" rx="3" stroke="#9E9E9E" stroke-width="1.2"/>
+<rect x="105.0" y="272.4" width="150.0" height="9.3" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="48.0" y="298.6" width="264.0" height="7.4" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="72.0" y="316.0" width="216.0" height="7.4" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="16.0" y="373.6" width="328.0" height="36.0" fill="#555555"/>
+<text x="180.0" y="396.6" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.0" font-weight="600" fill="#FFFFFF" text-anchor="middle">Button</text>
+<rect x="16.0" y="419.2" width="159.0" height="36.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="95.5" y="442.2" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.0" font-weight="600" fill="#1A1A1A" text-anchor="middle">Button</text>
+<rect x="185.0" y="419.2" width="159.0" height="36.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="264.5" y="442.2" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.0" font-weight="600" fill="#1A1A1A" text-anchor="middle">Button</text>
+<rect x="144.2" y="468.2" width="71.5" height="8.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/></g></g>
+</g>
+<g id="phone-setup" transform="translate(3816,4236)">
+<rect width="1224" height="1364" rx="8" fill="#868686"/>
+<text x="16" y="26" font-family="Inter, Roboto, Arial, sans-serif" font-size="16" font-weight="600" fill="#FFFFFF">/phone-setup</text>
+<text x="16" y="52" font-family="Inter, Roboto, Arial, sans-serif" font-size="12" fill="#EDEDED">Tablet · 800 +</text>
+<text x="848" y="52" font-family="Inter, Roboto, Arial, sans-serif" font-size="12" fill="#EDEDED">Mobile · Primary · 1 - 799</text>
+<g id="phone-setup-tablet" transform="translate(16,64)">
+<clipPath id="clip-phone-setup-1"><rect width="800" height="1280"/></clipPath>
+<g clip-path="url(#clip-phone-setup-1)"><rect x="0.0" y="0.0" width="800.0" height="1280.0" fill="#FFFFFF"/>
+<path d="M41 48.0H27 M33 42.0L27 48.0L33 54.0" fill="none" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="69.0" y="54.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="19.0" font-weight="500" fill="#1A1A1A" text-anchor="start">Title</text>
+<rect x="367.0" y="107.0" width="66.0" height="66.0" fill="#FFFFFF" stroke="#9E9E9E" stroke-width="1"/>
+<path d="M367.0 107.0L433.0 173.0 M433.0 107.0L367.0 173.0" fill="none" stroke="#BDBDBD" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="393.0" y="134.0" width="14.0" height="12.0" fill="#FFFFFF" rx="1" stroke="#9E9E9E" stroke-width="1.2"/>
+<circle cx="398.0" cy="138.0" r="1.5" fill="#9E9E9E"/>
+<text x="400.0" y="202.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="23.5" font-weight="700" fill="#1A1A1A" text-anchor="middle">Title</text>
+<rect x="211.8" y="214.3" width="376.3" height="8.3" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="35.0" y="259.1" width="730.0" height="135.5" fill="#E0E0E0"/>
+<rect x="394.0" y="292.1" width="12.0" height="12.0" fill="none" rx="3" stroke="#9E9E9E" stroke-width="1.2"/>
+<text x="400.0" y="337.1" font-family="Inter, Roboto, Arial, sans-serif" font-size="16.8" font-weight="600" fill="#1A1A1A" text-anchor="middle">Card</text>
+<rect x="188.3" y="349.4" width="423.4" height="8.3" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="35.0" y="420.2" width="730.0" height="46.0" fill="#555555"/>
+<text x="400.0" y="448.2" font-family="Inter, Roboto, Arial, sans-serif" font-size="14.6" font-weight="600" fill="#FFFFFF" text-anchor="middle">Button</text>
+<rect x="35.0" y="479.0" width="730.0" height="46.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="400.0" y="507.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="14.6" font-weight="600" fill="#1A1A1A" text-anchor="middle">Button</text>
+<rect x="66.8" y="546.1" width="666.4" height="6.9" fill="#9E9E9E" rx="2" fill-opacity="0.28"/></g></g>
+<g id="phone-setup-mobile" transform="translate(848,64)">
+<clipPath id="clip-phone-setup-0"><rect width="360" height="800"/></clipPath>
+<g clip-path="url(#clip-phone-setup-0)"><rect x="0.0" y="0.0" width="360.0" height="800.0" fill="#FFFFFF"/>
+<path d="M26 38.0H12 M18 32.0L12 38.0L18 44.0" fill="none" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="44.0" y="44.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="17.0" font-weight="500" fill="#1A1A1A" text-anchor="start">Title</text>
+<rect x="154.7" y="83.7" width="50.6" height="50.6" fill="#FFFFFF" stroke="#9E9E9E" stroke-width="1"/>
+<path d="M154.7 83.7L205.3 134.3 M205.3 83.7L154.7 134.3" fill="none" stroke="#BDBDBD" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="173.0" y="103.0" width="14.0" height="12.0" fill="#FFFFFF" rx="1" stroke="#9E9E9E" stroke-width="1.2"/>
+<circle cx="178.0" cy="107.0" r="1.5" fill="#9E9E9E"/>
+<text x="180.0" y="160.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="21.0" font-weight="700" fill="#1A1A1A" text-anchor="middle">Title</text>
+<rect x="48.0" y="173.4" width="264.0" height="7.4" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="147.0" y="190.8" width="66.0" height="7.4" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="16.0" y="226.0" width="328.0" height="138.8" fill="#E0E0E0"/>
+<rect x="174.0" y="253.0" width="12.0" height="12.0" fill="none" rx="3" stroke="#9E9E9E" stroke-width="1.2"/>
+<text x="180.0" y="298.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="15.0" font-weight="600" fill="#1A1A1A" text-anchor="middle">Card</text>
+<rect x="57.0" y="311.4" width="246.0" height="7.4" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="117.0" y="328.8" width="126.0" height="7.4" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="16.0" y="384.0" width="328.0" height="36.0" fill="#555555"/>
+<text x="180.0" y="407.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.0" font-weight="600" fill="#FFFFFF" text-anchor="middle">Button</text>
+<rect x="16.0" y="429.6" width="328.0" height="36.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="180.0" y="452.6" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.0" font-weight="600" fill="#1A1A1A" text-anchor="middle">Button</text>
+<rect x="40.0" y="482.8" width="280.0" height="6.2" fill="#9E9E9E" rx="2" fill-opacity="0.28"/>
+<rect x="42.5" y="497.3" width="275.0" height="6.2" fill="#9E9E9E" rx="2" fill-opacity="0.28"/>
+<rect x="165.0" y="511.8" width="30.0" height="6.2" fill="#9E9E9E" rx="2" fill-opacity="0.28"/></g></g>
+</g>
+<g id="assign-nfc-card" transform="translate(0,5648)">
+<rect width="1224" height="1364" rx="8" fill="#868686"/>
+<text x="16" y="26" font-family="Inter, Roboto, Arial, sans-serif" font-size="16" font-weight="600" fill="#FFFFFF">/assign-nfc-card</text>
+<text x="16" y="52" font-family="Inter, Roboto, Arial, sans-serif" font-size="12" fill="#EDEDED">Tablet · 800 +</text>
+<text x="848" y="52" font-family="Inter, Roboto, Arial, sans-serif" font-size="12" fill="#EDEDED">Mobile · Primary · 1 - 799</text>
+<g id="assign-nfc-card-tablet" transform="translate(16,64)">
+<clipPath id="clip-assign-nfc-card-1"><rect width="800" height="1280"/></clipPath>
+<g clip-path="url(#clip-assign-nfc-card-1)"><rect x="0.0" y="0.0" width="800.0" height="1280.0" fill="#FFFFFF"/>
+<path d="M41 48.0H27 M33 42.0L27 48.0L33 54.0" fill="none" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="69.0" y="54.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="19.0" font-weight="500" fill="#1A1A1A" text-anchor="start">Title</text>
+<rect x="367.0" y="107.0" width="66.0" height="66.0" fill="#FFFFFF" stroke="#9E9E9E" stroke-width="1"/>
+<path d="M367.0 107.0L433.0 173.0 M433.0 107.0L367.0 173.0" fill="none" stroke="#BDBDBD" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="393.0" y="134.0" width="14.0" height="12.0" fill="#FFFFFF" rx="1" stroke="#9E9E9E" stroke-width="1.2"/>
+<circle cx="398.0" cy="138.0" r="1.5" fill="#9E9E9E"/>
+<text x="400.0" y="202.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="23.5" font-weight="700" fill="#1A1A1A" text-anchor="middle">Title</text>
+<rect x="195.0" y="214.3" width="409.9" height="8.3" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="35.0" y="259.1" width="730.0" height="135.5" fill="#E0E0E0"/>
+<rect x="394.0" y="292.1" width="12.0" height="12.0" fill="none" rx="3" stroke="#9E9E9E" stroke-width="1.2"/>
+<text x="400.0" y="337.1" font-family="Inter, Roboto, Arial, sans-serif" font-size="16.8" font-weight="600" fill="#1A1A1A" text-anchor="middle">Card</text>
+<rect x="144.6" y="349.4" width="510.7" height="8.3" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="35.0" y="420.2" width="730.0" height="46.0" fill="#555555"/>
+<text x="400.0" y="448.2" font-family="Inter, Roboto, Arial, sans-serif" font-size="14.6" font-weight="600" fill="#FFFFFF" text-anchor="middle">Button</text>
+<rect x="35.0" y="479.0" width="730.0" height="46.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="400.0" y="507.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="14.6" font-weight="600" fill="#1A1A1A" text-anchor="middle">Button</text></g></g>
+<g id="assign-nfc-card-mobile" transform="translate(848,64)">
+<clipPath id="clip-assign-nfc-card-0"><rect width="360" height="800"/></clipPath>
+<g clip-path="url(#clip-assign-nfc-card-0)"><rect x="0.0" y="0.0" width="360.0" height="800.0" fill="#FFFFFF"/>
+<path d="M26 38.0H12 M18 32.0L12 38.0L18 44.0" fill="none" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="44.0" y="44.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="17.0" font-weight="500" fill="#1A1A1A" text-anchor="start">Title</text>
+<rect x="154.7" y="83.7" width="50.6" height="50.6" fill="#FFFFFF" stroke="#9E9E9E" stroke-width="1"/>
+<path d="M154.7 83.7L205.3 134.3 M205.3 83.7L154.7 134.3" fill="none" stroke="#BDBDBD" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="173.0" y="103.0" width="14.0" height="12.0" fill="#FFFFFF" rx="1" stroke="#9E9E9E" stroke-width="1.2"/>
+<circle cx="178.0" cy="107.0" r="1.5" fill="#9E9E9E"/>
+<text x="180.0" y="160.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="21.0" font-weight="700" fill="#1A1A1A" text-anchor="middle">Title</text>
+<rect x="42.0" y="173.4" width="276.0" height="7.4" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="138.0" y="190.8" width="84.0" height="7.4" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="16.0" y="226.0" width="328.0" height="138.8" fill="#E0E0E0"/>
+<rect x="174.0" y="253.0" width="12.0" height="12.0" fill="none" rx="3" stroke="#9E9E9E" stroke-width="1.2"/>
+<text x="180.0" y="298.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="15.0" font-weight="600" fill="#1A1A1A" text-anchor="middle">Card</text>
+<rect x="48.0" y="311.4" width="264.0" height="7.4" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="87.0" y="328.8" width="186.0" height="7.4" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="16.0" y="384.0" width="328.0" height="36.0" fill="#555555"/>
+<text x="180.0" y="407.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.0" font-weight="600" fill="#FFFFFF" text-anchor="middle">Button</text>
+<rect x="16.0" y="429.6" width="328.0" height="36.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="180.0" y="452.6" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.0" font-weight="600" fill="#1A1A1A" text-anchor="middle">Button</text></g></g>
+</g>
+<g id="upcoming-activity-sheet" transform="translate(1272,5648)">
+<rect width="1224" height="1364" rx="8" fill="#868686"/>
+<text x="16" y="26" font-family="Inter, Roboto, Arial, sans-serif" font-size="16" font-weight="600" fill="#FFFFFF">/upcoming-activity-sheet</text>
+<text x="16" y="52" font-family="Inter, Roboto, Arial, sans-serif" font-size="12" fill="#EDEDED">Tablet · 800 +</text>
+<text x="848" y="52" font-family="Inter, Roboto, Arial, sans-serif" font-size="12" fill="#EDEDED">Mobile · Primary · 1 - 799</text>
+<g id="upcoming-activity-sheet-tablet" transform="translate(16,64)">
+<clipPath id="clip-upcoming-activity-sheet-1"><rect width="800" height="1280"/></clipPath>
+<g clip-path="url(#clip-upcoming-activity-sheet-1)"><rect x="0.0" y="0.0" width="800.0" height="1280.0" fill="#FFFFFF"/>
+<text x="35.0" y="44.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="14.0" font-weight="600" fill="#1A1A1A" text-anchor="start">Title</text>
+<rect x="35.0" y="72.1" width="43.1" height="7.6" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="35.0" y="88.0" width="730.0" height="46.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="49.0" y="115.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.4" font-weight="400" fill="#9E9E9E" text-anchor="start">Dropdown</text>
+<text x="747.0" y="115.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="10.0" font-weight="400" fill="#1A1A1A" text-anchor="middle">v</text>
+<rect x="35.0" y="150.0" width="356.0" height="190.0" fill="#E0E0E0"/>
+<text x="49.0" y="178.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="12.0" font-weight="600" fill="#1A1A1A" text-anchor="start">Card</text>
+<rect x="49.0" y="244.4" width="44.0" height="13.6" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="49.0" y="316.8" width="60.0" height="6.2" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="409.0" y="150.0" width="356.0" height="190.0" fill="#E0E0E0"/>
+<text x="423.0" y="178.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="12.0" font-weight="600" fill="#1A1A1A" text-anchor="start">Card</text>
+<rect x="423.0" y="244.4" width="44.0" height="13.6" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="423.0" y="316.8" width="100.0" height="6.2" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="35.0" y="356.0" width="730.0" height="34.0" fill="#BDBDBD"/>
+<text x="47.0" y="377.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.4" font-weight="700" fill="#1A1A1A" text-anchor="start">Section header</text>
+<rect x="744.2" y="368.2" width="9.6" height="9.6" fill="none" rx="3" stroke="#9E9E9E" stroke-width="1.2"/>
+<rect x="35.0" y="394.0" width="730.0" height="74.0" fill="#E0E0E0"/>
+<rect x="49.0" y="405.5" width="43.7" height="9.0" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="49.0" y="425.1" width="98.6" height="7.6" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="49.0" y="441.1" width="92.4" height="7.6" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="35.0" y="472.0" width="730.0" height="74.0" fill="#E0E0E0"/>
+<rect x="49.0" y="483.5" width="72.8" height="9.0" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="49.0" y="503.1" width="98.6" height="7.6" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="49.0" y="519.1" width="117.0" height="7.6" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="35.0" y="569.2" width="360.0" height="46.0" fill="#555555"/>
+<text x="215.0" y="597.2" font-family="Inter, Roboto, Arial, sans-serif" font-size="14.6" font-weight="600" fill="#FFFFFF" text-anchor="middle">Button</text>
+<rect x="405.0" y="569.2" width="360.0" height="46.0" fill="#555555"/>
+<text x="585.0" y="597.2" font-family="Inter, Roboto, Arial, sans-serif" font-size="14.6" font-weight="600" fill="#FFFFFF" text-anchor="middle">Button</text>
+<rect x="35.0" y="628.0" width="730.0" height="46.0" fill="#555555"/>
+<text x="400.0" y="656.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="14.6" font-weight="600" fill="#FFFFFF" text-anchor="middle">Button</text>
+<rect x="0.0" y="0.0" width="800.0" height="1280.0" fill="#000000" fill-opacity="0.42"/>
+<path d="M0 1048A18 18 0 0 1 18 1030H782A18 18 0 0 1 800 1048V1280H0Z" fill="#FFFFFF" stroke="none" stroke-width="0" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="380.0" y="1040.0" width="40.0" height="4.0" fill="#BDBDBD" rx="2"/>
+<text x="35.0" y="1076.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="19.0" font-weight="700" fill="#1A1A1A" text-anchor="start">Title</text>
+<rect x="28.6" y="1101.6" width="12.8" height="12.8" fill="none" rx="3" stroke="#9E9E9E" stroke-width="1.2"/>
+<rect x="63.0" y="1102.5" width="131.0" height="9.0" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="28.6" y="1141.6" width="12.8" height="12.8" fill="none" rx="3" stroke="#9E9E9E" stroke-width="1.2"/>
+<rect x="63.0" y="1142.5" width="131.0" height="9.0" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="28.6" y="1181.6" width="12.8" height="12.8" fill="none" rx="3" stroke="#9E9E9E" stroke-width="1.2"/>
+<rect x="63.0" y="1182.5" width="72.8" height="9.0" fill="#1A1A1A" rx="2" fill-opacity="0.28"/></g></g>
+<g id="upcoming-activity-sheet-mobile" transform="translate(848,64)">
+<clipPath id="clip-upcoming-activity-sheet-0"><rect width="360" height="800"/></clipPath>
+<g clip-path="url(#clip-upcoming-activity-sheet-0)"><rect x="0.0" y="0.0" width="360.0" height="800.0" fill="#FFFFFF"/>
+<text x="16.0" y="38.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="14.0" font-weight="600" fill="#1A1A1A" text-anchor="start">Title</text>
+<rect x="16.0" y="57.1" width="38.5" height="6.8" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="16.0" y="72.0" width="328.0" height="34.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="30.0" y="93.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="12.0" font-weight="400" fill="#9E9E9E" text-anchor="start">Dropdown</text>
+<text x="326.0" y="93.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="10.0" font-weight="400" fill="#1A1A1A" text-anchor="middle">v</text>
+<rect x="16.0" y="118.0" width="160.0" height="112.0" fill="#E0E0E0"/>
+<text x="30.0" y="146.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="12.0" font-weight="600" fill="#1A1A1A" text-anchor="start">Card</text>
+<rect x="30.0" y="167.1" width="44.0" height="13.6" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="30.0" y="206.8" width="60.0" height="6.2" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="184.0" y="118.0" width="160.0" height="112.0" fill="#E0E0E0"/>
+<text x="198.0" y="146.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="12.0" font-weight="600" fill="#1A1A1A" text-anchor="start">Card</text>
+<rect x="198.0" y="167.1" width="44.0" height="13.6" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="198.0" y="206.8" width="100.0" height="6.2" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="16.0" y="246.0" width="328.0" height="26.0" fill="#BDBDBD"/>
+<text x="28.0" y="263.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="12.0" font-weight="700" fill="#1A1A1A" text-anchor="start">Section header</text>
+<rect x="323.2" y="254.2" width="9.6" height="9.6" fill="none" rx="3" stroke="#9E9E9E" stroke-width="1.2"/>
+<rect x="16.0" y="276.0" width="328.0" height="60.0" fill="#E0E0E0"/>
+<rect x="30.0" y="288.6" width="39.0" height="8.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="30.0" y="308.1" width="88.0" height="6.8" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="30.0" y="324.1" width="82.5" height="6.8" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="16.0" y="340.0" width="328.0" height="60.0" fill="#E0E0E0"/>
+<rect x="30.0" y="352.6" width="65.0" height="8.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="30.0" y="372.1" width="88.0" height="6.8" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="30.0" y="388.1" width="104.5" height="6.8" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="16.0" y="418.4" width="159.0" height="36.0" fill="#555555"/>
+<text x="95.5" y="441.4" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.0" font-weight="600" fill="#FFFFFF" text-anchor="middle">Button</text>
+<rect x="185.0" y="418.4" width="159.0" height="36.0" fill="#555555"/>
+<text x="264.5" y="441.4" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.0" font-weight="600" fill="#FFFFFF" text-anchor="middle">Button</text>
+<rect x="16.0" y="464.0" width="328.0" height="36.0" fill="#555555"/>
+<text x="180.0" y="487.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.0" font-weight="600" fill="#FFFFFF" text-anchor="middle">Button</text>
+<rect x="0.0" y="0.0" width="360.0" height="800.0" fill="#000000" fill-opacity="0.42"/>
+<path d="M0 588A18 18 0 0 1 18 570H342A18 18 0 0 1 360 588V800H0Z" fill="#FFFFFF" stroke="none" stroke-width="0" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="160.0" y="580.0" width="40.0" height="4.0" fill="#BDBDBD" rx="2"/>
+<text x="16.0" y="616.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="17.0" font-weight="700" fill="#1A1A1A" text-anchor="start">Title</text>
+<rect x="9.6" y="641.6" width="12.8" height="12.8" fill="none" rx="3" stroke="#9E9E9E" stroke-width="1.2"/>
+<rect x="44.0" y="643.6" width="117.0" height="8.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="9.6" y="677.6" width="12.8" height="12.8" fill="none" rx="3" stroke="#9E9E9E" stroke-width="1.2"/>
+<rect x="44.0" y="679.6" width="117.0" height="8.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="9.6" y="713.6" width="12.8" height="12.8" fill="none" rx="3" stroke="#9E9E9E" stroke-width="1.2"/>
+<rect x="44.0" y="715.6" width="65.0" height="8.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/></g></g>
+</g>
+<g id="excuse-letters-my-submissions" transform="translate(2544,5648)">
+<rect width="1224" height="1364" rx="8" fill="#868686"/>
+<text x="16" y="26" font-family="Inter, Roboto, Arial, sans-serif" font-size="16" font-weight="600" fill="#FFFFFF">/excuse-letters-my-submissions</text>
+<text x="16" y="52" font-family="Inter, Roboto, Arial, sans-serif" font-size="12" fill="#EDEDED">Tablet · 800 +</text>
+<text x="848" y="52" font-family="Inter, Roboto, Arial, sans-serif" font-size="12" fill="#EDEDED">Mobile · Primary · 1 - 799</text>
+<g id="excuse-letters-my-submissions-tablet" transform="translate(16,64)">
+<clipPath id="clip-excuse-letters-my-submissions-1"><rect width="800" height="1280"/></clipPath>
+<g clip-path="url(#clip-excuse-letters-my-submissions-1)"><rect x="0.0" y="0.0" width="800.0" height="1280.0" fill="#FFFFFF"/>
+<path d="M41 48.0H27 M33 42.0L27 48.0L33 54.0" fill="none" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="69.0" y="54.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="19.0" font-weight="500" fill="#1A1A1A" text-anchor="start">Title</text>
+<rect x="758.6" y="41.6" width="12.8" height="12.8" fill="none" rx="3" stroke="#9E9E9E" stroke-width="1.2"/>
+<rect x="35.0" y="94.3" width="221.8" height="8.3" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="35.0" y="122.0" width="360.0" height="46.0" fill="#555555"/>
+<text x="215.0" y="150.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="14.6" font-weight="600" fill="#FFFFFF" text-anchor="middle">Button</text>
+<rect x="405.0" y="122.0" width="360.0" height="46.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="585.0" y="150.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="14.6" font-weight="600" fill="#1A1A1A" text-anchor="middle">Button</text>
+<rect x="35.0" y="187.2" width="59.2" height="32.0" fill="#555555" rx="8"/>
+<text x="64.6" y="207.2" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.4" font-weight="600" fill="#FFFFFF" text-anchor="middle">Chip</text>
+<rect x="102.2" y="187.2" width="59.2" height="32.0" fill="#FFFFFF" rx="8" stroke="#9E9E9E" stroke-width="1"/>
+<text x="131.8" y="207.2" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.4" font-weight="500" fill="#1A1A1A" text-anchor="middle">Chip</text>
+<rect x="169.4" y="187.2" width="59.2" height="32.0" fill="#FFFFFF" rx="8" stroke="#9E9E9E" stroke-width="1"/>
+<text x="199.0" y="207.2" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.4" font-weight="500" fill="#1A1A1A" text-anchor="middle">Chip</text>
+<rect x="236.5" y="187.2" width="59.2" height="32.0" fill="#FFFFFF" rx="8" stroke="#9E9E9E" stroke-width="1"/>
+<text x="266.1" y="207.2" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.4" font-weight="500" fill="#1A1A1A" text-anchor="middle">Chip</text>
+<rect x="35.0" y="238.4" width="730.0" height="155.5" fill="#E0E0E0" rx="12"/>
+<rect x="53.0" y="256.4" width="69.0" height="22.0" fill="#BDBDBD" rx="11"/>
+<rect x="68.2" y="263.5" width="38.5" height="6.8" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="53.0" y="293.5" width="80.6" height="11.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="53.0" y="317.5" width="172.5" height="7.6" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="53.0" y="340.7" width="483.8" height="8.3" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="53.0" y="369.0" width="98.6" height="7.6" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="35.0" y="405.9" width="730.0" height="155.5" fill="#E0E0E0" rx="12"/>
+<rect x="53.0" y="423.9" width="76.0" height="22.0" fill="#BDBDBD" rx="11"/>
+<rect x="69.0" y="431.0" width="44.0" height="6.8" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="53.0" y="461.0" width="80.6" height="11.1" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="53.0" y="485.0" width="135.5" height="7.6" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="53.0" y="508.2" width="322.6" height="8.3" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="53.0" y="536.5" width="234.1" height="7.6" fill="#5F5F5F" rx="2" fill-opacity="0.28"/></g></g>
+<g id="excuse-letters-my-submissions-mobile" transform="translate(848,64)">
+<clipPath id="clip-excuse-letters-my-submissions-0"><rect width="360" height="800"/></clipPath>
+<g clip-path="url(#clip-excuse-letters-my-submissions-0)"><rect x="0.0" y="0.0" width="360.0" height="800.0" fill="#FFFFFF"/>
+<path d="M26 38.0H12 M18 32.0L12 38.0L18 44.0" fill="none" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="44.0" y="44.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="17.0" font-weight="500" fill="#1A1A1A" text-anchor="start">Title</text>
+<rect x="337.6" y="31.6" width="12.8" height="12.8" fill="none" rx="3" stroke="#9E9E9E" stroke-width="1.2"/>
+<rect x="16.0" y="71.4" width="198.0" height="7.4" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="16.0" y="98.0" width="159.0" height="36.0" fill="#555555"/>
+<text x="95.5" y="121.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.0" font-weight="600" fill="#FFFFFF" text-anchor="middle">Button</text>
+<rect x="185.0" y="98.0" width="159.0" height="36.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="264.5" y="121.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.0" font-weight="600" fill="#1A1A1A" text-anchor="middle">Button</text>
+<rect x="16.0" y="148.4" width="55.8" height="28.0" fill="#555555" rx="8"/>
+<text x="43.9" y="166.4" font-family="Inter, Roboto, Arial, sans-serif" font-size="12.0" font-weight="600" fill="#FFFFFF" text-anchor="middle">Chip</text>
+<rect x="79.8" y="148.4" width="55.8" height="28.0" fill="#FFFFFF" rx="8" stroke="#9E9E9E" stroke-width="1"/>
+<text x="107.8" y="166.4" font-family="Inter, Roboto, Arial, sans-serif" font-size="12.0" font-weight="500" fill="#1A1A1A" text-anchor="middle">Chip</text>
+<rect x="143.7" y="148.4" width="55.8" height="28.0" fill="#FFFFFF" rx="8" stroke="#9E9E9E" stroke-width="1"/>
+<text x="171.6" y="166.4" font-family="Inter, Roboto, Arial, sans-serif" font-size="12.0" font-weight="500" fill="#1A1A1A" text-anchor="middle">Chip</text>
+<rect x="207.5" y="148.4" width="55.8" height="28.0" fill="#FFFFFF" rx="8" stroke="#9E9E9E" stroke-width="1"/>
+<text x="235.4" y="166.4" font-family="Inter, Roboto, Arial, sans-serif" font-size="12.0" font-weight="500" fill="#1A1A1A" text-anchor="middle">Chip</text>
+<rect x="16.0" y="190.8" width="328.0" height="162.8" fill="#E0E0E0" rx="12"/>
+<rect x="30.0" y="204.8" width="69.0" height="22.0" fill="#BDBDBD" rx="11"/>
+<rect x="45.2" y="211.9" width="38.5" height="6.8" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="30.0" y="243.3" width="72.0" height="9.9" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="30.0" y="266.9" width="154.0" height="6.8" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="30.0" y="290.2" width="252.0" height="7.4" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="30.0" y="307.6" width="174.0" height="7.4" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="30.0" y="333.7" width="88.0" height="6.8" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="16.0" y="365.6" width="328.0" height="162.8" fill="#E0E0E0" rx="12"/>
+<rect x="30.0" y="379.6" width="76.0" height="22.0" fill="#BDBDBD" rx="11"/>
+<rect x="46.0" y="386.7" width="44.0" height="6.8" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="30.0" y="418.1" width="72.0" height="9.9" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="30.0" y="441.7" width="121.0" height="6.8" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="30.0" y="465.0" width="240.0" height="7.4" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="30.0" y="482.4" width="42.0" height="7.4" fill="#1A1A1A" rx="2" fill-opacity="0.28"/>
+<rect x="30.0" y="508.5" width="209.0" height="6.8" fill="#5F5F5F" rx="2" fill-opacity="0.28"/></g></g>
+</g>
+<g id="excuse-letters-new-submission" transform="translate(3816,5648)">
+<rect width="1224" height="1364" rx="8" fill="#868686"/>
+<text x="16" y="26" font-family="Inter, Roboto, Arial, sans-serif" font-size="16" font-weight="600" fill="#FFFFFF">/excuse-letters-new-submission</text>
+<text x="16" y="52" font-family="Inter, Roboto, Arial, sans-serif" font-size="12" fill="#EDEDED">Tablet · 800 +</text>
+<text x="848" y="52" font-family="Inter, Roboto, Arial, sans-serif" font-size="12" fill="#EDEDED">Mobile · Primary · 1 - 799</text>
+<g id="excuse-letters-new-submission-tablet" transform="translate(16,64)">
+<clipPath id="clip-excuse-letters-new-submission-1"><rect width="800" height="1280"/></clipPath>
+<g clip-path="url(#clip-excuse-letters-new-submission-1)"><rect x="0.0" y="0.0" width="800.0" height="1280.0" fill="#FFFFFF"/>
+<path d="M41 48.0H27 M33 42.0L27 48.0L33 54.0" fill="none" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="69.0" y="54.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="19.0" font-weight="500" fill="#1A1A1A" text-anchor="start">Title</text>
+<rect x="758.6" y="41.6" width="12.8" height="12.8" fill="none" rx="3" stroke="#9E9E9E" stroke-width="1.2"/>
+<rect x="35.0" y="94.3" width="221.8" height="8.3" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="35.0" y="122.0" width="360.0" height="46.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="215.0" y="150.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="14.6" font-weight="600" fill="#1A1A1A" text-anchor="middle">Button</text>
+<rect x="405.0" y="122.0" width="360.0" height="46.0" fill="#555555"/>
+<text x="585.0" y="150.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="14.6" font-weight="600" fill="#FFFFFF" text-anchor="middle">Button</text>
+<rect x="35.0" y="189.3" width="30.8" height="7.6" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="35.0" y="205.2" width="730.0" height="46.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="49.0" y="232.2" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.4" font-weight="400" fill="#9E9E9E" text-anchor="start">Dropdown</text>
+<text x="747.0" y="232.2" font-family="Inter, Roboto, Arial, sans-serif" font-size="10.0" font-weight="400" fill="#1A1A1A" text-anchor="middle">v</text>
+<rect x="35.0" y="269.3" width="92.4" height="7.6" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="35.0" y="285.2" width="730.0" height="46.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="49.0" y="312.2" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.4" font-weight="400" fill="#9E9E9E" text-anchor="start">Dropdown</text>
+<text x="747.0" y="312.2" font-family="Inter, Roboto, Arial, sans-serif" font-size="10.0" font-weight="400" fill="#1A1A1A" text-anchor="middle">v</text>
+<rect x="35.0" y="347.2" width="730.0" height="46.0" fill="#FFFFFF" rx="6" stroke="#9E9E9E" stroke-width="1"/>
+<rect x="42.6" y="363.8" width="12.8" height="12.8" fill="none" rx="3" stroke="#9E9E9E" stroke-width="1.2"/>
+<text x="77.0" y="375.2" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.4" font-weight="500" fill="#1A1A1A" text-anchor="start">Date picker</text>
+<rect x="35.0" y="411.3" width="73.9" height="7.6" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="35.0" y="427.2" width="730.0" height="190.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="49.0" y="449.2" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.4" font-weight="400" fill="#9E9E9E" text-anchor="start">Text area</text>
+<rect x="731.4" y="624.1" width="33.6" height="6.9" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="35.0" y="648.0" width="730.0" height="46.0" fill="#555555"/>
+<text x="400.0" y="676.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="14.6" font-weight="600" fill="#FFFFFF" text-anchor="middle">Button</text>
+<rect x="35.0" y="711.9" width="548.8" height="6.9" fill="#9E9E9E" rx="2" fill-opacity="0.28"/></g></g>
+<g id="excuse-letters-new-submission-mobile" transform="translate(848,64)">
+<clipPath id="clip-excuse-letters-new-submission-0"><rect width="360" height="800"/></clipPath>
+<g clip-path="url(#clip-excuse-letters-new-submission-0)"><rect x="0.0" y="0.0" width="360.0" height="800.0" fill="#FFFFFF"/>
+<path d="M26 38.0H12 M18 32.0L12 38.0L18 44.0" fill="none" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="44.0" y="44.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="17.0" font-weight="500" fill="#1A1A1A" text-anchor="start">Title</text>
+<rect x="337.6" y="31.6" width="12.8" height="12.8" fill="none" rx="3" stroke="#9E9E9E" stroke-width="1.2"/>
+<rect x="16.0" y="71.4" width="198.0" height="7.4" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="16.0" y="98.0" width="159.0" height="36.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="95.5" y="121.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.0" font-weight="600" fill="#1A1A1A" text-anchor="middle">Button</text>
+<rect x="185.0" y="98.0" width="159.0" height="36.0" fill="#555555"/>
+<text x="264.5" y="121.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.0" font-weight="600" fill="#FFFFFF" text-anchor="middle">Button</text>
+<rect x="16.0" y="151.5" width="27.5" height="6.8" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="16.0" y="166.4" width="328.0" height="34.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="30.0" y="187.4" font-family="Inter, Roboto, Arial, sans-serif" font-size="12.0" font-weight="400" fill="#9E9E9E" text-anchor="start">Dropdown</text>
+<text x="326.0" y="187.4" font-family="Inter, Roboto, Arial, sans-serif" font-size="10.0" font-weight="400" fill="#1A1A1A" text-anchor="middle">v</text>
+<rect x="16.0" y="215.5" width="82.5" height="6.8" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="16.0" y="230.4" width="328.0" height="34.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="30.0" y="251.4" font-family="Inter, Roboto, Arial, sans-serif" font-size="12.0" font-weight="400" fill="#9E9E9E" text-anchor="start">Dropdown</text>
+<text x="326.0" y="251.4" font-family="Inter, Roboto, Arial, sans-serif" font-size="10.0" font-weight="400" fill="#1A1A1A" text-anchor="middle">v</text>
+<rect x="16.0" y="276.4" width="328.0" height="38.0" fill="#FFFFFF" rx="6" stroke="#9E9E9E" stroke-width="1"/>
+<rect x="23.6" y="289.0" width="12.8" height="12.8" fill="none" rx="3" stroke="#9E9E9E" stroke-width="1.2"/>
+<text x="58.0" y="300.4" font-family="Inter, Roboto, Arial, sans-serif" font-size="12.0" font-weight="500" fill="#1A1A1A" text-anchor="start">Date picker</text>
+<rect x="16.0" y="329.5" width="66.0" height="6.8" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="16.0" y="344.4" width="328.0" height="120.0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<text x="30.0" y="366.4" font-family="Inter, Roboto, Arial, sans-serif" font-size="12.0" font-weight="400" fill="#9E9E9E" text-anchor="start">Text area</text>
+<rect x="314.0" y="472.2" width="30.0" height="6.2" fill="#5F5F5F" rx="2" fill-opacity="0.28"/>
+<rect x="16.0" y="492.0" width="328.0" height="36.0" fill="#555555"/>
+<text x="180.0" y="515.0" font-family="Inter, Roboto, Arial, sans-serif" font-size="13.0" font-weight="600" fill="#FFFFFF" text-anchor="middle">Button</text>
+<rect x="16.0" y="542.8" width="305.0" height="6.2" fill="#9E9E9E" rx="2" fill-opacity="0.28"/>
+<rect x="16.0" y="557.3" width="180.0" height="6.2" fill="#9E9E9E" rx="2" fill-opacity="0.28"/></g></g>
+</g>
+</svg>
