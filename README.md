@@ -4,6 +4,15 @@ Student mobile app of **CiTracker: An Integrated Classroom Attendance and Studen
 
 Students check in to class by tapping their phone or an assigned NFC card on the professor's scanner, or by scanning the professor's QR code. Faculty accounts open a built-in NFC scanner for attendance and hands-on scoring.
 
+## Download
+
+Android APKs are in the [`apk/`](apk) folder (version 1.0.0, Android 7.0 or newer):
+
+- [`CiTracker-1.0.0-arm64-v8a.apk`](apk/CiTracker-1.0.0-arm64-v8a.apk) – for almost all current phones
+- [`CiTracker-1.0.0-armeabi-v7a.apk`](apk/CiTracker-1.0.0-armeabi-v7a.apk) – for older 32-bit phones
+
+Open the file's page, click **Download raw file**, then open it on the phone and allow installing from this source. These builds are signed with a development key, not a Play Store key.
+
 ## Features
 
 - NFC attendance (Tap Phone using Host Card Emulation, or an assigned NFC card) and QR code attendance
