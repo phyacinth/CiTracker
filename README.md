@@ -1,4 +1,4 @@
-# CiTracker
+# CiTracker (This is a Copy of the Original Shared Repository with other thesis member)
 
 Student mobile app of **CiTracker: An Integrated Classroom Attendance and Student Performance Management System**, a capstone thesis project by a BIT Computer Technology team at Bulacan State University, College of Industrial Technology.
 
